@@ -1,4 +1,10 @@
 {
   "extends": "@apa-control/tsconfig/node.json",
-  "include": ["./src/**/*.ts", "./drizzle.config.ts"]
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src", "*.ts", "**/*.ts"],
+  "exclude": ["node_modules"]
 }

@@ -1,25 +1,14 @@
-import Decimal from 'decimal.js'
-import fastify from 'fastify'
+import rateLimit from '@fastify/rate-limit'
 
-import cors from '@fastify/cors'
-import multiPart from '@fastify/multipart'
+import { rateLimitOptions } from './config/rate-limit'
+import { accessProfileRoutes } from './http/controllers/access-profile/routes'
+import { authRoutes } from './http/controllers/auth/routes'
+import { createBaseApp } from './utils/fastify/create-base-app'
 
-import { registerRoutes } from './routes'
-import { exceptionHandler } from './utils/fastify/exceptionHandler'
-import { ipHandler } from './utils/fastify/ipHandler'
-import { notFoundHandler } from './utils/fastify/notFoundHandler'
+const app = createBaseApp()
 
-Decimal.prototype.toJSON = function () {
-  return this.toNumber() as unknown as string
-}
-
-const app = fastify({ ignoreTrailingSlash: true, caseSensitive: false })
-
-app.setErrorHandler(exceptionHandler)
-app.setNotFoundHandler(notFoundHandler)
-app.addHook('onRequest', ipHandler)
-app.register(cors, { exposedHeaders: ['X-Total-Count'], credentials: true })
-app.register(multiPart, { limits: { fileSize: 15 * 1024 * 1024 } })
-app.register(registerRoutes, { prefix: '/' })
+app.register(rateLimit, rateLimitOptions)
+app.register(authRoutes)
+app.register(accessProfileRoutes)
 
 export { app }

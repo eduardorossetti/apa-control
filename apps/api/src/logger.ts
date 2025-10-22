@@ -1,8 +1,8 @@
 import path from 'node:path'
 import winston from 'winston'
 
-import { env } from './env'
-import { ApiError } from './utils/ApiError'
+import { env } from '@/env'
+import { ApiError } from '@/utils/api-error'
 
 const logger = winston.createLogger({
   format: winston.format.json(),
@@ -10,7 +10,7 @@ const logger = winston.createLogger({
 })
 
 export function logError<T extends object>(error: unknown, args?: T) {
-  if (!['test', 'production'].includes(process.env.NODE_ENV!)) {
+  if (!['test', 'production'].includes(env.NODE_ENV)) {
     console.error(error, args)
   }
 

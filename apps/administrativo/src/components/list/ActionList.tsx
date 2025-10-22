@@ -1,9 +1,8 @@
 import { type ElementType, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-import { MoreHorizontalIcon } from 'lucide-react'
-
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
+import { MoreHorizontalIcon } from 'lucide-react'
 
 export type ActionListItem<T> = {
   title: string

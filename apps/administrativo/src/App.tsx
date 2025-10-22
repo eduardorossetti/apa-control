@@ -4,13 +4,14 @@ import { z } from 'zod'
 
 import { Modal, type ModalActions, type ModalState } from './components/modal'
 import { appConfig } from './config'
+import { pages } from './config/pages'
 import { RequiredMessage } from './helpers/constants'
 import { useInterval } from './hooks/interval'
 import { useLocalStorage } from './hooks/local-storage'
 import { api } from './service'
 
 export const loginSchema = z.object({
-  username: z.string().min(1, RequiredMessage),
+  login: z.string().min(1, RequiredMessage),
   password: z.string().min(1, RequiredMessage),
 })
 
@@ -71,9 +72,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   )
 
   const signIn = useCallback(async (values: LoginData) => {
-    // TODO: Implementar sua lógica de login aqui
-    const { data } = await api.post('auth/login', values)
+    const { data } = await api.post('auth.employee', values)
     const { permissions, ...user } = data.user
+
+    if (!allPossibleRoles.some((role) => permissions.includes(role))) {
+      throw new Error('Você não tem permissão para acessar esse painel.')
+    }
 
     setTokenExpires(addHours(new Date(), 20))
     setOperator({ ...user, roles: permissions })
@@ -124,3 +128,5 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     </AppContext.Provider>
   )
 }
+
+const allPossibleRoles = Array.from(new Set(pages.flatMap((page) => page.roles)))

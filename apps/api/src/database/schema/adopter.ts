@@ -1,0 +1,17 @@
+import { boolean, pgTable, serial, text, timestamp, varchar } from 'drizzle-orm/pg-core'
+import { decimalJs } from '../decimal-type'
+import { approvalStatusEnum } from './enums'
+
+export const adopter = pgTable('adopter', {
+  id: serial().primaryKey(),
+  name: varchar({ length: 100 }).notNull(),
+  cpf: varchar({ length: 11 }).notNull().unique(),
+  email: varchar({ length: 255 }).notNull(),
+  phone: varchar({ length: 20 }).notNull(),
+  address: text().notNull(),
+  familyIncome: decimalJs({ precision: 10, scale: 2 }).notNull(),
+  animalExperience: boolean().notNull().default(false),
+  approvalStatus: approvalStatusEnum().notNull(),
+  createdAt: timestamp().notNull(),
+  updatedAt: timestamp(),
+})

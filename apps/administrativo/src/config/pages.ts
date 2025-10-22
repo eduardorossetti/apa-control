@@ -1,8 +1,70 @@
-import { HomeIcon } from 'lucide-react'
+import {
+  BarChart3Icon,
+  CalendarHeartIcon,
+  ClipboardListIcon,
+  DogIcon,
+  FlagIcon,
+  HeartHandshakeIcon,
+  HeartIcon,
+  HospitalIcon,
+  LifeBuoyIcon,
+  MegaphoneIcon,
+  NewspaperIcon,
+  PlusCircleIcon,
+  SyringeIcon,
+  WalletIcon,
+} from 'lucide-react'
 import type { PageProps } from '../components/panel-outlet'
 
-// Defina aqui as páginas do menu principal
 export const pages: PageProps[] = [
-  { title: 'Home', path: '/', icon: HomeIcon, roles: ['Admin'] },
-  // Adicione suas páginas aqui...
+  { title: 'Animais', path: '/animais', icon: DogIcon, roles: ['AdminPanel', 'Animals'] },
+  { title: 'Resgates', path: '/resgates', icon: LifeBuoyIcon, roles: ['AdminPanel', 'Rescues'] },
+  { title: 'Adoções', path: '/adocoes', icon: HeartHandshakeIcon, roles: ['AdminPanel', 'Adoptions'] },
+  { title: 'Adotantes', path: '/adotantes', icon: HeartIcon, roles: ['AdminPanel', 'Adopters'] },
+  { title: 'Consultas', path: '/consultas', icon: CalendarHeartIcon, roles: ['AdminPanel', 'Appointments'] },
+  { title: 'Anamnese', path: '/anamnese', icon: ClipboardListIcon, roles: ['AdminPanel', 'Anamnesis'] },
+  {
+    title: 'Procedimentos Clínicos',
+    path: '/procedimentos',
+    icon: SyringeIcon,
+    roles: ['AdminPanel', 'ClinicalProcedures'],
+  },
+  { title: 'Campanhas', path: '/campanhas', icon: MegaphoneIcon, roles: ['AdminPanel', 'Campaigns'] },
+  {
+    title: 'Clínicas Veterinárias',
+    path: '/clinicas',
+    icon: HospitalIcon,
+    roles: ['AdminPanel', 'VeterinaryClinics'],
+  },
+  {
+    title: 'Destino Final',
+    path: '/destino-final',
+    icon: FlagIcon,
+    roles: ['AdminPanel', 'FinalDestinations'],
+  },
+  { title: 'Publicações', path: '/publicacoes', icon: NewspaperIcon, roles: ['AdminPanel', 'Posts'] },
+  {
+    title: 'Financeiro',
+    icon: WalletIcon,
+    pages: [
+      { title: 'Despesas', path: '/financeiro/despesas' },
+      { title: 'Receitas', path: '/financeiro/receitas' },
+    ],
+    roles: ['AdminPanel', 'Financial'],
+  },
+  { title: 'Relatórios', path: '/relatorios', icon: BarChart3Icon, roles: ['AdminPanel', 'Reports'] },
+  {
+    title: 'Cadastros',
+    icon: PlusCircleIcon,
+    pages: [
+      { title: 'Funcionários', path: '/funcionarios' },
+      { title: 'Perfis de Acesso', path: '/perfis' },
+      { title: 'Tipos de Procedimento', path: '/tipos-procedimento' },
+      { title: 'Tipos de Consulta', path: '/tipos-consulta' },
+      { title: 'Tipos de Campanha', path: '/tipos-campanha' },
+      { title: 'Tipos de Transação', path: '/tipos-transacao' },
+      { title: 'Tipos de Destino Final', path: '/tipos-destino' },
+    ],
+    roles: ['AdminPanel', 'Settings'],
+  },
 ]
