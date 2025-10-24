@@ -1,8 +1,10 @@
 import { useCallback, useState } from 'react'
 import { Controller, useFormContext } from 'react-hook-form'
+
 import AsyncSelect from 'react-select/async'
 
 import { getSelectClassNames } from '../../helpers/select'
+
 import type { FormSelectOption } from './Select'
 
 interface FormSelectProps {

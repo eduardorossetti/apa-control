@@ -1,10 +1,10 @@
-import type { ClassNamesConfig, GroupBase, StylesConfig } from 'react-select'
-
 import chroma from 'chroma-js'
 import { clsx } from 'clsx'
 
-import type { FormOption } from '../components/form-hook/MultiSelect'
 import { cn } from './classname'
+
+import type { ClassNamesConfig, GroupBase, StylesConfig } from 'react-select'
+import type { FormOption } from '../components/form-hook/MultiSelect'
 
 export const colorizedStyles: StylesConfig<FormOption & { color: string }, true> = {
   option(styles, { data, isDisabled, isFocused, isSelected }) {
@@ -93,7 +93,7 @@ export function getSelectClassNames<
     noOptionsMessage: () => 'text-neutral-400 py-2 px-3',
     option: ({ isDisabled, isFocused, isSelected }) =>
       clsx(
-        'px-3 py-2 !text-sm',
+        'px-3 py-2 text-sm!',
         isSelected ? 'bg-brand/90' : isFocused ? 'bg-light/50' : 'bg-transparent',
         isDisabled ? 'text-neutral-200' : isSelected ? 'text-white' : 'text-inherit',
         !isDisabled && (isSelected ? 'active:bg-brand' : 'active:bg-light'),

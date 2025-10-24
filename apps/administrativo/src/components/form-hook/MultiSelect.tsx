@@ -33,7 +33,7 @@ export function FormMultiSelect<T extends FormOption>({
   const value = watch(name)
 
   useEffect(() => {
-    const items = options.filter((option) => value?.includes(option.value))
+    const items = options.filter((option) => value.includes(option.value))
 
     setSelected(items)
   }, [value])

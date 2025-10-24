@@ -4,9 +4,10 @@ import { Link, matchRoutes, useLocation, useMatch, useResolvedPath } from 'react
 import { clsx } from 'clsx'
 import { ChevronRightIcon, DotIcon } from 'lucide-react'
 
-import type { Page } from '.'
 import { cn } from '../../helpers/classname'
 import { firstOrSelf } from '../../helpers/first-or-self'
+
+import type { Page } from '.'
 
 interface SingleMenuItemProps {
   page: Page

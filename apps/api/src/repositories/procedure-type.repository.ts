@@ -33,7 +33,6 @@ export class ProcedureTypeRepository {
         active: procedureType.active,
       })
       .from(procedureType)
-      .where(eq(procedureType.active, true))
       .orderBy(asc(procedureType.name))
   }
 

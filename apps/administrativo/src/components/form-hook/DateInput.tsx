@@ -1,4 +1,3 @@
-import type { InputHTMLAttributes } from 'react'
 import { Controller, useFormContext } from 'react-hook-form'
 
 import { clsx } from 'clsx'
@@ -6,6 +5,8 @@ import { format as formatDate, parseISO } from 'date-fns'
 import { XIcon } from 'lucide-react'
 
 import { Input } from '../input'
+
+import type { InputHTMLAttributes } from 'react'
 
 interface DateInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
   name: string

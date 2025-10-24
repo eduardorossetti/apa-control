@@ -1,9 +1,10 @@
-import type { ElementType } from 'react'
 import { Navigate, matchRoutes, useLocation } from 'react-router-dom'
 
 import { version } from '../../../package.json'
 import { useApp } from '../../App'
 import { Panel } from '../panel'
+
+import type { ElementType } from 'react'
 
 export interface PageProps {
   title: string

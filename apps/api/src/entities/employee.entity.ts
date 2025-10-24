@@ -18,7 +18,6 @@ export class Employee {
   createdAt: Date
   activedAt?: Date | null
   disabledAt?: Date | null
-  blockedAt?: Date | null
 
   constructor(props: Omit<Employee, 'id'>, id?: number) {
     this.id = id
@@ -40,6 +39,5 @@ export class Employee {
     this.createdAt = props.createdAt
     this.activedAt = props.activedAt
     this.disabledAt = props.disabledAt
-    this.blockedAt = props.blockedAt
   }
 }

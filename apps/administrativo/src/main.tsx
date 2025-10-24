@@ -7,6 +7,8 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { AppProvider } from './App'
 import { PanelOutlet } from './components/panel-outlet'
 import { pages } from './config/pages'
+import { EmployeeForm } from './pages/employee-form'
+import { EmployeeList } from './pages/employee-list'
 import { ForgotPassword } from './pages/forgot-password'
 import { Home } from './pages/home'
 import { Login } from './pages/login'
@@ -18,7 +20,7 @@ import { ProfileList } from './pages/profile-list'
 const rootElement = document.getElementById('root')
 
 ReactDOM.createRoot(rootElement!).render(
-  <BrowserRouter basename={import.meta.env.PROD ? 'administrativo' : undefined}>
+  <BrowserRouter>
     <AppProvider>
       <Routes>
         <Route path="login" element={<Login />} />
@@ -28,6 +30,9 @@ ReactDOM.createRoot(rootElement!).render(
           <Route path="perfis" element={<ProfileList />} />
           <Route path="perfis/cadastro" element={<ProfileForm />} />
           <Route path="perfis/:id" element={<ProfileForm />} />
+          <Route path="funcionarios" element={<EmployeeList />} />
+          <Route path="funcionarios/cadastro" element={<EmployeeForm />} />
+          <Route path="funcionarios/:id" element={<EmployeeForm />} />
           <Route path="tipos-procedimentos" element={<ProcedureTypeList />} />
           <Route path="tipos-procedimentos/cadastro" element={<ProcedureTypeList />} />
           <Route path="tipos-procedimentos/:id" element={<ProcedureTypeList />} />

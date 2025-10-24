@@ -23,5 +23,4 @@ export const employee = pgTable('employee', {
   createdAt: timestamp({ withTimezone: true }).notNull(),
   activedAt: timestamp({ withTimezone: true }),
   disabledAt: timestamp({ withTimezone: true }),
-  blockedAt: timestamp({ withTimezone: true }),
 })

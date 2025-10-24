@@ -3,11 +3,13 @@ import type z from 'zod'
 
 export type AuthEmployeeData = z.infer<typeof authEmployeeSchema>
 
+export interface AuthEmployeeUser {
+  id: number
+  name: string
+  permissions: string[]
+}
+
 export interface AuthEmployeeDTO {
   accessToken: string
-  user: {
-    id: number
-    name: string
-    permissions: string[]
-  }
+  user: AuthEmployeeUser
 }

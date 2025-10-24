@@ -2,10 +2,10 @@ import { Controller, useFormContext } from 'react-hook-form'
 
 import { XCircleIcon } from 'lucide-react'
 
-import type { SelectProps } from '@radix-ui/react-select'
-
 import { cn } from '../../helpers/classname'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../form/select'
+
+import type { SelectProps } from '@radix-ui/react-select'
 
 export interface FormSelectOption {
   label: string

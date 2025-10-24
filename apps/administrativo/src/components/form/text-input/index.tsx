@@ -1,7 +1,8 @@
-import type React from 'react'
 import { forwardRef } from 'react'
 
 import { Input } from '../../input'
+
+import type React from 'react'
 
 type InputProps = React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>
 

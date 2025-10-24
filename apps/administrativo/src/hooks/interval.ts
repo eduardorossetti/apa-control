@@ -1,25 +1,23 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 
-export function useInterval(callback: VoidFunction, delay: number | null) {
-  const callbacRef = useRef<VoidFunction>()
+export function useInterval(callback: () => void, delay: number | null) {
+  const savedCallback = useRef(callback)
+
+  useLayoutEffect(() => {
+    savedCallback.current = callback
+  }, [callback])
 
   useEffect(() => {
-    callbacRef.current = callback
-  })
-
-  useEffect(() => {
-    if (!delay) {
-      return () => {
-        /* */
-      }
+    if (delay === null) {
+      return
     }
 
-    const interval = setInterval(() => {
-      if (callbacRef.current) {
-        callbacRef.current()
-      }
+    const id = setInterval(() => {
+      savedCallback.current()
     }, delay)
 
-    return () => clearInterval(interval)
+    return () => {
+      clearInterval(id)
+    }
   }, [delay])
 }

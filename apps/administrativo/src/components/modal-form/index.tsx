@@ -1,4 +1,3 @@
-import type React from 'react'
 import { type ElementType, useEffect } from 'react'
 
 import clsx from 'clsx'
@@ -16,6 +15,8 @@ import {
   ModalTitle,
 } from '../modal/styles'
 import { Spinner } from '../spinner'
+
+import type React from 'react'
 
 interface ModalFormProps {
   children?: React.ReactNode
@@ -50,7 +51,7 @@ export const ModalForm = ({
     if (!show && resetForm) {
       setTimeout(resetForm, 300)
     }
-  }, [show, resetForm])
+  }, [show])
 
   return (
     <ModalRoot open={show}>

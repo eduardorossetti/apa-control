@@ -1,10 +1,11 @@
-import type { TextareaHTMLAttributes } from 'react'
 import { useFormContext } from 'react-hook-form'
 
 import clsx from 'clsx'
 
 import { TextArea } from '../textarea'
 import { getField } from './utils'
+
+import type { TextareaHTMLAttributes } from 'react'
 
 interface TextAreaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   name: string

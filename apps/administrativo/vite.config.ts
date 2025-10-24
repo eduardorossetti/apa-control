@@ -1,12 +1,12 @@
+import tailwindcss from '@tailwindcss/vite'
+import react from '@vitejs/plugin-react'
 import Unfonts from 'unplugin-fonts/vite'
 import { defineConfig } from 'vite'
 
-import react from '@vitejs/plugin-react'
-
-export default defineConfig(({ mode }) => {
+export default defineConfig(() => {
   return {
-    base: mode === 'production' ? '/administrativo/' : undefined,
     plugins: [
+      tailwindcss(),
       react(),
       Unfonts({
         google: {

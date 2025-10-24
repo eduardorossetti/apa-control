@@ -8,10 +8,12 @@ import {
   ModalTitle,
 } from './styles'
 
+import type { ReactNode } from 'react'
+
 interface ConfirmProps {
   title: string
   confirmText: string
-  message: string | JSX.Element
+  message: string | ReactNode
   closeModal: (type: 'close' | 'submit') => void
 }
 

@@ -1,13 +1,13 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@plugin "tailwindcss-animate";
 
-:root {
-  --brand: 358 73% 46%;
-  --primary: 225 2% 45%;
-  --dark: 216 2% 28%;
-  --light: 220 2% 52%;
-  --success: 133 73% 23%;
-  --warning: 41 100% 23%;
-  --danger: 340 98% 36%;
+@theme {
+  --color-brand: hsl(358 73% 46%);
+  --color-primary: hsl(225 2% 45%);
+  --color-dark: hsl(216 2% 28%);
+  --color-light: hsl(220 2% 52%);
+  --color-success: hsl(133 73% 23%);
+  --color-warning: hsl(41 100% 23%);
+  --color-danger: hsl(340 98% 36%);
+  --ease-steps-12: steps(12, end);
 }

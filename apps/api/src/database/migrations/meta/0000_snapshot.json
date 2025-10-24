@@ -1,5 +1,5 @@
 {
-  "id": "a2867507-b1db-4ca7-a53c-519d36c7ca7d",
+  "id": "566a74c8-a1f0-4578-85d9-e3e0ab44ea0b",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -963,12 +963,6 @@
         },
         "disabled_at": {
           "name": "disabled_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "blocked_at": {
-          "name": "blocked_at",
           "type": "timestamp with time zone",
           "primaryKey": false,
           "notNull": false

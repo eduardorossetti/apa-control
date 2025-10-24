@@ -1,6 +1,6 @@
-import type { HTMLAttributes } from 'react'
-
 import { Spinner } from '../spinner'
+
+import type { HTMLAttributes } from 'react'
 
 interface InputLoadingProps extends HTMLAttributes<SVGElement> {
   loading: boolean

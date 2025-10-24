@@ -1,6 +1,6 @@
-import type { ElementType, HTMLAttributes } from 'react'
-
 import { cn } from '../../helpers/classname'
+
+import type { ElementType, HTMLAttributes } from 'react'
 
 interface IconProps extends HTMLAttributes<SVGElement> {
   icon: ElementType

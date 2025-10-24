@@ -3,11 +3,10 @@ import { accessProfile, permission } from '@/database/schema'
 import type { DrizzleTransaction } from '@/database/types'
 import type { AccessProfile } from '@/entities'
 import { ApiError } from '@/utils/api-error'
-import type { ApiQuery } from '@/utils/drizzle/api-query-schema'
-import { type QuerySettings, getPager, querify } from '@/utils/drizzle/querify'
-import { asc, eq } from 'drizzle-orm'
+import { type QueryStringSettings, querifyString } from '@/utils/drizzle/querify-string'
+import { eq } from 'drizzle-orm'
 
-const querifySettings: QuerySettings = {
+const querifyStringSettings: QueryStringSettings = {
   table: accessProfile,
   initialOrderBy: accessProfile.description,
 }
@@ -30,17 +29,13 @@ export class AccessProfileRepository {
     await db.update(accessProfile).set(data).where(eq(accessProfile.id, id))
   }
 
-  list() {
-    return db
-      .select({ id: accessProfile.id, description: accessProfile.description })
-      .from(accessProfile)
-      .orderBy(asc(accessProfile.description))
-  }
+  async list() {
+    const [sqlQuery, countQuery] = querifyString<AccessProfile>({}, [], querifyStringSettings)
 
-  async listPost(query: ApiQuery) {
-    const [sqlQuery, countQuery] = querify<AccessProfile>(query, querifySettings)
-    const [items, [{ total }]] = await Promise.all([sqlQuery, countQuery])
-    return { items, pager: getPager(query, total) }
+    const items = await sqlQuery
+    const [{ total }] = await countQuery
+
+    return [total, items] as const
   }
 
   async remove(id: number, dbTransaction: DrizzleTransaction) {

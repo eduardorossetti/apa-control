@@ -1,8 +1,8 @@
-import type { ElementType } from 'react'
-
 import clsx from 'clsx'
 
 import { Input } from '../../input'
+
+import type { ElementType } from 'react'
 
 interface ReadOnlyInputProps {
   id?: string

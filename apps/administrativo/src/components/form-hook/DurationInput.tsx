@@ -1,10 +1,9 @@
 import { type InputHTMLAttributes, useState } from 'react'
 import { Controller, useFormContext } from 'react-hook-form'
 
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import clsx from 'clsx'
 import { ChevronDownIcon } from 'lucide-react'
-
-import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 
 import { cn } from '../../helpers/classname'
 import { Button } from '../button'

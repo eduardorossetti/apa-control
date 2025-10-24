@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { type ReactNode, useCallback } from 'react'
 
 import { TextInput } from '../form/text-input'
 import {
@@ -13,7 +13,7 @@ import {
 
 interface PromptProps {
   title: string
-  message: string | JSX.Element
+  message: string | ReactNode
   type: 'text' | 'password' | 'number' | 'email'
   value: string
   setValue: (value: string) => void

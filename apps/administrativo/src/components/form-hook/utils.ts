@@ -1,4 +1,4 @@
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+// biome-ignore lint/suspicious/noExplicitAny: idk
 export function getField(obj: Record<any, any>, path: string) {
   const travel = (regexp: RegExp) =>
     String.prototype.split

@@ -1,10 +1,11 @@
-import type { InputHTMLAttributes } from 'react'
 import { useFormContext } from 'react-hook-form'
 
 import clsx from 'clsx'
 
 import { Input } from '../input'
 import { getField } from './utils'
+
+import type { InputHTMLAttributes } from 'react'
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   name: string

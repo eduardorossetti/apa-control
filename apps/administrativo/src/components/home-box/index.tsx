@@ -5,7 +5,7 @@ const HomeBoxBackground: React.FC<React.InputHTMLAttributes<HTMLDivElement>> = (
   <div
     {...props}
     className={cn(
-      'flex min-h-screen w-full flex-col flex-wrap items-center justify-center bg-gradient-to-bl from-primary to-brand px-4',
+      'flex min-h-screen w-full flex-col flex-wrap items-center justify-center bg-linear-to-bl from-primary to-brand px-4',
       className,
     )}
   >
@@ -24,7 +24,7 @@ const HomeBox: React.FC<React.InputHTMLAttributes<HTMLDivElement>> = ({ classNam
 
 const HomeBoxLogo: React.FC<React.InputHTMLAttributes<HTMLDivElement>> = ({ className, ...props }) => (
   <div {...props} className={cn('flex items-center justify-center px-4', className)}>
-    <Logo isLogin className="max-h-48 w-auto max-w-full" />
+    <Logo isLogin className="max-h-36 w-auto max-w-full" />
   </div>
 )
 

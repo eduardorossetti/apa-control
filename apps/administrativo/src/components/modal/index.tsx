@@ -1,10 +1,11 @@
-import type React from 'react'
-import { useCallback } from 'react'
+import { type ReactNode, useCallback } from 'react'
 
 import { Alert } from './Alert'
 import { Confirm } from './Confirm'
 import { Prompt } from './Prompt'
 import { ModalContainer, ModalRoot } from './styles'
+
+import type React from 'react'
 
 type InputType = 'text' | 'password' | 'number' | 'email'
 
@@ -12,9 +13,9 @@ export interface ModalState {
   type: 'alert' | 'confirm' | 'prompt'
   title: string
   confirmText: string
-  message: string | JSX.Element
+  message: string | ReactNode
   value: string
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+  // biome-ignore lint/suspicious/noExplicitAny: idk
   callback?: (value: any) => void
   inputType: InputType
   show: boolean
@@ -22,20 +23,20 @@ export interface ModalState {
 
 interface ConfirmData {
   title: string
-  message: string | JSX.Element
+  message: string | ReactNode
   confirmText: string
   callback: (confirmed: boolean) => void
 }
 
 interface PromptData {
   title: string
-  message: string | JSX.Element
+  message: string | ReactNode
   callback: (value: string) => void
   inputType?: InputType
 }
 
 export interface ModalActions {
-  alert: (message: string | JSX.Element, callback?: VoidFunction) => void
+  alert: (message: string | ReactNode, callback?: VoidFunction) => void
   confirm: (data: ConfirmData) => void
   prompt: (data: PromptData) => void
 }
@@ -43,7 +44,7 @@ export interface ModalActions {
 interface ModalProps {
   type: 'alert' | 'confirm' | 'prompt'
   title: string
-  message: string | JSX.Element
+  message: string | ReactNode
   value: string
   confirmText: string
   inputType: InputType

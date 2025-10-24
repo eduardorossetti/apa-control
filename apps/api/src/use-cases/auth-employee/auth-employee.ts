@@ -5,7 +5,7 @@ import type { EmployeeRepository } from '@/repositories/employee.repository'
 import type { PermissionRepository } from '@/repositories/permission.repository'
 import { ApiError } from '@/utils/api-error'
 import { compare } from 'bcryptjs'
-import type { AuthEmployeeDTO, AuthEmployeeData } from './auth-employee.dto'
+import type { AuthEmployeeDTO, AuthEmployeeData, AuthEmployeeUser } from './auth-employee.dto'
 
 export class AuthEmployeeUseCase {
   constructor(
@@ -14,11 +14,13 @@ export class AuthEmployeeUseCase {
   ) {}
 
   async execute(data: AuthEmployeeData): Promise<AuthEmployeeDTO> {
+    const today = new Date()
+
     const employee = await this.employeeRepository.findByLogin(data.login, [
       'id',
       'name',
       'profileId',
-      'blockedAt',
+      'disabledAt',
       'passwordHash',
     ])
 
@@ -26,13 +28,14 @@ export class AuthEmployeeUseCase {
       throw new ApiError('Login ou senha está incorreto.', 422)
     }
 
-    if (employee.blockedAt) {
+    if (employee.disabledAt) {
       throw new ApiError('Funcionário bloqueado.', 422)
     }
 
     const permissions = await this.permissionRepository.getPermissionRoles(employee.profileId)
 
     const roles = ['Employee', ...permissions]
+
     const isValid = await compare(data.password, employee.passwordHash)
 
     if (!isValid) {
@@ -45,15 +48,17 @@ export class AuthEmployeeUseCase {
       roles,
     }
 
+    const user: AuthEmployeeUser = {
+      id: employee.id,
+      name: employee.name,
+      permissions: roles,
+    }
+
     const accessToken = jwt.sign(payload, env.APP_SECRET, { expiresIn: '24h' })
 
     return {
       accessToken,
-      user: {
-        id: employee.id,
-        name: employee.name,
-        permissions: roles,
-      },
+      user,
     }
   }
 }

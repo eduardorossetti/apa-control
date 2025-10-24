@@ -39,7 +39,7 @@ export const ProcedureTypeForm = ({ show, refresh, id }: ProcedureTypeFormProps)
   const [fetching, setFetching] = useState(false)
   const [displayName, setDisplayName] = useState('')
 
-  const procedureTypeForm = useForm<ProcedureTypeData>({
+  const procedureTypeForm = useForm({
     resolver: zodResolver(procedureTypeSchema),
     defaultValues: { category: 'clinico', averageCost: 0, active: true },
   })

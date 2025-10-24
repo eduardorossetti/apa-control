@@ -3,22 +3,22 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Tabs } from '@radix-ui/react-tabs'
 import groupBy from 'lodash/groupBy'
 import { ChevronLeftIcon, SaveIcon, UserSquare2Icon } from 'lucide-react'
 import { z } from 'zod'
+
 import { useApp } from '../../App'
 import { Button } from '../../components/button'
-import { Card, CardContent, CardFooter, CardHeader } from '../../components/card'
-import type { FormTreeNode } from '../../components/form-hook/Tree'
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../../components/card'
+import { Form } from '../../components/form-hook'
 import { ErrorAlert } from '../../components/form/error-alert'
 import { LoadingCard } from '../../components/loading-card'
 import { Spinner } from '../../components/spinner'
-import { TabsContent, TabsList, TabsTrigger } from '../../components/tabs'
 import { errorMessageHandler } from '../../helpers/axios'
 import { RequiredMessage } from '../../helpers/constants'
 import { api } from '../../service'
-import { ProfileView } from './ProfileView'
+
+import type { FormTreeNode } from '../../components/form-hook/Tree'
 
 const profileSchema = z.object({
   id: z.number().nullish(),
@@ -41,7 +41,7 @@ export const ProfileForm = () => {
   const [fetching, setFetching] = useState(false)
   const [modules, setModules] = useState<Module[]>([])
 
-  const profileForm = useForm<ProfileData>({
+  const profileForm = useForm({
     resolver: zodResolver(profileSchema),
     defaultValues: {
       description: '',
@@ -95,46 +95,50 @@ export const ProfileForm = () => {
 
   return (
     <Card>
-      <Tabs defaultValue="profile">
-        <CardHeader>
-          <TabsList>
-            <TabsTrigger value="profile">
-              <UserSquare2Icon className="h-5 w-5 shrink-0" />
-              Perfil
-            </TabsTrigger>
-          </TabsList>
-        </CardHeader>
+      <CardHeader>
+        <CardTitle>
+          <UserSquare2Icon className="h-5 w-5 shrink-0" />
+          Perfil
+        </CardTitle>
+      </CardHeader>
 
-        <FormProvider {...profileForm}>
-          <form onSubmit={handleSubmit(addOrUpdateProfile)}>
-            <CardContent>
-              <TabsContent value="profile">
-                <ProfileView modules={moduleTreeData} />
-              </TabsContent>
+      <FormProvider {...profileForm}>
+        <form onSubmit={handleSubmit(addOrUpdateProfile)}>
+          <CardContent>
+            <Form.Field>
+              <Form.Label htmlFor="description">Descrição</Form.Label>
+              <Form.Input name="description" />
+              <Form.ErrorMessage field="description" />
+            </Form.Field>
 
-              <ErrorAlert className="mt-5" error={errors.root?.message} />
-            </CardContent>
+            <Form.Field>
+              <Form.Label>Permissões</Form.Label>
+              <Form.Tree name="permissions" options={moduleTreeData} />
+              <Form.ErrorMessage field="permissions" />
+            </Form.Field>
 
-            <CardFooter>
-              <Button type="button" variant="outline" disabled={isSubmitting} onClick={() => pushTo(-1)}>
-                <ChevronLeftIcon className="mr-2 h-5 w-5" />
-                <span>Voltar</span>
-              </Button>
+            <ErrorAlert className="mt-5" error={errors.root?.message} />
+          </CardContent>
 
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? (
-                  <Spinner />
-                ) : (
-                  <>
-                    <SaveIcon className="mr-2 h-5 w-5" />
-                    <span>Salvar</span>
-                  </>
-                )}
-              </Button>
-            </CardFooter>
-          </form>
-        </FormProvider>
-      </Tabs>
+          <CardFooter>
+            <Button type="button" variant="outline" disabled={isSubmitting} onClick={() => pushTo(-1)}>
+              <ChevronLeftIcon className="mr-2 h-5 w-5" />
+              <span>Voltar</span>
+            </Button>
+
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? (
+                <Spinner />
+              ) : (
+                <>
+                  <SaveIcon className="mr-2 h-5 w-5" />
+                  <span>Salvar</span>
+                </>
+              )}
+            </Button>
+          </CardFooter>
+        </form>
+      </FormProvider>
     </Card>
   )
 }

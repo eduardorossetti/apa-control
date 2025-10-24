@@ -163,7 +163,6 @@ CREATE TABLE "employee" (
 	"created_at" timestamp with time zone NOT NULL,
 	"actived_at" timestamp with time zone,
 	"disabled_at" timestamp with time zone,
-	"blocked_at" timestamp with time zone,
 	CONSTRAINT "employee_login_unique" UNIQUE("login"),
 	CONSTRAINT "employee_cpf_unique" UNIQUE("cpf"),
 	CONSTRAINT "employee_email_unique" UNIQUE("email")

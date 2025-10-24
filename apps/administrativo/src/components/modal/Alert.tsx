@@ -1,7 +1,9 @@
 import { ModalAction, ModalContent, ModalDescription, ModalFooter, ModalHeader, ModalTitle } from './styles'
 
+import type { ReactNode } from 'react'
+
 interface AlertProps {
-  message: string | JSX.Element
+  message: string | ReactNode
   closeModal: (type: 'close' | 'submit') => void
 }
 
