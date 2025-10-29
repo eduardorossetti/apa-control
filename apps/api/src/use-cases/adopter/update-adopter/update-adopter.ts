@@ -13,6 +13,10 @@ export class UpdateAdopterUseCase {
       throw new ApiError('Adotante não encontrado.', 404)
     }
 
+    if (oldData.cpf !== data.cpf && (await this.adopterRepository.hasCpf(data.cpf))) {
+      throw new ApiError('Já existe um adotante cadastrado com o CPF informado.', 409)
+    }
+
     await this.adopterRepository.update(data.id, {
       name: data.name,
       cpf: data.cpf,

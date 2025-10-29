@@ -37,7 +37,7 @@ export const pages: PageProps[] = [
       },
       { title: 'Tipos de Campanha', path: '/tipos-campanhas', roles: ['AdminPanel', 'Registrations', 'CampaignTypes'] },
       {
-        title: 'Tipos de Transação',
+        title: 'Tipos de Lançamento',
         path: '/tipos-transacoes',
         roles: ['AdminPanel', 'Registrations', 'TransactionTypes'],
       },

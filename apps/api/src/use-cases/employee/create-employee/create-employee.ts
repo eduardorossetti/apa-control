@@ -7,14 +7,19 @@ import type { CreateEmployeeData } from './create-employee.dto'
 export class CreateEmployeeUseCase {
   constructor(private employeeRepository: EmployeeRepository) {}
 
-  async validate(data: Pick<CreateEmployeeData, 'login'>) {
+  async validate(data: Pick<CreateEmployeeData, 'login' | 'cpf'>) {
     if (await this.employeeRepository.hasLogin(data.login)) {
-      throw new ApiError('Já existe um operador cadastrado com o login informado na cidade informada.', 409)
+      throw new ApiError('Já existe um funcionário cadastrado com o login informado.', 409)
+    }
+
+    if (await this.employeeRepository.hasCpf(data.cpf)) {
+      throw new ApiError('Já existe um funcionário cadastrado com o CPF informado.', 409)
     }
   }
 
   async execute(data: CreateEmployeeData) {
-    await this.validate(data)
+    const { login, cpf } = data
+    await this.validate({ login, cpf })
 
     const { password, ...employeeData } = data
     const passwordHash = await hashPassword(password)

@@ -69,14 +69,14 @@ export const TransactionTypeList = () => {
         <CardHeader>
           <CardTitle>
             <CreditCardIcon />
-            Tipos de Transação
+            Tipos de Lançamento
           </CardTitle>
 
           <CardToolbar>
             <Button variant="danger" asChild>
               <Link to="cadastro">
                 <PlusIcon className="mr-2 h-5 w-5" />
-                <span>Novo Tipo de Transação</span>
+                <span>Novo Tipo de Lançamento</span>
               </Link>
             </Button>
           </CardToolbar>

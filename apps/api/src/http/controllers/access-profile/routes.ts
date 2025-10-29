@@ -12,6 +12,6 @@ export async function accessProfileRoutes(app: FastifyInstance) {
   app.get('/profile.key/:id', authorize('AdminPanel', 'AccessProfiles'), getAccessProfileByIdController)
   app.get('/profile.list', authorize('AdminPanel', 'AccessProfiles'), listAccessProfilesController)
   app.get('/profile.modules', authorize('AdminPanel', 'AccessProfiles'), listModulesController)
-  app.delete('/profile.delete', authorize('AdminPanel', 'AccessProfiles'), removeAccessProfileController)
+  app.delete('/profile.delete/:id', authorize('AdminPanel', 'AccessProfiles'), removeAccessProfileController)
   app.put('/profile.update', authorize('AdminPanel', 'AccessProfiles'), updateAccessProfileController)
 }

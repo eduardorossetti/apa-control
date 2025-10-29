@@ -20,6 +20,11 @@ const querifySettings: QuerySettings = {
 }
 
 export class AdopterRepository {
+  async hasCpf(cpf: string) {
+    const count = await db.$count(adopter, eq(adopter.cpf, cpf))
+    return count > 0
+  }
+
   async create(data: Adopter) {
     const [result] = await db.insert(adopter).values(data).returning({ id: adopter.id })
 

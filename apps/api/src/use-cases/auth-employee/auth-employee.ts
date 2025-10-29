@@ -14,8 +14,6 @@ export class AuthEmployeeUseCase {
   ) {}
 
   async execute(data: AuthEmployeeData): Promise<AuthEmployeeDTO> {
-    const today = new Date()
-
     const employee = await this.employeeRepository.findByLogin(data.login, [
       'id',
       'name',

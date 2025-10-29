@@ -87,7 +87,7 @@ export const TransactionTypeForm = ({ show, refresh, id }: TransactionTypeFormPr
   return (
     <FormProvider {...transactionTypeForm}>
       <ModalForm
-        title={displayName || 'Novo Tipo de Transação'}
+        title={displayName || 'Novo Tipo de Lançamento'}
         show={show}
         fetching={fetching}
         submitting={isSubmitting}

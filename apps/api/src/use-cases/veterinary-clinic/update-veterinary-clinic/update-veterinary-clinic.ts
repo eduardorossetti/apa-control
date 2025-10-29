@@ -12,6 +12,10 @@ export class UpdateVeterinaryClinicUseCase {
       throw new ApiError('Clínica veterinária não encontrada.', 404)
     }
 
+    if (oldData.cnpj !== data.cnpj && (await this.veterinaryClinicRepository.hasExist(data.cnpj))) {
+      throw new ApiError('Já existe uma clínica veterinária cadastrada com o CNPJ informado.', 409)
+    }
+
     await this.veterinaryClinicRepository.update(data.id, {
       name: data.name,
       cnpj: data.cnpj,

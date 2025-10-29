@@ -145,7 +145,7 @@ export const AdopterList = () => {
         </CardTitle>
 
         <CardToolbar>
-          <Button variant="success" onClick={() => navigate('cadastro')}>
+          <Button variant="danger" onClick={() => navigate('cadastro')}>
             <PlusIcon className="mr-2 h-5 w-5" />
             <span>Novo Adotante</span>
           </Button>

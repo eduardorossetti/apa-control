@@ -11,7 +11,12 @@ export const createEmployeeSchema = z.object({
     .transform((cpf) => cpf.replace(/\D/g, ''))
     .refine((cpf) => isCpf(cpf), 'Informe um número de CPF válido.'),
   email: z.string().trim().email('Informe um endereço de e-mail válido.').nullish().or(z.literal('')),
-  phone: z
+  phone1: z
+    .string()
+    .transform((phone) => phone.replace(/\D/g, ''))
+    .refine((phone) => [0, 10, 11].includes(phone.length), 'Informe um número de telefone válido.')
+    .nullish(),
+  phone2: z
     .string()
     .transform((phone) => phone.replace(/\D/g, ''))
     .refine((phone) => [0, 10, 11].includes(phone.length), 'Informe um número de telefone válido.')

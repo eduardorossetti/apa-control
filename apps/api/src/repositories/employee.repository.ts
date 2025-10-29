@@ -4,7 +4,6 @@ import type { DrizzleTransaction } from '@/database/types'
 import type { Employee } from '@/entities'
 import type { EmployeeWithDetails, ListEmployeesData } from '@/use-cases/employee/list-employees/list-employees.dto'
 import { ApiError } from '@/utils/api-error'
-import type { QuerySettings } from '@/utils/drizzle/querify'
 import { type QueryStringSettings, querifyString } from '@/utils/drizzle/querify-string'
 import { type SQL, eq, ilike, inArray, isNotNull, isNull } from 'drizzle-orm'
 
@@ -19,15 +18,15 @@ const querifyStringSettings: QueryStringSettings = {
 
 type EmployeeSelectSchema = typeof employee.$inferSelect
 
-const querifySettings: QuerySettings = {
-  table: employee,
-  initialOrderBy: employee.name,
-}
-
 export class EmployeeRepository {
+  async hasCpf(cpf: string) {
+    const count = await db.$count(employee, eq(employee.cpf, cpf))
+    return count > 0
+  }
+
   async hasLogin(login: string) {
-    const loginCount = await db.$count(employee, eq(employee.login, login))
-    return loginCount > 0
+    const count = await db.$count(employee, eq(employee.login, login))
+    return count > 0
   }
 
   create(data: Employee, dbTransaction: DrizzleTransaction | null) {

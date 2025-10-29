@@ -23,6 +23,11 @@ const querifySettings: QuerySettings = {
 }
 
 export class VeterinaryClinicRepository {
+  async hasExist(cnpj: string) {
+    const count = await db.$count(veterinaryClinic, eq(veterinaryClinic.cnpj, cnpj))
+    return count > 0
+  }
+
   async create(data: VeterinaryClinic) {
     const [result] = await db.insert(veterinaryClinic).values(data).returning({ id: veterinaryClinic.id })
 
