@@ -18,6 +18,7 @@ import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, Tabl
 import { errorMessageHandler } from '../../helpers/axios'
 import { itemCountMessage } from '../../helpers/item-count'
 import { maskCpfCnpj } from '../../helpers/mask/cpf-cnpj'
+import { maskPhone } from '../../helpers/mask/phone'
 import { toQueryString } from '../../helpers/qs'
 import { useRefresh } from '../../hooks/refresh'
 import { api } from '../../service'
@@ -221,7 +222,7 @@ export const AdopterList = () => {
                   <TableCell>{item.name}</TableCell>
                   <TableCell>{maskCpfCnpj(item.cpf)}</TableCell>
                   <TableCell>{item.email}</TableCell>
-                  <TableCell>{item.phone}</TableCell>
+                  <TableCell>{maskPhone(item.phone)}</TableCell>
                   <TableCell>{getApprovalStatusBadge(item.approvalStatus)}</TableCell>
                   <TableCell className="w-[1%] whitespace-nowrap">
                     <ActionsList

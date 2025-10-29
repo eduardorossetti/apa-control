@@ -4,7 +4,10 @@ import { z } from 'zod'
 export const listVeterinaryClinicsSchema = apiQueryStringSchema.extend({
   name: z.string().nullish(),
   cnpj: z.string().nullish(),
-  phone: z.string().nullish(),
+  phone: z
+    .string()
+    .transform((phone) => phone.replace(/\D/g, ''))
+    .nullish(),
   responsible: z.string().nullish(),
   active: z.enum(['true', 'false']).nullish(),
 })
