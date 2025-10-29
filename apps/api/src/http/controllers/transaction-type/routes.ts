@@ -7,13 +7,29 @@ import { removeTransactionTypeController } from './remove-transaction-type/remov
 import { updateTransactionTypeController } from './update-transaction-type/update-transaction-type.controller'
 
 export async function transactionTypeRoutes(app: FastifyInstance) {
-  app.post('/transaction-type.add', authorize('AdminPanel', 'TransactionTypes'), createTransactionTypeController)
-  app.put('/transaction-type.update', authorize('AdminPanel', 'TransactionTypes'), updateTransactionTypeController)
-  app.get('/transaction-type.list', authorize('AdminPanel', 'TransactionTypes'), listTransactionTypesController)
-  app.get('/transaction-type.key/:id', authorize('AdminPanel', 'TransactionTypes'), getTransactionTypeByIdController)
+  app.post(
+    '/transaction-type.add',
+    authorize('AdminPanel', 'Registrations', 'TransactionTypes'),
+    createTransactionTypeController,
+  )
+  app.put(
+    '/transaction-type.update',
+    authorize('AdminPanel', 'Registrations', 'TransactionTypes'),
+    updateTransactionTypeController,
+  )
+  app.get(
+    '/transaction-type.list',
+    authorize('AdminPanel', 'Registrations', 'TransactionTypes'),
+    listTransactionTypesController,
+  )
+  app.get(
+    '/transaction-type.key/:id',
+    authorize('AdminPanel', 'Registrations', 'TransactionTypes'),
+    getTransactionTypeByIdController,
+  )
   app.delete(
     '/transaction-type.delete/:id',
-    authorize('AdminPanel', 'TransactionTypes'),
+    authorize('AdminPanel', 'Registrations', 'TransactionTypes'),
     removeTransactionTypeController,
   )
 }

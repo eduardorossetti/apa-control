@@ -9,27 +9,27 @@ import { updateFinalDestinationTypeController } from './update-final-destination
 export async function finalDestinationTypeRoutes(app: FastifyInstance) {
   app.post(
     '/final-destination-type.add',
-    authorize('AdminPanel', 'FinalDestinationTypes'),
+    authorize('AdminPanel', 'Registrations', 'FinalDestinationTypes'),
     createFinalDestinationTypeController,
   )
   app.put(
     '/final-destination-type.update',
-    authorize('AdminPanel', 'FinalDestinationTypes'),
+    authorize('AdminPanel', 'Registrations', 'FinalDestinationTypes'),
     updateFinalDestinationTypeController,
   )
   app.get(
     '/final-destination-type.list',
-    authorize('AdminPanel', 'FinalDestinationTypes'),
+    authorize('AdminPanel', 'Registrations', 'FinalDestinationTypes'),
     listFinalDestinationTypesController,
   )
   app.get(
     '/final-destination-type.key/:id',
-    authorize('AdminPanel', 'FinalDestinationTypes'),
+    authorize('AdminPanel', 'Registrations', 'FinalDestinationTypes'),
     getFinalDestinationTypeByIdController,
   )
   app.delete(
     '/final-destination-type.delete/:id',
-    authorize('AdminPanel', 'FinalDestinationTypes'),
+    authorize('AdminPanel', 'Registrations', 'FinalDestinationTypes'),
     removeFinalDestinationTypeController,
   )
 }

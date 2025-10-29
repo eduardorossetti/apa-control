@@ -47,7 +47,15 @@ export const pages: PageProps[] = [
         roles: ['AdminPanel', 'Registrations', 'FinalDestinationTypes'],
       },
     ],
-    roles: ['AdminPanel', 'Registrations'],
+    roles: [
+      'AdminPanel',
+      'Registrations',
+      'ProcedureTypes',
+      'AppointmentTypes',
+      'CampaignTypes',
+      'TransactionTypes',
+      'FinalDestinationTypes',
+    ],
   },
   {
     title: 'Clínicas Veterinárias',
@@ -79,10 +87,10 @@ export const pages: PageProps[] = [
     title: 'Financeiro',
     icon: WalletIcon,
     pages: [
-      { title: 'Despesas', path: '/financeiro/despesas' },
-      { title: 'Receitas', path: '/financeiro/receitas' },
+      { title: 'Despesas', path: '/financeiro/despesas', roles: ['AdminPanel', 'Financial', 'Despesas'] },
+      { title: 'Receitas', path: '/financeiro/receitas', roles: ['AdminPanel', 'Financial', 'Receitas'] },
     ],
-    roles: ['AdminPanel', 'Financial'],
+    roles: ['AdminPanel', 'Financial', 'Despesas', 'Receitas'],
   },
   { title: 'Relatórios', path: '/relatorios', icon: BarChart3Icon, roles: ['AdminPanel', 'Reports'] },
 ]

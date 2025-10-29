@@ -7,13 +7,29 @@ import { removeAppointmentTypeController } from './remove-appointment-type/remov
 import { updateAppointmentTypeController } from './update-appointment-type/update-appointment-type.controller'
 
 export async function appointmentTypeRoutes(app: FastifyInstance) {
-  app.post('/appointment-type.add', authorize('AdminPanel', 'AppointmentTypes'), createAppointmentTypeController)
-  app.put('/appointment-type.update', authorize('AdminPanel', 'AppointmentTypes'), updateAppointmentTypeController)
-  app.get('/appointment-type.list', authorize('AdminPanel', 'AppointmentTypes'), listAppointmentTypesController)
-  app.get('/appointment-type.key/:id', authorize('AdminPanel', 'AppointmentTypes'), getAppointmentTypeByIdController)
+  app.post(
+    '/appointment-type.add',
+    authorize('AdminPanel', 'Registrations', 'AppointmentTypes'),
+    createAppointmentTypeController,
+  )
+  app.put(
+    '/appointment-type.update',
+    authorize('AdminPanel', 'Registrations', 'AppointmentTypes'),
+    updateAppointmentTypeController,
+  )
+  app.get(
+    '/appointment-type.list',
+    authorize('AdminPanel', 'Registrations', 'AppointmentTypes'),
+    listAppointmentTypesController,
+  )
+  app.get(
+    '/appointment-type.key/:id',
+    authorize('AdminPanel', 'Registrations', 'AppointmentTypes'),
+    getAppointmentTypeByIdController,
+  )
   app.delete(
     '/appointment-type.delete/:id',
-    authorize('AdminPanel', 'AppointmentTypes'),
+    authorize('AdminPanel', 'Registrations', 'AppointmentTypes'),
     removeAppointmentTypeController,
   )
 }

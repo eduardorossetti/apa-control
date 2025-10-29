@@ -7,9 +7,29 @@ import { removeProcedureTypeController } from './remove-procedure-type/remove-pr
 import { updateProcedureTypeController } from './update-procedure-type/update-procedure-type.controller'
 
 export async function procedureTypeRoutes(app: FastifyInstance) {
-  app.post('/procedure-type.add', authorize('AdminPanel', 'ProcedureTypes'), createProcedureTypeController)
-  app.put('/procedure-type.update', authorize('AdminPanel', 'ProcedureTypes'), updateProcedureTypeController)
-  app.get('/procedure-type.list', authorize('AdminPanel', 'ProcedureTypes'), listProcedureTypesController)
-  app.get('/procedure-type.key/:id', authorize('AdminPanel', 'ProcedureTypes'), getProcedureTypeByIdController)
-  app.delete('/procedure-type.delete/:id', authorize('AdminPanel', 'ProcedureTypes'), removeProcedureTypeController)
+  app.post(
+    '/procedure-type.add',
+    authorize('AdminPanel', 'Registrations', 'ProcedureTypes'),
+    createProcedureTypeController,
+  )
+  app.put(
+    '/procedure-type.update',
+    authorize('AdminPanel', 'Registrations', 'ProcedureTypes'),
+    updateProcedureTypeController,
+  )
+  app.get(
+    '/procedure-type.list',
+    authorize('AdminPanel', 'Registrations', 'ProcedureTypes'),
+    listProcedureTypesController,
+  )
+  app.get(
+    '/procedure-type.key/:id',
+    authorize('AdminPanel', 'Registrations', 'ProcedureTypes'),
+    getProcedureTypeByIdController,
+  )
+  app.delete(
+    '/procedure-type.delete/:id',
+    authorize('AdminPanel', 'Registrations', 'ProcedureTypes'),
+    removeProcedureTypeController,
+  )
 }

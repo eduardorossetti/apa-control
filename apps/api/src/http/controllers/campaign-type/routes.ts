@@ -7,9 +7,25 @@ import { removeCampaignTypeController } from './remove-campaign-type/remove-camp
 import { updateCampaignTypeController } from './update-campaign-type/update-campaign-type.controller'
 
 export async function campaignTypeRoutes(app: FastifyInstance) {
-  app.post('/campaign-type.add', authorize('AdminPanel', 'CampaignTypes'), createCampaignTypeController)
-  app.put('/campaign-type.update', authorize('AdminPanel', 'CampaignTypes'), updateCampaignTypeController)
-  app.get('/campaign-type.list', authorize('AdminPanel', 'CampaignTypes'), listCampaignTypesController)
-  app.get('/campaign-type.key/:id', authorize('AdminPanel', 'CampaignTypes'), getCampaignTypeByIdController)
-  app.delete('/campaign-type.delete/:id', authorize('AdminPanel', 'CampaignTypes'), removeCampaignTypeController)
+  app.post(
+    '/campaign-type.add',
+    authorize('AdminPanel', 'Registrations', 'CampaignTypes'),
+    createCampaignTypeController,
+  )
+  app.put(
+    '/campaign-type.update',
+    authorize('AdminPanel', 'Registrations', 'CampaignTypes'),
+    updateCampaignTypeController,
+  )
+  app.get('/campaign-type.list', authorize('AdminPanel', 'Registrations', 'CampaignTypes'), listCampaignTypesController)
+  app.get(
+    '/campaign-type.key/:id',
+    authorize('AdminPanel', 'Registrations', 'CampaignTypes'),
+    getCampaignTypeByIdController,
+  )
+  app.delete(
+    '/campaign-type.delete/:id',
+    authorize('AdminPanel', 'Registrations', 'CampaignTypes'),
+    removeCampaignTypeController,
+  )
 }
