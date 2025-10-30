@@ -1,5 +1,6 @@
 export * from './access-profile.repository'
 export * from './adopter.repository'
+export * from './animal.repository'
 export * from './appointment-type.repository'
 export * from './campaign-type.repository'
 export * from './dashboard.repository'

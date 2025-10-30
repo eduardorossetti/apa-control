@@ -9,6 +9,8 @@ import { PanelOutlet } from './components/panel-outlet'
 import { pages } from './config/pages'
 import { AdopterForm } from './pages/adopter-form'
 import { AdopterList } from './pages/adopter-list'
+import { AnimalForm } from './pages/animal-form'
+import { AnimalList } from './pages/animal-list'
 import { AppointmentTypeList } from './pages/appointment-type-list'
 import { CampaignTypeList } from './pages/campaign-type-list'
 import { EmployeeForm } from './pages/employee-form'
@@ -62,6 +64,9 @@ ReactDOM.createRoot(rootElement!).render(
           <Route path="adotantes" element={<AdopterList />} />
           <Route path="adotantes/cadastro" element={<AdopterForm />} />
           <Route path="adotantes/:id" element={<AdopterForm />} />
+          <Route path="animais" element={<AnimalList />} />
+          <Route path="animais/cadastro" element={<AnimalForm />} />
+          <Route path="animais/:id" element={<AnimalForm />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>

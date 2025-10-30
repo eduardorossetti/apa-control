@@ -3,6 +3,7 @@ import rateLimit from '@fastify/rate-limit'
 import { rateLimitOptions } from './config/rate-limit'
 import { accessProfileRoutes } from './http/controllers/access-profile/routes'
 import { adopterRoutes } from './http/controllers/adopter/routes'
+import { animalRoutes } from './http/controllers/animal/routes'
 import { appointmentTypeRoutes } from './http/controllers/appointment-type/routes'
 import { authRoutes } from './http/controllers/auth/routes'
 import { campaignTypeRoutes } from './http/controllers/campaign-type/routes'
@@ -21,6 +22,7 @@ app.register(authRoutes)
 app.register(accessProfileRoutes)
 app.register(procedureTypeRoutes)
 app.register(employeeRoutes)
+app.register(animalRoutes)
 app.register(appointmentTypeRoutes)
 app.register(campaignTypeRoutes)
 app.register(finalDestinationTypeRoutes)
