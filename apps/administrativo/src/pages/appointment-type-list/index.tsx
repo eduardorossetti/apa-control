@@ -87,7 +87,7 @@ export const AppointmentTypeList = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>Nome</TableHead>
-                <TableHead>Urgência</TableHead>
+                <TableHead>Classificação</TableHead>
                 <TableHead>Ativo</TableHead>
                 <TableHead aria-label="Ações" />
               </TableRow>

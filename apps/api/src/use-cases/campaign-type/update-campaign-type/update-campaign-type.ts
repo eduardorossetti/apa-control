@@ -15,7 +15,6 @@ export class UpdateCampaignTypeUseCase {
     await this.campaignTypeRepository.update(data.id, {
       name: data.name,
       description: data.description,
-      category: data.category,
       active: data.active,
     })
   }

@@ -2,10 +2,20 @@ import { db } from '@/database/client'
 import { transactionType } from '@/database/schema'
 import type { DrizzleTransaction } from '@/database/types'
 import type { TransactionType } from '@/entities'
+import type {
+  ListTransactionTypesDTO,
+  ListTransactionTypesData,
+} from '@/use-cases/transaction-type/list-transaction-types/list-transaction-types.dto'
 import { ApiError } from '@/utils/api-error'
 import type { ApiQuery } from '@/utils/drizzle/api-query-schema'
 import { type QuerySettings, getPager, querify } from '@/utils/drizzle/querify'
-import { asc, eq } from 'drizzle-orm'
+import { type QueryStringSettings, querifyString } from '@/utils/drizzle/querify-string'
+import { type SQL, eq, ilike, inArray } from 'drizzle-orm'
+
+const querifyStringSettings: QueryStringSettings = {
+  table: transactionType,
+  initialOrderBy: transactionType.name,
+}
 
 const querifySettings: QuerySettings = {
   table: transactionType,
@@ -23,16 +33,24 @@ export class TransactionTypeRepository {
     await db.update(transactionType).set(data).where(eq(transactionType.id, id))
   }
 
-  list() {
-    return db
-      .select({
-        id: transactionType.id,
-        name: transactionType.name,
-        category: transactionType.category,
-        active: transactionType.active,
-      })
-      .from(transactionType)
-      .orderBy(asc(transactionType.name))
+  async list(data: ListTransactionTypesData): Promise<[number, ListTransactionTypesDTO[]]> {
+    const { name, categoryIds } = data
+    const whereList: SQL[] = []
+
+    if (name) {
+      whereList.push(ilike(transactionType.name, `%${name}%`))
+    }
+
+    if (categoryIds?.length) {
+      whereList.push(inArray(transactionType.category, categoryIds))
+    }
+
+    const [sqlQuery, countQuery] = querifyString<ListTransactionTypesDTO>(data, whereList, querifyStringSettings)
+
+    const items = await sqlQuery
+    const [{ total }] = await countQuery
+
+    return [total, items] as const
   }
 
   async listPost(query: ApiQuery) {

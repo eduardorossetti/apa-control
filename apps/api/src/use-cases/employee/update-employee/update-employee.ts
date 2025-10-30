@@ -18,6 +18,10 @@ export class UpdateEmployeeUseCase {
       throw new ApiError('Já existe um funcionário cadastrado com o login.', 409)
     }
 
+    if (oldData.cpf !== data.cpf && (await this.employeeRepository.hasCpf(data.cpf))) {
+      throw new ApiError('Já existe um funcionário cadastrado com o CPF informado.', 409)
+    }
+
     if (data.password) {
       oldData.passwordHash = await hashPassword(data.password)
     }

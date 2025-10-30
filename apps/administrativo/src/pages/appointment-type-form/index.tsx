@@ -103,25 +103,23 @@ export const AppointmentTypeForm = ({ show, refresh, id }: AppointmentTypeFormPr
           </div>
 
           <div>
-            <Form.Label htmlFor="urgency">Urgência</Form.Label>
+            <Form.Label htmlFor="urgency">Classificação</Form.Label>
             <Form.Select name="urgency" options={urgencyLevelOptions} />
             <Form.ErrorMessage field="urgency" />
           </div>
         </div>
 
-        <div className="mb-6 grid gap-4 lg:grid-cols-2">
-          <div>
-            <Form.Label htmlFor="description">Descrição</Form.Label>
-            <Form.Input name="description" />
-            <Form.ErrorMessage field="description" />
-          </div>
+        <div className="mb-6">
+          <Form.Label htmlFor="description">Descrição</Form.Label>
+          <Form.TextArea name="description" />
+          <Form.ErrorMessage field="description" />
+        </div>
 
-          <div className="mb-6 flex items-center space-x-2">
-            <Form.Switch name="active" />
-            <Form.Label htmlFor="active" className="mb-0 leading-normal">
-              Ativo?
-            </Form.Label>
-          </div>
+        <div className="mb-6 flex items-center space-x-2">
+          <Form.Switch name="active" />
+          <Form.Label htmlFor="active" className="mb-0 leading-normal">
+            Ativo?
+          </Form.Label>
         </div>
 
         <ErrorAlert className="mt-5" error={errors.root?.message} />

@@ -1,7 +1,13 @@
 import { makeListProcedureTypesUseCase } from '@/use-cases/procedure-type/list-procedure-types/list-procedure-types.factory'
+import type { FastifyReply, FastifyRequest } from 'fastify'
+import { listProcedureTypesSchema } from './list-procedure-types.schema'
 
-export async function listProcedureTypesController() {
+export async function listProcedureTypesController(request: FastifyRequest, reply: FastifyReply) {
+  const data = listProcedureTypesSchema.parse(request.query)
   const listProcedureTypesUseCase = makeListProcedureTypesUseCase()
-  const result = await listProcedureTypesUseCase.execute()
-  return result
+  const [count, items] = await listProcedureTypesUseCase.execute(data)
+
+  reply.header('X-Total-Count', count)
+
+  return items
 }

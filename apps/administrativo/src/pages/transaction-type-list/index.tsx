@@ -1,16 +1,23 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
+import { FormProvider, useForm } from 'react-hook-form'
 import { Link, useParams } from 'react-router-dom'
 
-import { CheckIcon, CreditCardIcon, PencilIcon, PlusIcon, XIcon } from 'lucide-react'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { CheckIcon, CreditCardIcon, PencilIcon, PlusIcon, SearchIcon, XIcon } from 'lucide-react'
+import { z } from 'zod'
 
 import { useApp } from '../../App'
 import { Button } from '../../components/button'
-import { Card, CardHeader, CardTitle, CardToolbar } from '../../components/card'
+import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardToolbar } from '../../components/card'
+import { Form } from '../../components/form-hook'
 import { ActionsList } from '../../components/list/ActionList'
+import { Pagination } from '../../components/list/Pagination'
 import { LoadingCard } from '../../components/loading-card'
 import { Separator } from '../../components/separator'
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '../../components/table'
 import { errorMessageHandler } from '../../helpers/axios'
+import { itemCountMessage } from '../../helpers/item-count'
+import { toQueryString } from '../../helpers/qs'
 import { useRefresh } from '../../hooks/refresh'
 import { api } from '../../service'
 import { TransactionTypeForm } from '../transaction-type-form'
@@ -22,45 +29,79 @@ interface TransactionTypeListValues {
   active: boolean
 }
 
+const transactionTypeFilterSchema = z.object({
+  fields: z.string(),
+  page: z.number(),
+  name: z.string().nullish(),
+  categoryIds: z.array(z.string()),
+})
+
+type TransactionTypeFilterData = z.infer<typeof transactionTypeFilterSchema>
+
 export const TransactionTypeList = () => {
   const { modal, token } = useApp()
   const refresh = useRefresh()
   const params = useParams()
   const [fetching, setFetching] = useState(false)
   const [items, setItems] = useState<TransactionTypeListValues[]>([])
+  const [total, setTotal] = useState(0)
 
   const id = Number.parseInt(params.id!, 10)
   const showForm = location.pathname.includes('cadastro') || Boolean(id)
 
-  const removeTransactionType = useCallback(
-    (values: TransactionTypeListValues) => {
-      modal.confirm({
-        title: 'Remover tipo de transação',
-        message: `Deseja remover o tipo de transação ${values.name}?`,
-        confirmText: 'Remover',
-        callback: (confirmed) => {
-          if (confirmed) {
-            api
-              .delete(`transaction-type.delete/${values.id}`, {
-                headers: { Authorization: `Bearer ${token}` },
-              })
-              .then(refresh.force)
-              .catch((err) => modal.alert(errorMessageHandler(err)))
-          }
-        },
-      })
+  const transactionTypeFilterForm = useForm<TransactionTypeFilterData>({
+    resolver: zodResolver(transactionTypeFilterSchema),
+    defaultValues: {
+      page: 1,
+      fields: 'id,name,category,active',
+      categoryIds: [],
     },
-    [token],
-  )
+  })
 
-  useEffect(() => {
+  const { handleSubmit, getValues, setValue } = transactionTypeFilterForm
+  const page = getValues('page')
+  const pages = Math.ceil(total / 10)
+
+  async function listTransactionTypes(values: TransactionTypeFilterData) {
     setFetching(true)
 
-    api
-      .get('transaction-type.list', { headers: { Authorization: `Bearer ${token}` } })
-      .then(({ data }) => setItems(data))
-      .catch((err) => modal.alert(errorMessageHandler(err)))
-      .finally(() => setFetching(false))
+    try {
+      const { data, headers } = await api.get(`transaction-type.list?${toQueryString(values)}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      setItems(data)
+      setTotal(Number(headers['x-total-count']))
+    } catch (error) {
+      modal.alert(errorMessageHandler(error))
+    }
+    setFetching(false)
+  }
+
+  function changePage(page: number) {
+    setValue('page', page)
+    refresh.force()
+  }
+
+  function removeTransactionType(values: TransactionTypeListValues) {
+    modal.confirm({
+      title: 'Remover tipo de transação',
+      message: `Deseja remover o tipo de transação ${values.name}?`,
+      confirmText: 'Remover',
+      callback: (confirmed) => {
+        if (confirmed) {
+          api
+            .delete(`transaction-type.delete/${values.id}`, {
+              headers: { Authorization: `Bearer ${token}` },
+            })
+            .then(refresh.force)
+            .catch((err) => modal.alert(errorMessageHandler(err)))
+        }
+      },
+    })
+  }
+
+  useEffect(() => {
+    handleSubmit(listTransactionTypes)()
   }, [refresh.ref])
 
   return (
@@ -81,6 +122,39 @@ export const TransactionTypeList = () => {
             </Button>
           </CardToolbar>
         </CardHeader>
+
+        <CardContent>
+          <FormProvider {...transactionTypeFilterForm}>
+            <form onSubmit={handleSubmit(listTransactionTypes)}>
+              <div className="mb-6 grid gap-4 lg:grid-cols-2 2xl:grid-cols-2">
+                <div>
+                  <Form.Label htmlFor="name">Nome</Form.Label>
+                  <Form.Input type="search" name="name" />
+                  <Form.ErrorMessage field="name" />
+                </div>
+
+                <div>
+                  <Form.Label>Categoria</Form.Label>
+                  <Form.MultiSelect
+                    name="categoryIds"
+                    options={[
+                      { label: 'Receita', value: 'receita' },
+                      { label: 'Despesa', value: 'despesa' },
+                    ]}
+                  />
+                  <Form.ErrorMessage field="categoryIds" />
+                </div>
+              </div>
+
+              <CardFooter className="mt-6 p-0">
+                <Button type="submit">
+                  <SearchIcon className="mr-2 h-5 w-5 shrink-0" />
+                  <span>Consultar</span>
+                </Button>
+              </CardFooter>
+            </form>
+          </FormProvider>
+        </CardContent>
 
         <div className="relative">
           <Separator />
@@ -131,6 +205,12 @@ export const TransactionTypeList = () => {
           </Table>
 
           {fetching && <LoadingCard position="absolute" />}
+        </div>
+
+        <div className="flex flex-wrap items-center justify-between gap-6 p-6">
+          <span className="text-sm">{itemCountMessage('tipos de lançamento', page, pages, total)}</span>
+
+          <Pagination current={page} total={pages} changePage={changePage} />
         </div>
       </Card>
 

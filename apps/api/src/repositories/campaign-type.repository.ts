@@ -28,7 +28,6 @@ export class CampaignTypeRepository {
       .select({
         id: campaignType.id,
         name: campaignType.name,
-        category: campaignType.category,
         active: campaignType.active,
       })
       .from(campaignType)
@@ -51,7 +50,6 @@ export class CampaignTypeRepository {
         id: campaignType.id,
         name: campaignType.name,
         description: campaignType.description,
-        category: campaignType.category,
         active: campaignType.active,
         createdAt: campaignType.createdAt,
       })
@@ -72,7 +70,6 @@ export class CampaignTypeRepository {
         id: campaignType.id,
         name: campaignType.name,
         description: campaignType.description,
-        category: campaignType.category,
         active: campaignType.active,
         createdAt: campaignType.createdAt,
       })

@@ -16,7 +16,6 @@ export class GetCampaignTypeByIdUseCase {
       id: campaignType.id,
       name: campaignType.name,
       description: campaignType.description,
-      category: campaignType.category,
       active: campaignType.active,
     }
   }

@@ -7,6 +7,5 @@ export interface GetCampaignTypeByIdDTO {
   id: number
   name: string
   description: string | null
-  category: string
   active: boolean
 }

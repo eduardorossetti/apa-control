@@ -4,7 +4,6 @@ import {
   AnimalStatusValues,
   AppointmentStatusValues,
   ApprovalStatusValues,
-  CampaignCategoryValues,
   CampaignStatusValues,
   ConsultationTypeValues,
   HealthConditionValues,
@@ -25,7 +24,6 @@ export const profileTypeEnum = pgEnum('profile_type', ProfileTypeValues)
 export const procedureCategoryEnum = pgEnum('procedure_category', ProcedureCategoryValues)
 export const transactionCategoryEnum = pgEnum('transaction_category', TransactionCategoryValues)
 export const urgencyLevelEnum = pgEnum('urgency_level', UrgencyLevelValues)
-export const campaignCategoryEnum = pgEnum('campaign_category', CampaignCategoryValues)
 export const speciesEnum = pgEnum('species', SpeciesValues)
 export const sizeEnum = pgEnum('size', SizeValues)
 export const sexEnum = pgEnum('sex', SexValues)

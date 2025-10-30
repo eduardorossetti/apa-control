@@ -18,7 +18,6 @@ import { CampaignTypeForm } from '../campaign-type-form'
 interface CampaignTypeListValues {
   id: number
   name: string
-  category: string
   active: boolean
 }
 
@@ -87,7 +86,6 @@ export const CampaignTypeList = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>Nome</TableHead>
-                <TableHead>Categoria</TableHead>
                 <TableHead>Ativo</TableHead>
                 <TableHead aria-label="Ações" />
               </TableRow>
@@ -97,7 +95,6 @@ export const CampaignTypeList = () => {
               {items.map((item) => (
                 <TableRow key={item.id}>
                   <TableCell>{item.name}</TableCell>
-                  <TableCell>{getCategoryLabel(item.category)}</TableCell>
                   <TableCell>
                     {item.active ? (
                       <CheckIcon className="h-4 w-4 text-green-500" />
@@ -129,14 +126,4 @@ export const CampaignTypeList = () => {
       <CampaignTypeForm id={id} show={showForm} refresh={refresh.force} />
     </>
   )
-}
-
-function getCategoryLabel(category: string) {
-  const labels: Record<string, string> = {
-    doacao: 'Doação',
-    rifa: 'Rifa',
-    evento: 'Evento',
-    patrocinio: 'Patrocínio',
-  }
-  return labels[category] || category
 }

@@ -25,7 +25,6 @@ const campaignTypeSchema = z.object({
   id: z.number().nullish(),
   name: z.string().min(1, RequiredMessage),
   description: z.string().min(1, RequiredMessage),
-  category: z.enum(['doacao', 'rifa', 'evento', 'patrocinio']),
   active: z.coerce.boolean(),
 })
 
@@ -39,7 +38,7 @@ export const CampaignTypeForm = ({ show, refresh, id }: CampaignTypeFormProps) =
 
   const campaignTypeForm = useForm({
     resolver: zodResolver(campaignTypeSchema),
-    defaultValues: { category: 'doacao', active: true },
+    defaultValues: { active: true },
   })
 
   const {
@@ -95,33 +94,23 @@ export const CampaignTypeForm = ({ show, refresh, id }: CampaignTypeFormProps) =
         onSubmit={handleSubmit(addOrUpdateCampaignType)}
         closeAction={handleClose}
       >
-        <div className="mb-6 grid gap-4 lg:grid-cols-2">
-          <div>
-            <Form.Label htmlFor="name">Nome</Form.Label>
-            <Form.Input name="name" />
-            <Form.ErrorMessage field="name" />
-          </div>
-
-          <div>
-            <Form.Label htmlFor="category">Categoria</Form.Label>
-            <Form.Select name="category" options={campaignCategoryOptions} />
-            <Form.ErrorMessage field="category" />
-          </div>
+        <div className="mb-6">
+          <Form.Label htmlFor="name">Nome</Form.Label>
+          <Form.Input name="name" />
+          <Form.ErrorMessage field="name" />
         </div>
 
-        <div className="mb-6 grid gap-4 lg:grid-cols-2">
-          <div>
-            <Form.Label htmlFor="description">Descrição</Form.Label>
-            <Form.Input name="description" />
-            <Form.ErrorMessage field="description" />
-          </div>
+        <div className="mb-6">
+          <Form.Label htmlFor="description">Descrição</Form.Label>
+          <Form.TextArea name="description" />
+          <Form.ErrorMessage field="description" />
+        </div>
 
-          <div className="mb-6 flex items-center space-x-2">
-            <Form.Switch name="active" />
-            <Form.Label htmlFor="active" className="mb-0 leading-normal">
-              Ativo?
-            </Form.Label>
-          </div>
+        <div className="mb-6 flex items-center space-x-2">
+          <Form.Switch name="active" />
+          <Form.Label htmlFor="active" className="mb-0 leading-normal">
+            Ativo?
+          </Form.Label>
         </div>
 
         <ErrorAlert className="mt-5" error={errors.root?.message} />
@@ -129,10 +118,3 @@ export const CampaignTypeForm = ({ show, refresh, id }: CampaignTypeFormProps) =
     </FormProvider>
   )
 }
-
-const campaignCategoryOptions = [
-  { label: 'Doação', value: 'doacao' },
-  { label: 'Rifa', value: 'rifa' },
-  { label: 'Evento', value: 'evento' },
-  { label: 'Patrocínio', value: 'patrocinio' },
-]

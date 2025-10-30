@@ -87,10 +87,10 @@ export const pages: PageProps[] = [
     title: 'Financeiro',
     icon: WalletIcon,
     pages: [
-      { title: 'Despesas', path: '/financeiro/despesas', roles: ['AdminPanel', 'Financial', 'Despesas'] },
-      { title: 'Receitas', path: '/financeiro/receitas', roles: ['AdminPanel', 'Financial', 'Receitas'] },
+      { title: 'Despesas', path: '/financeiro/despesas', roles: ['AdminPanel', 'Financial', 'Expenses'] },
+      { title: 'Receitas', path: '/financeiro/receitas', roles: ['AdminPanel', 'Financial', 'Revenues'] },
     ],
-    roles: ['AdminPanel', 'Financial', 'Despesas', 'Receitas'],
+    roles: ['AdminPanel', 'Financial', 'Expenses', 'Revenues'],
   },
   { title: 'Relatórios', path: '/relatorios', icon: BarChart3Icon, roles: ['AdminPanel', 'Reports'] },
 ]

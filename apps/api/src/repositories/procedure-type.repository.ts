@@ -2,10 +2,20 @@ import { db } from '@/database/client'
 import { procedureType } from '@/database/schema'
 import type { DrizzleTransaction } from '@/database/types'
 import type { ProcedureType } from '@/entities'
+import type {
+  ListProcedureTypesDTO,
+  ListProcedureTypesData,
+} from '@/use-cases/procedure-type/list-procedure-types/list-procedure-types.dto'
 import { ApiError } from '@/utils/api-error'
 import type { ApiQuery } from '@/utils/drizzle/api-query-schema'
 import { type QuerySettings, getPager, querify } from '@/utils/drizzle/querify'
-import { asc, eq } from 'drizzle-orm'
+import { type QueryStringSettings, querifyString } from '@/utils/drizzle/querify-string'
+import { type SQL, eq, ilike, inArray } from 'drizzle-orm'
+
+const querifyStringSettings: QueryStringSettings = {
+  table: procedureType,
+  initialOrderBy: procedureType.name,
+}
 
 const querifySettings: QuerySettings = {
   table: procedureType,
@@ -23,17 +33,24 @@ export class ProcedureTypeRepository {
     await db.update(procedureType).set(data).where(eq(procedureType.id, id))
   }
 
-  list() {
-    return db
-      .select({
-        id: procedureType.id,
-        name: procedureType.name,
-        category: procedureType.category,
-        averageCost: procedureType.averageCost,
-        active: procedureType.active,
-      })
-      .from(procedureType)
-      .orderBy(asc(procedureType.name))
+  async list(data: ListProcedureTypesData): Promise<[number, ListProcedureTypesDTO[]]> {
+    const { name, categoryIds } = data
+    const whereList: SQL[] = []
+
+    if (name) {
+      whereList.push(ilike(procedureType.name, `%${name}%`))
+    }
+
+    if (categoryIds?.length) {
+      whereList.push(inArray(procedureType.category, categoryIds))
+    }
+
+    const [sqlQuery, countQuery] = querifyString<ListProcedureTypesDTO>(data, whereList, querifyStringSettings)
+
+    const items = await sqlQuery
+    const [{ total }] = await countQuery
+
+    return [total, items] as const
   }
 
   async listPost(query: ApiQuery) {

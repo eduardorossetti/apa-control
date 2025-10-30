@@ -9,7 +9,6 @@ export class CreateCampaignTypeUseCase {
     const campaignType = new CampaignType({
       name: data.name,
       description: data.description,
-      category: data.category,
       active: data.active,
       createdAt: new Date(),
     })
