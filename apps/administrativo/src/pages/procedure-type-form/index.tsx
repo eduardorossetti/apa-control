@@ -81,8 +81,11 @@ export const ProcedureTypeForm = ({ show, refresh, id }: ProcedureTypeFormProps)
         })
         .catch((err) => modal.alert(errorMessageHandler(err)))
         .finally(() => setFetching(false))
+    } else if (show) {
+      reset({ category: 'clinico', averageCost: 0, active: true })
+      setDisplayName('')
     }
-  }, [id])
+  }, [id, show])
 
   if (fetching) return <LoadingCard />
 
@@ -105,7 +108,7 @@ export const ProcedureTypeForm = ({ show, refresh, id }: ProcedureTypeFormProps)
           </div>
 
           <div>
-            <Form.Label htmlFor="category">Categoria</Form.Label>
+            <Form.Label htmlFor="category">Classificação</Form.Label>
             <Form.Select name="category" options={procedureCategoryOptions} />
             <Form.ErrorMessage field="category" />
           </div>

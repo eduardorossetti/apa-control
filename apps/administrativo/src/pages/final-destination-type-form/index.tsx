@@ -79,8 +79,11 @@ export const FinalDestinationTypeForm = ({ show, refresh, id }: FinalDestination
         })
         .catch((err) => modal.alert(errorMessageHandler(err)))
         .finally(() => setFetching(false))
+    } else if (show) {
+      reset({ requiresApproval: false, active: true })
+      setDisplayName('')
     }
-  }, [id])
+  }, [id, show])
 
   if (fetching) return <LoadingCard />
 

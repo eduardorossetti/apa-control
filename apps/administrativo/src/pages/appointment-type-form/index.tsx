@@ -79,8 +79,11 @@ export const AppointmentTypeForm = ({ show, refresh, id }: AppointmentTypeFormPr
         })
         .catch((err) => modal.alert(errorMessageHandler(err)))
         .finally(() => setFetching(false))
+    } else if (show) {
+      reset({ urgency: 'rotina', active: true })
+      setDisplayName('')
     }
-  }, [id])
+  }, [id, show])
 
   if (fetching) return <LoadingCard />
 

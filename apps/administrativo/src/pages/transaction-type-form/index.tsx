@@ -79,8 +79,11 @@ export const TransactionTypeForm = ({ show, refresh, id }: TransactionTypeFormPr
         })
         .catch((err) => modal.alert(errorMessageHandler(err)))
         .finally(() => setFetching(false))
+    } else if (show) {
+      reset({ active: true })
+      setDisplayName('')
     }
-  }, [id])
+  }, [id, show])
 
   if (fetching) return <LoadingCard />
 

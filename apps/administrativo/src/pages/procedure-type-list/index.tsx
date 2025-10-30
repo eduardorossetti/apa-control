@@ -134,7 +134,7 @@ export const ProcedureTypeList = () => {
                 </div>
 
                 <div>
-                  <Form.Label>Categoria</Form.Label>
+                  <Form.Label>Classificação</Form.Label>
                   <Form.MultiSelect name="categoryIds" options={procedureCategoryOptions} />
                   <Form.ErrorMessage field="categoryIds" />
                 </div>
@@ -157,7 +157,7 @@ export const ProcedureTypeList = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>Nome</TableHead>
-                <TableHead>Categoria</TableHead>
+                <TableHead>Classificação</TableHead>
                 <TableHead>Custo Médio</TableHead>
                 <TableHead>Ativo</TableHead>
                 <TableHead aria-label="Ações" />

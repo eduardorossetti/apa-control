@@ -78,8 +78,11 @@ export const CampaignTypeForm = ({ show, refresh, id }: CampaignTypeFormProps) =
         })
         .catch((err) => modal.alert(errorMessageHandler(err)))
         .finally(() => setFetching(false))
+    } else if (show) {
+      reset({ active: true })
+      setDisplayName('')
     }
-  }, [id])
+  }, [id, show])
 
   if (fetching) return <LoadingCard />
 
