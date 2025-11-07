@@ -1,4 +1,3 @@
-import { ApprovalStatusValues } from '@/database/schema/enums/approval-status'
 import { z } from 'zod'
 
 export const updateAdopterSchema = z.object({
@@ -13,5 +12,4 @@ export const updateAdopterSchema = z.object({
   address: z.string({ error: 'O endereço é obrigatório.' }).trim(),
   familyIncome: z.number({ error: 'A renda familiar é obrigatória.' }),
   animalExperience: z.coerce.boolean({ error: 'O campo experiência com animais é obrigatório.' }),
-  approvalStatus: z.enum(ApprovalStatusValues, { error: 'O status de aprovação é obrigatório.' }),
 })

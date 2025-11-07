@@ -9,7 +9,6 @@ export class Adopter {
   address: string
   familyIncome: Decimal
   animalExperience: boolean
-  approvalStatus: string
   createdAt: Date
   updatedAt?: Date | null
 
@@ -22,7 +21,6 @@ export class Adopter {
     this.address = props.address
     this.familyIncome = props.familyIncome
     this.animalExperience = props.animalExperience
-    this.approvalStatus = props.approvalStatus
     this.createdAt = props.createdAt
     this.updatedAt = props.updatedAt
   }

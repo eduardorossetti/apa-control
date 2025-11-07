@@ -1,7 +1,6 @@
 export * from './adoption-status'
 export * from './animal-status'
 export * from './appointment-status'
-export * from './approval-status'
 export * from './campaign-status'
 export * from './consultation-type'
 export * from './health-condition'

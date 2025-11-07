@@ -168,7 +168,7 @@ export const ProcedureTypeList = () => {
               {items.map((item) => (
                 <TableRow key={item.id}>
                   <TableCell>{item.name}</TableCell>
-                  <TableCell>{item.category}</TableCell>
+                  <TableCell>{formatProcedureCategory(item.category)}</TableCell>
                   <TableCell>{maskDecimal(item.averageCost)}</TableCell>
                   <TableCell>
                     {item.active ? (
@@ -215,3 +215,7 @@ const procedureCategoryOptions = [
   { label: 'Exame', value: 'exame' },
   { label: 'Vacina', value: 'vacina' },
 ]
+
+function formatProcedureCategory(category: string) {
+  return procedureCategoryOptions.find((option) => option.value === category)?.label
+}

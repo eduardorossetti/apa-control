@@ -3,7 +3,6 @@ import {
   AdoptionStatusValues,
   AnimalStatusValues,
   AppointmentStatusValues,
-  ApprovalStatusValues,
   CampaignStatusValues,
   ConsultationTypeValues,
   HealthConditionValues,
@@ -29,7 +28,6 @@ export const sizeEnum = pgEnum('size', SizeValues)
 export const sexEnum = pgEnum('sex', SexValues)
 export const healthConditionEnum = pgEnum('health_condition', HealthConditionValues)
 export const animalStatusEnum = pgEnum('animal_status', AnimalStatusValues)
-export const approvalStatusEnum = pgEnum('approval_status', ApprovalStatusValues)
 export const campaignStatusEnum = pgEnum('campaign_status', CampaignStatusValues)
 export const consultationTypeEnum = pgEnum('consultation_type', ConsultationTypeValues)
 export const appointmentStatusEnum = pgEnum('appointment_status', AppointmentStatusValues)

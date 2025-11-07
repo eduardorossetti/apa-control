@@ -1,4 +1,3 @@
-import { ApprovalStatusValues } from '@/database/schema/enums/approval-status'
 import { apiQueryStringSchema } from '@/utils/drizzle/api-query-schema'
 import { z } from 'zod'
 
@@ -10,5 +9,4 @@ export const listAdoptersSchema = apiQueryStringSchema.extend({
     .string()
     .transform((phone) => phone.replace(/\D/g, ''))
     .nullish(),
-  approvalStatus: z.enum(ApprovalStatusValues).nullish(),
 })

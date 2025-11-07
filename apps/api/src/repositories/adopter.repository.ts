@@ -36,7 +36,7 @@ export class AdopterRepository {
   }
 
   async list(data: ListAdoptersData): Promise<[number, ListAdoptersDTO[]]> {
-    const { name, cpf, email, phone, approvalStatus } = data
+    const { name, cpf, email, phone } = data
     const whereList: SQL[] = []
 
     if (name) {
@@ -53,10 +53,6 @@ export class AdopterRepository {
 
     if (phone) {
       whereList.push(ilike(adopter.phone, `%${phone}%`))
-    }
-
-    if (approvalStatus) {
-      whereList.push(eq(adopter.approvalStatus, approvalStatus))
     }
 
     const [sqlQuery, countQuery] = querifyString(data, whereList, querifyStringSettings)
@@ -88,7 +84,6 @@ export class AdopterRepository {
         address: adopter.address,
         familyIncome: adopter.familyIncome,
         animalExperience: adopter.animalExperience,
-        approvalStatus: adopter.approvalStatus,
         createdAt: adopter.createdAt,
         updatedAt: adopter.updatedAt,
       })
@@ -114,7 +109,6 @@ export class AdopterRepository {
         address: adopter.address,
         familyIncome: adopter.familyIncome,
         animalExperience: adopter.animalExperience,
-        approvalStatus: adopter.approvalStatus,
         createdAt: adopter.createdAt,
         updatedAt: adopter.updatedAt,
       })

@@ -21,7 +21,6 @@ export class GetAdopterByIdUseCase {
       address: adopter.address,
       familyIncome: Number(adopter.familyIncome),
       animalExperience: adopter.animalExperience,
-      approvalStatus: adopter.approvalStatus,
     }
   }
 }

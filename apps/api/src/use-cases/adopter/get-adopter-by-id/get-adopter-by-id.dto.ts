@@ -12,5 +12,4 @@ export interface GetAdopterByIdDTO {
   address: string
   familyIncome: number
   animalExperience: boolean
-  approvalStatus: string
 }

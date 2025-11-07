@@ -38,16 +38,9 @@ const adopterSchema = z.object({
   address: z.string().min(1, RequiredMessage),
   familyIncome: z.number().min(1, 'A renda familiar não pode ser zero.'),
   animalExperience: z.coerce.boolean(),
-  approvalStatus: z.string().nullish(),
 })
 
 type AdopterData = z.infer<typeof adopterSchema>
-
-const approvalStatusOptions = [
-  { value: 'pendente', label: 'Pendente' },
-  { value: 'aprovado', label: 'Aprovado' },
-  { value: 'reprovado', label: 'Reprovado' },
-]
 
 export const AdopterForm = () => {
   const { modal, token } = useApp()
@@ -57,7 +50,7 @@ export const AdopterForm = () => {
 
   const adopterForm = useForm({
     resolver: zodResolver(adopterSchema),
-    defaultValues: { familyIncome: 0, animalExperience: false, approvalStatus: 'pendente' },
+    defaultValues: { familyIncome: 0, animalExperience: false },
   })
 
   const {
@@ -156,23 +149,15 @@ export const AdopterForm = () => {
             <Separator className="my-7" />
             <div className="mb-6 font-semibold leading-none tracking-tight">Informações para Adoção</div>
 
-            <div className="mb-6 grid gap-4 lg:grid-cols-2">
-              <div>
-                <Form.Label htmlFor="familyIncome">Renda Familiar</Form.Label>
+            <div className="mb-6">
+              <Form.Label htmlFor="familyIncome">Renda Familiar</Form.Label>
 
-                <Form.IconContainer>
-                  <Form.DecimalInput name="familyIncome" className="pl-9" />
-                  <Form.Icon icon={DollarSignIcon} />
-                </Form.IconContainer>
+              <Form.IconContainer>
+                <Form.DecimalInput name="familyIncome" className="pl-9" />
+                <Form.Icon icon={DollarSignIcon} />
+              </Form.IconContainer>
 
-                <Form.ErrorMessage field="familyIncome" />
-              </div>
-
-              <div>
-                <Form.Label htmlFor="approvalStatus">Status de Aprovação</Form.Label>
-                <Form.Select disabled name="approvalStatus" options={approvalStatusOptions} />
-                <Form.ErrorMessage field="approvalStatus" />
-              </div>
+              <Form.ErrorMessage field="familyIncome" />
             </div>
 
             <div className="mb-6 flex items-center space-x-2">

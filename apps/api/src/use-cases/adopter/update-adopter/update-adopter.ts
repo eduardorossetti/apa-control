@@ -25,7 +25,6 @@ export class UpdateAdopterUseCase {
       address: data.address,
       familyIncome: new Decimal(data.familyIncome),
       animalExperience: data.animalExperience,
-      approvalStatus: data.approvalStatus,
       updatedAt: new Date(),
     })
   }

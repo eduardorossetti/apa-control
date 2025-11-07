@@ -1,6 +1,5 @@
 import { boolean, pgTable, serial, text, timestamp, varchar } from 'drizzle-orm/pg-core'
 import { decimalJs } from '../decimal-type'
-import { approvalStatusEnum } from './enums'
 
 export const adopter = pgTable('adopter', {
   id: serial().primaryKey(),
@@ -11,7 +10,6 @@ export const adopter = pgTable('adopter', {
   address: text().notNull(),
   familyIncome: decimalJs({ precision: 10, scale: 2 }).notNull(),
   animalExperience: boolean().notNull().default(false),
-  approvalStatus: approvalStatusEnum().notNull(),
   createdAt: timestamp().notNull(),
   updatedAt: timestamp(),
 })

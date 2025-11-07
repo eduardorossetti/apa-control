@@ -9,5 +9,4 @@ export type ListAdoptersDTO = {
   cpf: string
   email: string
   phone: string
-  approvalStatus: string
 }

@@ -29,7 +29,6 @@ interface AdopterListValues {
   cpf: string
   email: string
   phone: string
-  approvalStatus: string
 }
 
 const adopterFilterSchema = z.object({
@@ -40,16 +39,9 @@ const adopterFilterSchema = z.object({
   cpf: z.string().nullish(),
   email: z.string().nullish(),
   phone: z.string().nullish(),
-  approvalStatus: z.enum(['pendente', 'aprovado', 'reprovado']).nullish(),
 })
 
 type AdopterFilterData = z.infer<typeof adopterFilterSchema>
-
-const approvalStatusOptions = [
-  { value: 'pendente', label: 'Pendentes' },
-  { value: 'aprovado', label: 'Aprovados' },
-  { value: 'reprovado', label: 'Reprovados' },
-]
 
 export const AdopterList = () => {
   const { modal, token } = useApp()
@@ -63,7 +55,7 @@ export const AdopterList = () => {
     resolver: zodResolver(adopterFilterSchema),
     defaultValues: {
       page: 1,
-      fields: 'id,name,cpf,email,phone,approvalStatus',
+      fields: 'id,name,cpf,email,phone',
       sort: 'name',
     },
   })
@@ -119,24 +111,6 @@ export const AdopterList = () => {
     refresh.force()
   }
 
-  function getApprovalStatusBadge(status: string) {
-    const statusMap: Record<string, { label: string; className: string }> = {
-      pendente: { label: 'Pendente', className: 'bg-yellow-100 text-yellow-800' },
-      aprovado: { label: 'Aprovado', className: 'bg-green-100 text-green-800' },
-      reprovado: { label: 'Reprovado', className: 'bg-red-100 text-red-800' },
-    }
-
-    const statusInfo = statusMap[status] || { label: status, className: 'bg-gray-100 text-gray-800' }
-
-    return (
-      <span
-        className={`inline-flex items-center rounded-full px-2.5 py-0.5 font-medium text-xs ${statusInfo.className}`}
-      >
-        {statusInfo.label}
-      </span>
-    )
-  }
-
   return (
     <Card>
       <CardHeader>
@@ -156,7 +130,7 @@ export const AdopterList = () => {
       <CardContent>
         <FormProvider {...adopterFilterForm}>
           <form onSubmit={handleSubmit(listAdopters)}>
-            <div className="mb-6 grid gap-4 lg:grid-cols-2 2xl:grid-cols-3">
+            <div className="mb-6 grid gap-4 lg:grid-cols-4">
               <div>
                 <Form.Label htmlFor="name">Nome</Form.Label>
                 <Form.Input type="search" name="name" />
@@ -174,19 +148,11 @@ export const AdopterList = () => {
                 <Form.Input type="search" name="email" />
                 <Form.ErrorMessage field="email" />
               </div>
-            </div>
 
-            <div className="mb-6 grid gap-4 lg:grid-cols-2 2xl:grid-cols-2">
               <div>
                 <Form.Label htmlFor="phone">Telefone</Form.Label>
                 <Form.MaskInput type="search" name="phone" mask="(00) 00000-0000" />
                 <Form.ErrorMessage field="phone" />
-              </div>
-
-              <div>
-                <Form.Label htmlFor="approvalStatus">Status</Form.Label>
-                <Form.Select name="approvalStatus" isClearable placeholder="Todos" options={approvalStatusOptions} />
-                <Form.ErrorMessage field="approvalStatus" />
               </div>
             </div>
 
@@ -211,7 +177,6 @@ export const AdopterList = () => {
                 <TableHead>CPF</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>Telefone</TableHead>
-                <TableHead>Status</TableHead>
                 <TableHead aria-label="Ações" />
               </TableRow>
             </TableHeader>
@@ -223,7 +188,6 @@ export const AdopterList = () => {
                   <TableCell>{maskCpfCnpj(item.cpf)}</TableCell>
                   <TableCell>{item.email}</TableCell>
                   <TableCell>{maskPhone(item.phone)}</TableCell>
-                  <TableCell>{getApprovalStatusBadge(item.approvalStatus)}</TableCell>
                   <TableCell className="w-[1%] whitespace-nowrap">
                     <ActionsList
                       primaryKey="id"

@@ -1,4 +1,3 @@
-import { ApprovalStatus } from '@/database/schema/enums/approval-status'
 import { Adopter } from '@/entities'
 import type { AdopterRepository } from '@/repositories/adopter.repository'
 import { ApiError } from '@/utils/api-error'
@@ -21,7 +20,6 @@ export class CreateAdopterUseCase {
       address: data.address,
       familyIncome: new Decimal(data.familyIncome),
       animalExperience: data.animalExperience,
-      approvalStatus: ApprovalStatus.PENDING,
       createdAt: new Date(),
     })
 
