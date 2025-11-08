@@ -6,7 +6,7 @@ export const employee = pgTable('employee', {
   name: varchar({ length: 100 }).notNull(),
   login: varchar({ length: 50 }).notNull().unique(),
   cpf: varchar({ length: 11 }).notNull().unique(),
-  email: varchar({ length: 255 }).unique(),
+  email: varchar({ length: 255 }),
   passwordHash: varchar({ length: 255 }).notNull(),
   streetName: varchar({ length: 50 }),
   streetNumber: varchar({ length: 20 }),
