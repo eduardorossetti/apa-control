@@ -36,7 +36,8 @@ Sistema ERP para instituição de adoção de animais desenvolvido com React, No
 
    Crie um arquivo `.env` na pasta `apps/api/` com as seguintes variáveis:
 
-   ```env
+   ```bash
+   .env
    # Servidor
    PORT=3001
    NODE_ENV=development

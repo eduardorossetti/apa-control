@@ -1,7 +1,6 @@
+import { env } from '@/env'
 import { drizzle } from 'drizzle-orm/node-postgres'
 import { Pool } from 'pg'
-
-import { env } from '@/env'
 
 import * as schema from './schema'
 
@@ -19,6 +18,7 @@ const pool = new Pool({
   allowExitOnIdle: true,
   keepAliveInitialDelayMillis: 10000,
   application_name: 'apa-control-api',
+  ssl: env.NODE_ENV === 'production' ? { rejectUnauthorized: true } : false,
 })
 
 const db = drizzle(pool, { schema, casing: 'snake_case' })
