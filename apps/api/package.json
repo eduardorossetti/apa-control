@@ -14,7 +14,8 @@
     "test:reset": "tsx --env-file .env.test src/tests/reset-database.ts",
     "lint": "tsc --noEmit",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate",
+    "db:create-schema": "tsx src/database/create-drizzle-schema.ts",
+    "db:migrate": "tsx src/database/run-migrations.ts",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio"
   },

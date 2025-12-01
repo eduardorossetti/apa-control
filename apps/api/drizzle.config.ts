@@ -9,4 +9,5 @@ export default defineConfig({
     ssl: true,
   },
   casing: 'snake_case',
+  schemaFilter: ['public'],
 })
