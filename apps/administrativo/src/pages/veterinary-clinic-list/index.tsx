@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Building2Icon, CheckIcon, PencilIcon, PlusIcon, SearchIcon, XIcon } from 'lucide-react'
+import { Helmet } from 'react-helmet-async'
 import { z } from 'zod'
 
 import { useApp } from '../../App'
@@ -119,124 +120,129 @@ export const VeterinaryClinicList = () => {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>
-          <Building2Icon />
-          Clínicas Veterinárias
-        </CardTitle>
+    <>
+      <Helmet>
+        <title>Clínicas Veterinárias - APA Control</title>
+      </Helmet>
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            <Building2Icon />
+            Clínicas Veterinárias
+          </CardTitle>
 
-        <CardToolbar>
-          <Button variant="danger" onClick={() => navigate('cadastro')}>
-            <PlusIcon className="mr-2 h-5 w-5" />
-            <span>Nova Clínica Veterinária</span>
-          </Button>
-        </CardToolbar>
-      </CardHeader>
+          <CardToolbar>
+            <Button variant="danger" onClick={() => navigate('cadastro')}>
+              <PlusIcon className="mr-2 h-5 w-5" />
+              <span>Nova Clínica Veterinária</span>
+            </Button>
+          </CardToolbar>
+        </CardHeader>
 
-      <CardContent>
-        <FormProvider {...veterinaryClinicFilterForm}>
-          <form onSubmit={handleSubmit(listVeterinaryClinics)}>
-            <div className="mb-6 grid gap-4 lg:grid-cols-2 2xl:grid-cols-3">
-              <div>
-                <Form.Label htmlFor="name">Nome</Form.Label>
-                <Form.Input type="search" name="name" />
-                <Form.ErrorMessage field="name" />
+        <CardContent>
+          <FormProvider {...veterinaryClinicFilterForm}>
+            <form onSubmit={handleSubmit(listVeterinaryClinics)}>
+              <div className="mb-6 grid gap-4 lg:grid-cols-2 2xl:grid-cols-3">
+                <div>
+                  <Form.Label htmlFor="name">Nome</Form.Label>
+                  <Form.Input type="search" name="name" />
+                  <Form.ErrorMessage field="name" />
+                </div>
+
+                <div>
+                  <Form.Label htmlFor="cnpj">CNPJ</Form.Label>
+                  <Form.MaskInput type="search" name="cnpj" mask="00.000.000/0000-00" />
+                  <Form.ErrorMessage field="cnpj" />
+                </div>
+
+                <div>
+                  <Form.Label htmlFor="phone">Telefone</Form.Label>
+                  <Form.MaskInput type="search" name="phone" mask="(00) 00000-0000" />
+                  <Form.ErrorMessage field="phone" />
+                </div>
               </div>
 
-              <div>
-                <Form.Label htmlFor="cnpj">CNPJ</Form.Label>
-                <Form.MaskInput type="search" name="cnpj" mask="00.000.000/0000-00" />
-                <Form.ErrorMessage field="cnpj" />
+              <div className="mb-6 grid gap-4 lg:grid-cols-2 2xl:grid-cols-2">
+                <div>
+                  <Form.Label htmlFor="responsible">Responsável</Form.Label>
+                  <Form.Input type="search" name="responsible" />
+                  <Form.ErrorMessage field="responsible" />
+                </div>
+
+                <div>
+                  <Form.Label htmlFor="active">Status</Form.Label>
+                  <Form.Select name="active" isClearable placeholder="Todos" options={activeOptions} />
+                  <Form.ErrorMessage field="active" />
+                </div>
               </div>
 
-              <div>
-                <Form.Label htmlFor="phone">Telefone</Form.Label>
-                <Form.MaskInput type="search" name="phone" mask="(00) 00000-0000" />
-                <Form.ErrorMessage field="phone" />
-              </div>
-            </div>
+              <CardFooter className="mt-6 p-0">
+                <Button type="submit">
+                  <SearchIcon className="mr-2 h-5 w-5 shrink-0" />
+                  <span>Consultar</span>
+                </Button>
+              </CardFooter>
+            </form>
+          </FormProvider>
+        </CardContent>
 
-            <div className="mb-6 grid gap-4 lg:grid-cols-2 2xl:grid-cols-2">
-              <div>
-                <Form.Label htmlFor="responsible">Responsável</Form.Label>
-                <Form.Input type="search" name="responsible" />
-                <Form.ErrorMessage field="responsible" />
-              </div>
+        <div>
+          <Separator />
 
-              <div>
-                <Form.Label htmlFor="active">Status</Form.Label>
-                <Form.Select name="active" isClearable placeholder="Todos" options={activeOptions} />
-                <Form.ErrorMessage field="active" />
-              </div>
-            </div>
-
-            <CardFooter className="mt-6 p-0">
-              <Button type="submit">
-                <SearchIcon className="mr-2 h-5 w-5 shrink-0" />
-                <span>Consultar</span>
-              </Button>
-            </CardFooter>
-          </form>
-        </FormProvider>
-      </CardContent>
-
-      <div>
-        <Separator />
-
-        <div className="relative">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Nome</TableHead>
-                <TableHead>CNPJ</TableHead>
-                <TableHead>Telefone</TableHead>
-                <TableHead>Responsável</TableHead>
-                <TableHead>Ativo</TableHead>
-                <TableHead aria-label="Ações" />
-              </TableRow>
-            </TableHeader>
-
-            <TableBody>
-              {items.map((item) => (
-                <TableRow key={item.id}>
-                  <TableCell>{item.name}</TableCell>
-                  <TableCell>{maskCpfCnpj(item.cnpj)}</TableCell>
-                  <TableCell>{maskPhone(item.phone)}</TableCell>
-                  <TableCell>{item.responsible}</TableCell>
-                  <TableCell>
-                    {item.active ? (
-                      <CheckIcon className="h-4 w-4 text-green-500" />
-                    ) : (
-                      <XIcon className="h-4 w-4 text-red-500" />
-                    )}
-                  </TableCell>
-                  <TableCell className="w-[1%] whitespace-nowrap">
-                    <ActionsList
-                      primaryKey="id"
-                      values={item}
-                      actions={[
-                        { icon: PencilIcon, title: 'Editar', action: (item) => navigate(`${item.id}`) },
-                        { icon: XIcon, title: 'Remover', action: removeVeterinaryClinic },
-                      ]}
-                    />
-                  </TableCell>
+          <div className="relative">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Nome</TableHead>
+                  <TableHead>CNPJ</TableHead>
+                  <TableHead>Telefone</TableHead>
+                  <TableHead>Responsável</TableHead>
+                  <TableHead>Ativo</TableHead>
+                  <TableHead aria-label="Ações" />
                 </TableRow>
-              ))}
-            </TableBody>
+              </TableHeader>
 
-            {items.length === 0 && <TableCaption>Nenhum item foi encontrado.</TableCaption>}
-          </Table>
+              <TableBody>
+                {items.map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell>{item.name}</TableCell>
+                    <TableCell>{maskCpfCnpj(item.cnpj)}</TableCell>
+                    <TableCell>{maskPhone(item.phone)}</TableCell>
+                    <TableCell>{item.responsible}</TableCell>
+                    <TableCell>
+                      {item.active ? (
+                        <CheckIcon className="h-4 w-4 text-green-500" />
+                      ) : (
+                        <XIcon className="h-4 w-4 text-red-500" />
+                      )}
+                    </TableCell>
+                    <TableCell className="w-[1%] whitespace-nowrap">
+                      <ActionsList
+                        primaryKey="id"
+                        values={item}
+                        actions={[
+                          { icon: PencilIcon, title: 'Editar', action: (item) => navigate(`${item.id}`) },
+                          { icon: XIcon, title: 'Remover', action: removeVeterinaryClinic },
+                        ]}
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
 
-          {fetching && <LoadingCard position="absolute" />}
+              {items.length === 0 && <TableCaption>Nenhum item foi encontrado.</TableCaption>}
+            </Table>
+
+            {fetching && <LoadingCard position="absolute" />}
+          </div>
+
+          <div className="flex flex-wrap items-center justify-between gap-6 p-6">
+            <span className="text-sm">{itemCountMessage('clínicas veterinárias', page, pages, total)}</span>
+
+            <Pagination current={page} total={pages} changePage={changePage} />
+          </div>
         </div>
-
-        <div className="flex flex-wrap items-center justify-between gap-6 p-6">
-          <span className="text-sm">{itemCountMessage('clínicas veterinárias', page, pages, total)}</span>
-
-          <Pagination current={page} total={pages} changePage={changePage} />
-        </div>
-      </div>
-    </Card>
+      </Card>
+    </>
   )
 }

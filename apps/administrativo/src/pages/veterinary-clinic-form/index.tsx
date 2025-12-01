@@ -3,6 +3,7 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { Building2Icon, CalendarIcon, ChevronLeftIcon, GlobeIcon, PhoneIcon, SaveIcon } from 'lucide-react'
+import { Helmet } from 'react-helmet-async'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
@@ -90,104 +91,108 @@ export const VeterinaryClinicForm = () => {
   if (fetching) return <LoadingCard />
 
   return (
-    <Card>
-      <Tabs defaultValue="general">
-        <CardHeader>
-          <CardTitle>
-            <Building2Icon />
-            {params.id ? 'Editar Clínica Veterinária' : 'Nova Clínica Veterinária'}
-          </CardTitle>
+    <>
+      <Helmet>
+        <title>Clínica Veterinária - APA Control</title>
+      </Helmet>
+      <Card>
+        <Tabs defaultValue="general">
+          <CardHeader>
+            <CardTitle>
+              <Building2Icon />
+              {params.id ? 'Editar Clínica Veterinária' : 'Nova Clínica Veterinária'}
+            </CardTitle>
 
-          <TabsList>
-            <TabsTrigger value="general">
-              <GlobeIcon className="h-5 w-5 shrink-0" />
-              Geral
-            </TabsTrigger>
+            <TabsList>
+              <TabsTrigger value="general">
+                <GlobeIcon className="h-5 w-5 shrink-0" />
+                Geral
+              </TabsTrigger>
 
-            <TabsTrigger value="schedule">
-              <CalendarIcon className="h-5 w-5 shrink-0" />
-              Agenda
-            </TabsTrigger>
-          </TabsList>
-        </CardHeader>
+              <TabsTrigger value="schedule">
+                <CalendarIcon className="h-5 w-5 shrink-0" />
+                Agenda
+              </TabsTrigger>
+            </TabsList>
+          </CardHeader>
 
-        <FormProvider {...veterinaryClinicForm}>
-          <form autoComplete="off" onSubmit={handleSubmit(addOrUpdateVeterinaryClinic)}>
-            <CardContent>
-              <TabsContent value="general">
-                <div className="mb-6 grid gap-4 lg:grid-cols-2">
-                  <div>
-                    <Form.Label htmlFor="name">Nome</Form.Label>
-                    <Form.Input name="name" />
-                    <Form.ErrorMessage field="name" />
+          <FormProvider {...veterinaryClinicForm}>
+            <form autoComplete="off" onSubmit={handleSubmit(addOrUpdateVeterinaryClinic)}>
+              <CardContent>
+                <TabsContent value="general">
+                  <div className="mb-6 grid gap-4 lg:grid-cols-2">
+                    <div>
+                      <Form.Label htmlFor="name">Nome</Form.Label>
+                      <Form.Input name="name" />
+                      <Form.ErrorMessage field="name" />
+                    </div>
+
+                    <div>
+                      <Form.Label htmlFor="cnpj">CNPJ</Form.Label>
+                      <Form.MaskInput name="cnpj" mask="00.000.000/0000-00" />
+                      <Form.ErrorMessage field="cnpj" />
+                    </div>
                   </div>
 
-                  <div>
-                    <Form.Label htmlFor="cnpj">CNPJ</Form.Label>
-                    <Form.MaskInput name="cnpj" mask="00.000.000/0000-00" />
-                    <Form.ErrorMessage field="cnpj" />
+                  <div className="mb-6 grid gap-4 lg:grid-cols-2">
+                    <div>
+                      <Form.Label htmlFor="phone">Telefone</Form.Label>
+                      <Form.IconContainer>
+                        <Form.MaskInput name="phone" mask="(00) 00000-0000" className="pl-9" />
+                        <Form.Icon icon={PhoneIcon} />
+                      </Form.IconContainer>
+                      <Form.ErrorMessage field="phone" />
+                    </div>
+
+                    <div>
+                      <Form.Label htmlFor="responsible">Responsável</Form.Label>
+                      <Form.Input name="responsible" />
+                      <Form.ErrorMessage field="responsible" />
+                    </div>
                   </div>
-                </div>
 
-                <div className="mb-6 grid gap-4 lg:grid-cols-2">
-                  <div>
-                    <Form.Label htmlFor="phone">Telefone</Form.Label>
-                    <Form.IconContainer>
-                      <Form.MaskInput name="phone" mask="(00) 00000-0000" className="pl-9" />
-                      <Form.Icon icon={PhoneIcon} />
-                    </Form.IconContainer>
-                    <Form.ErrorMessage field="phone" />
+                  <div className="mb-6">
+                    <Form.Label htmlFor="address">Endereço</Form.Label>
+                    <Form.TextArea name="address" rows={3} />
+                    <Form.ErrorMessage field="address" />
                   </div>
 
-                  <div>
-                    <Form.Label htmlFor="responsible">Responsável</Form.Label>
-                    <Form.Input name="responsible" />
-                    <Form.ErrorMessage field="responsible" />
+                  <div className="mb-6">
+                    <Form.Label htmlFor="specialties">Especialidades</Form.Label>
+                    <Form.TextArea name="specialties" rows={3} />
+                    <Form.ErrorMessage field="specialties" />
                   </div>
-                </div>
 
-                <div className="mb-6">
-                  <Form.Label htmlFor="address">Endereço</Form.Label>
-                  <Form.TextArea name="address" rows={3} />
-                  <Form.ErrorMessage field="address" />
-                </div>
+                  <div className="mb-6 flex items-center space-x-2">
+                    <Form.Switch name="active" />
+                    <Form.Label htmlFor="active" className="mb-0 leading-normal">
+                      Ativo?
+                    </Form.Label>
+                  </div>
+                </TabsContent>
+              </CardContent>
 
-                <div className="mb-6">
-                  <Form.Label htmlFor="specialties">Especialidades</Form.Label>
-                  <Form.TextArea name="specialties" rows={3} />
-                  <Form.ErrorMessage field="specialties" />
-                </div>
+              <CardFooter>
+                <Button type="button" variant="outline" disabled={isSubmitting} onClick={() => pushTo(-1)}>
+                  <ChevronLeftIcon className="mr-2 h-5 w-5" />
+                  <span>Voltar</span>
+                </Button>
 
-                <div className="mb-6 flex items-center space-x-2">
-                  <Form.Switch name="active" />
-                  <Form.Label htmlFor="active" className="mb-0 leading-normal">
-                    Ativo?
-                  </Form.Label>
-                </div>
-              </TabsContent>
-
-            </CardContent>
-
-            <CardFooter>
-              <Button type="button" variant="outline" disabled={isSubmitting} onClick={() => pushTo(-1)}>
-                <ChevronLeftIcon className="mr-2 h-5 w-5" />
-                <span>Voltar</span>
-              </Button>
-
-              <Button type="submit" variant="success" disabled={isSubmitting}>
-                {isSubmitting ? (
-                  <Spinner />
-                ) : (
-                  <>
-                    <SaveIcon className="mr-2 h-5 w-5" />
-                    <span>Salvar</span>
-                  </>
-                )}
-              </Button>
-            </CardFooter>
-          </form>
-        </FormProvider>
-      </Tabs>
-    </Card>
+                <Button type="submit" variant="success" disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <Spinner />
+                  ) : (
+                    <>
+                      <SaveIcon className="mr-2 h-5 w-5" />
+                      <span>Salvar</span>
+                    </>
+                  )}
+                </Button>
+              </CardFooter>
+            </form>
+          </FormProvider>
+        </Tabs>
+      </Card>
+    </>
   )
 }

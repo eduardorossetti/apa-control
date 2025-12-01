@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Separator } from '@radix-ui/react-select'
 import { PencilIcon, PlusIcon, UserSquare2Icon, XIcon } from 'lucide-react'
+import { Helmet } from 'react-helmet-async'
 import { z } from 'zod'
 
 import { useApp } from '../../App'
@@ -99,65 +100,70 @@ export const ProfileList = () => {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>
-          <UserSquare2Icon />
-          Perfis
-        </CardTitle>
+    <>
+      <Helmet>
+        <title>Perfis de Acesso - APA Control</title>
+      </Helmet>
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            <UserSquare2Icon />
+            Perfis
+          </CardTitle>
 
-        <CardToolbar>
-          <Button variant="danger" asChild>
-            <Link to="cadastro">
-              <PlusIcon className="mr-2 h-5 w-5" />
-              <span>Novo Perfil</span>
-            </Link>
-          </Button>
-        </CardToolbar>
-      </CardHeader>
+          <CardToolbar>
+            <Button variant="danger" asChild>
+              <Link to="cadastro">
+                <PlusIcon className="mr-2 h-5 w-5" />
+                <span>Novo Perfil</span>
+              </Link>
+            </Button>
+          </CardToolbar>
+        </CardHeader>
 
-      <div>
-        <Separator />
+        <div>
+          <Separator />
 
-        <div className="relative">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Descrição</TableHead>
-                <TableHead aria-label="Ações" />
-              </TableRow>
-            </TableHeader>
-
-            <TableBody>
-              {items.map((item) => (
-                <TableRow key={item.id}>
-                  <TableCell>{item.description}</TableCell>
-                  <TableCell className="w-[1%] whitespace-nowrap">
-                    <ActionsList
-                      primaryKey="id"
-                      values={item}
-                      actions={[
-                        { icon: PencilIcon, title: 'Editar', action: ':id' },
-                        { icon: XIcon, title: 'Remover', action: removeProfile },
-                      ]}
-                    />
-                  </TableCell>
+          <div className="relative">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Descrição</TableHead>
+                  <TableHead aria-label="Ações" />
                 </TableRow>
-              ))}
-            </TableBody>
+              </TableHeader>
 
-            {items.length === 0 && <TableCaption>Nenhum item foi encontrado.</TableCaption>}
-          </Table>
+              <TableBody>
+                {items.map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell>{item.description}</TableCell>
+                    <TableCell className="w-[1%] whitespace-nowrap">
+                      <ActionsList
+                        primaryKey="id"
+                        values={item}
+                        actions={[
+                          { icon: PencilIcon, title: 'Editar', action: ':id' },
+                          { icon: XIcon, title: 'Remover', action: removeProfile },
+                        ]}
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
 
-          {fetching && <LoadingCard position="absolute" />}
+              {items.length === 0 && <TableCaption>Nenhum item foi encontrado.</TableCaption>}
+            </Table>
+
+            {fetching && <LoadingCard position="absolute" />}
+          </div>
+
+          <div className="flex flex-wrap items-center justify-between gap-6 p-6">
+            <span className="text-sm">{itemCountMessage('perfis', page, pages, total)}</span>
+
+            <Pagination current={page} total={pages} changePage={changePage} />
+          </div>
         </div>
-
-        <div className="flex flex-wrap items-center justify-between gap-6 p-6">
-          <span className="text-sm">{itemCountMessage('perfis', page, pages, total)}</span>
-
-          <Pagination current={page} total={pages} changePage={changePage} />
-        </div>
-      </div>
-    </Card>
+      </Card>
+    </>
   )
 }

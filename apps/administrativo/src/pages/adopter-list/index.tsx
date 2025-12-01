@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { HeartIcon, PencilIcon, PlusIcon, SearchIcon, TrashIcon } from 'lucide-react'
+import { Helmet } from 'react-helmet-async'
 import { z } from 'zod'
 
 import { useApp } from '../../App'
@@ -112,108 +113,113 @@ export const AdopterList = () => {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>
-          <HeartIcon />
-          Adotantes
-        </CardTitle>
+    <>
+      <Helmet>
+        <title>Adotantes - APA Control</title>
+      </Helmet>
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            <HeartIcon />
+            Adotantes
+          </CardTitle>
 
-        <CardToolbar>
-          <Button variant="danger" onClick={() => navigate('cadastro')}>
-            <PlusIcon className="mr-2 h-5 w-5" />
-            <span>Novo Adotante</span>
-          </Button>
-        </CardToolbar>
-      </CardHeader>
+          <CardToolbar>
+            <Button variant="danger" onClick={() => navigate('cadastro')}>
+              <PlusIcon className="mr-2 h-5 w-5" />
+              <span>Novo Adotante</span>
+            </Button>
+          </CardToolbar>
+        </CardHeader>
 
-      <CardContent>
-        <FormProvider {...adopterFilterForm}>
-          <form onSubmit={handleSubmit(listAdopters)}>
-            <div className="mb-6 grid gap-4 lg:grid-cols-4">
-              <div>
-                <Form.Label htmlFor="name">Nome</Form.Label>
-                <Form.Input type="search" name="name" />
-                <Form.ErrorMessage field="name" />
+        <CardContent>
+          <FormProvider {...adopterFilterForm}>
+            <form onSubmit={handleSubmit(listAdopters)}>
+              <div className="mb-6 grid gap-4 lg:grid-cols-4">
+                <div>
+                  <Form.Label htmlFor="name">Nome</Form.Label>
+                  <Form.Input type="search" name="name" />
+                  <Form.ErrorMessage field="name" />
+                </div>
+
+                <div>
+                  <Form.Label htmlFor="cpf">CPF</Form.Label>
+                  <Form.MaskInput type="search" name="cpf" mask="000.000.000-00" />
+                  <Form.ErrorMessage field="cpf" />
+                </div>
+
+                <div>
+                  <Form.Label htmlFor="email">Email</Form.Label>
+                  <Form.Input type="search" name="email" />
+                  <Form.ErrorMessage field="email" />
+                </div>
+
+                <div>
+                  <Form.Label htmlFor="phone">Telefone</Form.Label>
+                  <Form.MaskInput type="search" name="phone" mask="(00) 00000-0000" />
+                  <Form.ErrorMessage field="phone" />
+                </div>
               </div>
 
-              <div>
-                <Form.Label htmlFor="cpf">CPF</Form.Label>
-                <Form.MaskInput type="search" name="cpf" mask="000.000.000-00" />
-                <Form.ErrorMessage field="cpf" />
-              </div>
+              <CardFooter className="mt-6 p-0">
+                <Button type="submit">
+                  <SearchIcon className="mr-2 h-5 w-5 shrink-0" />
+                  <span>Consultar</span>
+                </Button>
+              </CardFooter>
+            </form>
+          </FormProvider>
+        </CardContent>
 
-              <div>
-                <Form.Label htmlFor="email">Email</Form.Label>
-                <Form.Input type="search" name="email" />
-                <Form.ErrorMessage field="email" />
-              </div>
+        <div>
+          <Separator />
 
-              <div>
-                <Form.Label htmlFor="phone">Telefone</Form.Label>
-                <Form.MaskInput type="search" name="phone" mask="(00) 00000-0000" />
-                <Form.ErrorMessage field="phone" />
-              </div>
-            </div>
-
-            <CardFooter className="mt-6 p-0">
-              <Button type="submit">
-                <SearchIcon className="mr-2 h-5 w-5 shrink-0" />
-                <span>Consultar</span>
-              </Button>
-            </CardFooter>
-          </form>
-        </FormProvider>
-      </CardContent>
-
-      <div>
-        <Separator />
-
-        <div className="relative">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Nome</TableHead>
-                <TableHead>CPF</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Telefone</TableHead>
-                <TableHead aria-label="Ações" />
-              </TableRow>
-            </TableHeader>
-
-            <TableBody>
-              {items.map((item) => (
-                <TableRow key={item.id}>
-                  <TableCell>{item.name}</TableCell>
-                  <TableCell>{maskCpfCnpj(item.cpf)}</TableCell>
-                  <TableCell>{item.email}</TableCell>
-                  <TableCell>{maskPhone(item.phone)}</TableCell>
-                  <TableCell className="w-[1%] whitespace-nowrap">
-                    <ActionsList
-                      primaryKey="id"
-                      values={item}
-                      actions={[
-                        { icon: PencilIcon, title: 'Editar', action: (item) => navigate(`${item.id}`) },
-                        { icon: TrashIcon, title: 'Remover', action: removeAdopter },
-                      ]}
-                    />
-                  </TableCell>
+          <div className="relative">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Nome</TableHead>
+                  <TableHead>CPF</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Telefone</TableHead>
+                  <TableHead aria-label="Ações" />
                 </TableRow>
-              ))}
-            </TableBody>
+              </TableHeader>
 
-            {items.length === 0 && <TableCaption>Nenhum item foi encontrado.</TableCaption>}
-          </Table>
+              <TableBody>
+                {items.map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell>{item.name}</TableCell>
+                    <TableCell>{maskCpfCnpj(item.cpf)}</TableCell>
+                    <TableCell>{item.email}</TableCell>
+                    <TableCell>{maskPhone(item.phone)}</TableCell>
+                    <TableCell className="w-[1%] whitespace-nowrap">
+                      <ActionsList
+                        primaryKey="id"
+                        values={item}
+                        actions={[
+                          { icon: PencilIcon, title: 'Editar', action: (item) => navigate(`${item.id}`) },
+                          { icon: TrashIcon, title: 'Remover', action: removeAdopter },
+                        ]}
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
 
-          {fetching && <LoadingCard position="absolute" />}
+              {items.length === 0 && <TableCaption>Nenhum item foi encontrado.</TableCaption>}
+            </Table>
+
+            {fetching && <LoadingCard position="absolute" />}
+          </div>
+
+          <div className="flex flex-wrap items-center justify-between gap-6 p-6">
+            <span className="text-sm">{itemCountMessage('adotantes', page, pages, total)}</span>
+
+            <Pagination current={page} total={pages} changePage={changePage} />
+          </div>
         </div>
-
-        <div className="flex flex-wrap items-center justify-between gap-6 p-6">
-          <span className="text-sm">{itemCountMessage('adotantes', page, pages, total)}</span>
-
-          <Pagination current={page} total={pages} changePage={changePage} />
-        </div>
-      </div>
-    </Card>
+      </Card>
+    </>
   )
 }

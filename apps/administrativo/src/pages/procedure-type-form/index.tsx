@@ -3,6 +3,7 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 
 import { DollarSignIcon } from 'lucide-react'
+import { Helmet } from 'react-helmet-async'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
@@ -90,58 +91,62 @@ export const ProcedureTypeForm = ({ show, refresh, id }: ProcedureTypeFormProps)
   if (fetching) return <LoadingCard />
 
   return (
-    <FormProvider {...procedureTypeForm}>
-      <ModalForm
-        title={displayName || 'Novo Tipo de Procedimento'}
-        show={show}
-        fetching={fetching}
-        submitting={isSubmitting}
-        resetForm={reset}
-        onSubmit={handleSubmit(addOrUpdateProcedureType)}
-        closeAction={handleClose}
-      >
-        <div className="mb-6 grid gap-4 lg:grid-cols-2">
-          <div>
-            <Form.Label htmlFor="name">Nome</Form.Label>
-            <Form.Input name="name" />
-            <Form.ErrorMessage field="name" />
+    <>
+      <Helmet>
+        <title>Tipo de Procedimento - APA Control</title>
+      </Helmet>
+      <FormProvider {...procedureTypeForm}>
+        <ModalForm
+          title={displayName || 'Novo Tipo de Procedimento'}
+          show={show}
+          fetching={fetching}
+          submitting={isSubmitting}
+          resetForm={reset}
+          onSubmit={handleSubmit(addOrUpdateProcedureType)}
+          closeAction={handleClose}
+        >
+          <div className="mb-6 grid gap-4 lg:grid-cols-2">
+            <div>
+              <Form.Label htmlFor="name">Nome</Form.Label>
+              <Form.Input name="name" />
+              <Form.ErrorMessage field="name" />
+            </div>
+
+            <div>
+              <Form.Label htmlFor="category">Classificação</Form.Label>
+              <Form.Select name="category" options={procedureCategoryOptions} />
+              <Form.ErrorMessage field="category" />
+            </div>
           </div>
 
-          <div>
-            <Form.Label htmlFor="category">Classificação</Form.Label>
-            <Form.Select name="category" options={procedureCategoryOptions} />
-            <Form.ErrorMessage field="category" />
+          <div className="mb-6 grid gap-4 lg:grid-cols-2">
+            <div>
+              <Form.Label htmlFor="description">Descrição</Form.Label>
+              <Form.Input name="description" />
+              <Form.ErrorMessage field="description" />
+            </div>
+
+            <div>
+              <Form.Label htmlFor="averageCost">Custo Médio</Form.Label>
+
+              <Form.IconContainer>
+                <Form.DecimalInput name="averageCost" className="pl-9" />
+                <Form.Icon icon={DollarSignIcon} />
+              </Form.IconContainer>
+
+              <Form.ErrorMessage field="averageCost" />
+            </div>
+
+            <div className="mb-6 flex items-center space-x-2">
+              <Form.Switch name="active" />
+              <Form.Label htmlFor="active" className="mb-0 leading-normal">
+                Ativo?
+              </Form.Label>
+            </div>
           </div>
-        </div>
-
-        <div className="mb-6 grid gap-4 lg:grid-cols-2">
-          <div>
-            <Form.Label htmlFor="description">Descrição</Form.Label>
-            <Form.Input name="description" />
-            <Form.ErrorMessage field="description" />
-          </div>
-
-          <div>
-            <Form.Label htmlFor="averageCost">Custo Médio</Form.Label>
-
-            <Form.IconContainer>
-              <Form.DecimalInput name="averageCost" className="pl-9" />
-              <Form.Icon icon={DollarSignIcon} />
-            </Form.IconContainer>
-
-            <Form.ErrorMessage field="averageCost" />
-          </div>
-
-          <div className="mb-6 flex items-center space-x-2">
-            <Form.Switch name="active" />
-            <Form.Label htmlFor="active" className="mb-0 leading-normal">
-              Ativo?
-            </Form.Label>
-          </div>
-        </div>
-
-      </ModalForm>
-    </FormProvider>
+        </ModalForm>
+      </FormProvider>
+    </>
   )
 }
 

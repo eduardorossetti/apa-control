@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { DogIcon, PencilIcon, PlusIcon, SearchIcon, XIcon } from 'lucide-react'
+import { Helmet } from 'react-helmet-async'
 import { z } from 'zod'
 
 import { useApp } from '../../App'
@@ -127,115 +128,120 @@ export const AnimalList = () => {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>
-          <DogIcon />
-          Animais
-        </CardTitle>
+    <>
+      <Helmet>
+        <title>Animais - APA Control</title>
+      </Helmet>
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            <DogIcon />
+            Animais
+          </CardTitle>
 
-        <CardToolbar>
-          <Button variant="danger" asChild>
-            <Link to="cadastro">
-              <PlusIcon className="mr-2 h-5 w-5" />
-              <span>Novo Animal</span>
-            </Link>
-          </Button>
-        </CardToolbar>
-      </CardHeader>
+          <CardToolbar>
+            <Button variant="danger" asChild>
+              <Link to="cadastro">
+                <PlusIcon className="mr-2 h-5 w-5" />
+                <span>Novo Animal</span>
+              </Link>
+            </Button>
+          </CardToolbar>
+        </CardHeader>
 
-      <CardContent>
-        <FormProvider {...animalFilterForm}>
-          <form onSubmit={handleSubmit(listAnimals)}>
-            <div className="mb-6 grid gap-4 lg:grid-cols-2 2xl:grid-cols-4">
-              <div>
-                <Form.Label htmlFor="name">Nome</Form.Label>
-                <Form.Input type="search" name="name" />
-                <Form.ErrorMessage field="name" />
+        <CardContent>
+          <FormProvider {...animalFilterForm}>
+            <form onSubmit={handleSubmit(listAnimals)}>
+              <div className="mb-6 grid gap-4 lg:grid-cols-2 2xl:grid-cols-4">
+                <div>
+                  <Form.Label htmlFor="name">Nome</Form.Label>
+                  <Form.Input type="search" name="name" />
+                  <Form.ErrorMessage field="name" />
+                </div>
+
+                <div>
+                  <Form.Label htmlFor="species">Espécie</Form.Label>
+                  <Form.Select name="species" isClearable placeholder="Todas" options={speciesOptions} />
+                  <Form.ErrorMessage field="species" />
+                </div>
+
+                <div>
+                  <Form.Label htmlFor="breed">Raça</Form.Label>
+                  <Form.Input type="search" name="breed" />
+                  <Form.ErrorMessage field="breed" />
+                </div>
+
+                <div>
+                  <Form.Label htmlFor="status">Status</Form.Label>
+                  <Form.Select name="status" isClearable placeholder="Todos" options={statusOptions} />
+                  <Form.ErrorMessage field="status" />
+                </div>
               </div>
 
-              <div>
-                <Form.Label htmlFor="species">Espécie</Form.Label>
-                <Form.Select name="species" isClearable placeholder="Todas" options={speciesOptions} />
-                <Form.ErrorMessage field="species" />
-              </div>
+              <CardFooter className="mt-6 p-0">
+                <Button type="submit">
+                  <SearchIcon className="mr-2 h-5 w-5 shrink-0" />
+                  <span>Consultar</span>
+                </Button>
+              </CardFooter>
+            </form>
+          </FormProvider>
+        </CardContent>
 
-              <div>
-                <Form.Label htmlFor="breed">Raça</Form.Label>
-                <Form.Input type="search" name="breed" />
-                <Form.ErrorMessage field="breed" />
-              </div>
+        <div>
+          <Separator />
 
-              <div>
-                <Form.Label htmlFor="status">Status</Form.Label>
-                <Form.Select name="status" isClearable placeholder="Todos" options={statusOptions} />
-                <Form.ErrorMessage field="status" />
-              </div>
-            </div>
-
-            <CardFooter className="mt-6 p-0">
-              <Button type="submit">
-                <SearchIcon className="mr-2 h-5 w-5 shrink-0" />
-                <span>Consultar</span>
-              </Button>
-            </CardFooter>
-          </form>
-        </FormProvider>
-      </CardContent>
-
-      <div>
-        <Separator />
-
-        <div className="relative">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Nome</TableHead>
-                <TableHead>Espécie</TableHead>
-                <TableHead>Raça</TableHead>
-                <TableHead>Idade</TableHead>
-                <TableHead>Condição</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead aria-label="Ações" />
-              </TableRow>
-            </TableHeader>
-
-            <TableBody>
-              {items.map((item) => (
-                <TableRow key={item.id}>
-                  <TableCell>{formatName(item.name)}</TableCell>
-                  <TableCell>{formatSpecies(item.species)}</TableCell>
-                  <TableCell>{item.breed}</TableCell>
-                  <TableCell>{item.age} anos</TableCell>
-                  <TableCell>{formatHealthCondition(item.healthCondition)}</TableCell>
-                  <TableCell>{formatStatus(item.status)}</TableCell>
-                  <TableCell className="w-[1%] whitespace-nowrap">
-                    <ActionsList
-                      primaryKey="id"
-                      values={item}
-                      actions={[
-                        { icon: PencilIcon, title: 'Editar', action: ':id' },
-                        { icon: XIcon, title: 'Remover', action: removeAnimal },
-                      ]}
-                    />
-                  </TableCell>
+          <div className="relative">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Nome</TableHead>
+                  <TableHead>Espécie</TableHead>
+                  <TableHead>Raça</TableHead>
+                  <TableHead>Idade</TableHead>
+                  <TableHead>Condição</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead aria-label="Ações" />
                 </TableRow>
-              ))}
-            </TableBody>
+              </TableHeader>
 
-            {items.length === 0 && <TableCaption>Nenhum item foi encontrado.</TableCaption>}
-          </Table>
+              <TableBody>
+                {items.map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell>{formatName(item.name)}</TableCell>
+                    <TableCell>{formatSpecies(item.species)}</TableCell>
+                    <TableCell>{item.breed}</TableCell>
+                    <TableCell>{item.age} anos</TableCell>
+                    <TableCell>{formatHealthCondition(item.healthCondition)}</TableCell>
+                    <TableCell>{formatStatus(item.status)}</TableCell>
+                    <TableCell className="w-[1%] whitespace-nowrap">
+                      <ActionsList
+                        primaryKey="id"
+                        values={item}
+                        actions={[
+                          { icon: PencilIcon, title: 'Editar', action: ':id' },
+                          { icon: XIcon, title: 'Remover', action: removeAnimal },
+                        ]}
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
 
-          {fetching && <LoadingCard position="absolute" />}
+              {items.length === 0 && <TableCaption>Nenhum item foi encontrado.</TableCaption>}
+            </Table>
+
+            {fetching && <LoadingCard position="absolute" />}
+          </div>
+
+          <div className="flex flex-wrap items-center justify-between gap-6 p-6">
+            <span className="text-sm">{itemCountMessage('animais', page, pages, total)}</span>
+
+            <Pagination current={page} total={pages} changePage={changePage} />
+          </div>
         </div>
-
-        <div className="flex flex-wrap items-center justify-between gap-6 p-6">
-          <span className="text-sm">{itemCountMessage('animais', page, pages, total)}</span>
-
-          <Pagination current={page} total={pages} changePage={changePage} />
-        </div>
-      </div>
-    </Card>
+      </Card>
+    </>
   )
 }
 

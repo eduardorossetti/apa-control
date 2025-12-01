@@ -4,6 +4,7 @@ import { Link, useParams } from 'react-router-dom'
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CheckIcon, PawPrintIcon, PencilIcon, PlusIcon, SearchIcon, XIcon } from 'lucide-react'
+import { Helmet } from 'react-helmet-async'
 import { z } from 'zod'
 
 import { useApp } from '../../App'
@@ -106,6 +107,9 @@ export const ProcedureTypeList = () => {
 
   return (
     <>
+      <Helmet>
+        <title>Tipos de Procedimento - APA Control</title>
+      </Helmet>
       <Card>
         <CardHeader>
           <CardTitle>

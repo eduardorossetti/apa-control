@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 
 import { CalendarIcon, CheckIcon, PencilIcon, PlusIcon, XIcon } from 'lucide-react'
+import { Helmet } from 'react-helmet-async'
 
 import { useApp } from '../../App'
 import { Button } from '../../components/button'
@@ -63,6 +64,9 @@ export const AppointmentTypeList = () => {
 
   return (
     <>
+      <Helmet>
+        <title>Tipos de Consulta - APA Control</title>
+      </Helmet>
       <Card>
         <CardHeader>
           <CardTitle>

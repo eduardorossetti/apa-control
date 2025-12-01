@@ -7,6 +7,7 @@ import { z } from 'zod'
 
 import { zodResolver } from '@hookform/resolvers/zod'
 
+import { Helmet } from 'react-helmet-async'
 import { useApp } from '../../App'
 import { Form } from '../../components/form-hook'
 import { LoadingCard } from '../../components/loading-card'
@@ -87,36 +88,40 @@ export const CampaignTypeForm = ({ show, refresh, id }: CampaignTypeFormProps) =
   if (fetching) return <LoadingCard />
 
   return (
-    <FormProvider {...campaignTypeForm}>
-      <ModalForm
-        title={displayName || 'Novo Tipo de Campanha'}
-        show={show}
-        fetching={fetching}
-        submitting={isSubmitting}
-        resetForm={reset}
-        onSubmit={handleSubmit(addOrUpdateCampaignType)}
-        closeAction={handleClose}
-      >
-        <div className="mb-6">
-          <Form.Label htmlFor="name">Nome</Form.Label>
-          <Form.Input name="name" />
-          <Form.ErrorMessage field="name" />
-        </div>
+    <>
+      <Helmet>
+        <title>Tipo de Campanha - APA Control</title>
+      </Helmet>
+      <FormProvider {...campaignTypeForm}>
+        <ModalForm
+          title={displayName || 'Novo Tipo de Campanha'}
+          show={show}
+          fetching={fetching}
+          submitting={isSubmitting}
+          resetForm={reset}
+          onSubmit={handleSubmit(addOrUpdateCampaignType)}
+          closeAction={handleClose}
+        >
+          <div className="mb-6">
+            <Form.Label htmlFor="name">Nome</Form.Label>
+            <Form.Input name="name" />
+            <Form.ErrorMessage field="name" />
+          </div>
 
-        <div className="mb-6">
-          <Form.Label htmlFor="description">Descrição</Form.Label>
-          <Form.TextArea name="description" />
-          <Form.ErrorMessage field="description" />
-        </div>
+          <div className="mb-6">
+            <Form.Label htmlFor="description">Descrição</Form.Label>
+            <Form.TextArea name="description" />
+            <Form.ErrorMessage field="description" />
+          </div>
 
-        <div className="mb-6 flex items-center space-x-2">
-          <Form.Switch name="active" />
-          <Form.Label htmlFor="active" className="mb-0 leading-normal">
-            Ativo?
-          </Form.Label>
-        </div>
-
-      </ModalForm>
-    </FormProvider>
+          <div className="mb-6 flex items-center space-x-2">
+            <Form.Switch name="active" />
+            <Form.Label htmlFor="active" className="mb-0 leading-normal">
+              Ativo?
+            </Form.Label>
+          </div>
+        </ModalForm>
+      </FormProvider>
+    </>
   )
 }

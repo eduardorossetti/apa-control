@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 
 import { CheckIcon, MegaphoneIcon, PencilIcon, PlusIcon, XIcon } from 'lucide-react'
+import { Helmet } from 'react-helmet-async'
 
 import { useApp } from '../../App'
 import { Button } from '../../components/button'
@@ -62,6 +63,9 @@ export const CampaignTypeList = () => {
 
   return (
     <>
+      <Helmet>
+        <title>Tipos de Campanha - APA Control</title>
+      </Helmet>
       <Card>
         <CardHeader>
           <CardTitle>

@@ -5,6 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { zodResolver } from '@hookform/resolvers/zod'
 import groupBy from 'lodash/groupBy'
 import { ChevronLeftIcon, SaveIcon, UserSquare2Icon } from 'lucide-react'
+import { Helmet } from 'react-helmet-async'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
@@ -94,51 +95,55 @@ export const ProfileForm = () => {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>
-          <UserSquare2Icon className="h-5 w-5 shrink-0" />
-          Perfil
-        </CardTitle>
-      </CardHeader>
+    <>
+      <Helmet>
+        <title>Perfil de Acesso - APA Control</title>
+      </Helmet>
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            <UserSquare2Icon className="h-5 w-5 shrink-0" />
+            Perfil
+          </CardTitle>
+        </CardHeader>
 
-      <FormProvider {...profileForm}>
-        <form onSubmit={handleSubmit(addOrUpdateProfile)}>
-          <CardContent>
-            <Form.Field>
-              <Form.Label htmlFor="description">Descrição</Form.Label>
-              <Form.Input name="description" />
-              <Form.ErrorMessage field="description" />
-            </Form.Field>
+        <FormProvider {...profileForm}>
+          <form onSubmit={handleSubmit(addOrUpdateProfile)}>
+            <CardContent>
+              <Form.Field>
+                <Form.Label htmlFor="description">Descrição</Form.Label>
+                <Form.Input name="description" />
+                <Form.ErrorMessage field="description" />
+              </Form.Field>
 
-            <Form.Field>
-              <Form.Label>Permissões</Form.Label>
-              <Form.Tree name="permissions" options={moduleTreeData} />
-              <Form.ErrorMessage field="permissions" />
-            </Form.Field>
+              <Form.Field>
+                <Form.Label>Permissões</Form.Label>
+                <Form.Tree name="permissions" options={moduleTreeData} />
+                <Form.ErrorMessage field="permissions" />
+              </Form.Field>
+            </CardContent>
 
-          </CardContent>
+            <CardFooter>
+              <Button type="button" variant="outline" disabled={isSubmitting} onClick={() => pushTo(-1)}>
+                <ChevronLeftIcon className="mr-2 h-5 w-5" />
+                <span>Voltar</span>
+              </Button>
 
-          <CardFooter>
-            <Button type="button" variant="outline" disabled={isSubmitting} onClick={() => pushTo(-1)}>
-              <ChevronLeftIcon className="mr-2 h-5 w-5" />
-              <span>Voltar</span>
-            </Button>
-
-            <Button type="submit" variant="success" disabled={isSubmitting}>
-              {isSubmitting ? (
-                <Spinner />
-              ) : (
-                <>
-                  <SaveIcon className="mr-2 h-5 w-5" />
-                  <span>Salvar</span>
-                </>
-              )}
-            </Button>
-          </CardFooter>
-        </form>
-      </FormProvider>
-    </Card>
+              <Button type="submit" variant="success" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <Spinner />
+                ) : (
+                  <>
+                    <SaveIcon className="mr-2 h-5 w-5" />
+                    <span>Salvar</span>
+                  </>
+                )}
+              </Button>
+            </CardFooter>
+          </form>
+        </FormProvider>
+      </Card>
+    </>
   )
 }
 

@@ -6,7 +6,6 @@
   "type": "module",
   "main": "index.js",
   "dependencies": {
-    "serve": "^14.2.4",
     "@hookform/resolvers": "^5.2.2",
     "@radix-ui/react-alert-dialog": "^1.1.15",
     "@radix-ui/react-checkbox": "^1.3.3",
@@ -31,12 +30,14 @@
     "react": "^19.2.0",
     "react-datepicker": "^8.7.0",
     "react-dom": "^19.2.0",
+    "react-helmet-async": "^2.0.5",
     "react-hook-form": "^7.64.0",
     "react-imask": "^7.6.1",
     "react-number-format": "^5.4.4",
     "react-router-dom": "^7.9.3",
     "react-select": "^5.10.2",
     "recharts": "^3.3.0",
+    "serve": "^14.2.4",
     "sonner": "^2.0.7",
     "zod": "^4.1.11"
   },

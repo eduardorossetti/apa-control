@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 
 import { CheckIcon, FlagIcon, PencilIcon, PlusIcon, XIcon } from 'lucide-react'
+import { Helmet } from 'react-helmet-async'
 
 import { useApp } from '../../App'
 import { Button } from '../../components/button'
@@ -65,6 +66,9 @@ export const FinalDestinationTypeList = () => {
 
   return (
     <>
+      <Helmet>
+        <title>Tipos de Destino Final - APA Control</title>
+      </Helmet>
       <Card>
         <CardHeader>
           <CardTitle>

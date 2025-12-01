@@ -11,6 +11,7 @@ import {
   TrendingUpIcon,
   UserIcon,
 } from 'lucide-react'
+import { Helmet } from 'react-helmet-async'
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 
 import { useApp } from '../../App'
@@ -111,116 +112,121 @@ export const Home = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="mb-2 font-semibold text-2xl">Olá, {operator.name}.</h1>
-      </div>
-
-      {statsCards.length > 0 && (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-          {statsCards.map((stat) => {
-            const Icon = stat.icon
-            return (
-              <Link key={stat.key} to={stat.path}>
-                <Card className="h-full cursor-pointer transition-all hover:scale-105 hover:shadow-lg">
-                  <CardContent className="flex flex-col items-center justify-center space-y-2 p-6 text-center">
-                    {Icon && (
-                      <div className="rounded-full bg-primary/10 p-3">
-                        <Icon className="h-6 w-6 text-primary" />
-                      </div>
-                    )}
-                    <p className="font-semibold text-3xl">{stat.value}</p>
-                    <p className="text-muted-foreground text-xs">{stat.label}</p>
-                  </CardContent>
-                </Card>
-              </Link>
-            )
-          })}
+    <>
+      <Helmet>
+        <title>Dashboard - APA Control</title>
+      </Helmet>
+      <div className="space-y-6">
+        <div>
+          <h1 className="mb-2 font-semibold text-2xl">Olá, {operator.name}.</h1>
         </div>
-      )}
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUpIcon className="h-5 w-5" />
-              Atividade Mensal
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={monthlyData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="animals" fill="#8884d8" name="Animais" />
-                  <Bar dataKey="adoptions" fill="#82ca9d" name="Adoções" />
-                  <Bar dataKey="rescues" fill="#ffc658" name="Resgates" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
+        {statsCards.length > 0 && (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+            {statsCards.map((stat) => {
+              const Icon = stat.icon
+              return (
+                <Link key={stat.key} to={stat.path}>
+                  <Card className="h-full cursor-pointer transition-all hover:scale-105 hover:shadow-lg">
+                    <CardContent className="flex flex-col items-center justify-center space-y-2 p-6 text-center">
+                      {Icon && (
+                        <div className="rounded-full bg-primary/10 p-3">
+                          <Icon className="h-6 w-6 text-primary" />
+                        </div>
+                      )}
+                      <p className="font-semibold text-3xl">{stat.value}</p>
+                      <p className="text-muted-foreground text-xs">{stat.label}</p>
+                    </CardContent>
+                  </Card>
+                </Link>
+              )
+            })}
+          </div>
+        )}
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <DollarSignIcon className="h-5 w-5" />
-              Financeiro
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="mb-4 grid grid-cols-3 gap-4">
-              <div className="text-center">
-                <p className="text-muted-foreground text-xs">Receitas</p>
-                <p className="font-semibold text-green-600 text-xl">
-                  {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(
-                    financialStats.totalIncome,
-                  )}
-                </p>
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUpIcon className="h-5 w-5" />
+                Atividade Mensal
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={monthlyData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Bar dataKey="animals" fill="#8884d8" name="Animais" />
+                    <Bar dataKey="adoptions" fill="#82ca9d" name="Adoções" />
+                    <Bar dataKey="rescues" fill="#ffc658" name="Resgates" />
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
-              <div className="text-center">
-                <p className="text-muted-foreground text-xs">Despesas</p>
-                <p className="font-semibold text-red-600 text-xl">
-                  {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(
-                    financialStats.totalExpense,
-                  )}
-                </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <DollarSignIcon className="h-5 w-5" />
+                Financeiro
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="mb-4 grid grid-cols-3 gap-4">
+                <div className="text-center">
+                  <p className="text-muted-foreground text-xs">Receitas</p>
+                  <p className="font-semibold text-green-600 text-xl">
+                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(
+                      financialStats.totalIncome,
+                    )}
+                  </p>
+                </div>
+                <div className="text-center">
+                  <p className="text-muted-foreground text-xs">Despesas</p>
+                  <p className="font-semibold text-red-600 text-xl">
+                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(
+                      financialStats.totalExpense,
+                    )}
+                  </p>
+                </div>
+                <div className="text-center">
+                  <p className="text-muted-foreground text-xs">Saldo</p>
+                  <p
+                    className={`font-semibold text-xl ${financialStats.balance >= 0 ? 'text-green-600' : 'text-red-600'}`}
+                  >
+                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(
+                      financialStats.balance,
+                    )}
+                  </p>
+                </div>
               </div>
-              <div className="text-center">
-                <p className="text-muted-foreground text-xs">Saldo</p>
-                <p
-                  className={`font-semibold text-xl ${financialStats.balance >= 0 ? 'text-green-600' : 'text-red-600'}`}
-                >
-                  {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(
-                    financialStats.balance,
-                  )}
-                </p>
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={financialStats.monthlyData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip
+                      formatter={(value: number) =>
+                        new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
+                      }
+                    />
+                    <Legend />
+                    <Bar dataKey="income" fill="#22c55e" name="Receitas" />
+                    <Bar dataKey="expense" fill="#ef4444" name="Despesas" />
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
-            </div>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={financialStats.monthlyData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip
-                    formatter={(value: number) =>
-                      new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
-                    }
-                  />
-                  <Legend />
-                  <Bar dataKey="income" fill="#22c55e" name="Receitas" />
-                  <Bar dataKey="expense" fill="#ef4444" name="Despesas" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
       </div>
-    </div>
+    </>
   )
 }
