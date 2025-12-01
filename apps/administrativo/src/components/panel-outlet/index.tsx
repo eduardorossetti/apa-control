@@ -1,6 +1,5 @@
 import { Navigate, matchRoutes, useLocation } from 'react-router-dom'
 
-import { version } from '../../../package.json'
 import { useApp } from '../../App'
 import { Panel } from '../panel'
 
@@ -53,5 +52,5 @@ export function PanelOutlet({ pages, basename = '' }: PanelProps) {
       return newPage
     })
 
-  return <Panel basename={basename} version={version} pages={filteredPages} signOut={app.signOut} />
+  return <Panel basename={basename} pages={filteredPages} signOut={app.signOut} />
 }

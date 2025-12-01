@@ -21,14 +21,14 @@ export interface Page {
 
 interface PanelProps {
   pages: Page[]
-  version?: string
   signOut: VoidFunction
   basename?: string
 }
 
-export const Panel = ({ pages, version, signOut, basename = '' }: PanelProps) => {
+export const Panel = ({ pages, signOut, basename = '' }: PanelProps) => {
   const { pathname: actualPath } = useLocation()
   const [sidebarOpened, setSidebarOpened] = useState(false)
+  const [hasInteracted, setHasInteracted] = useState(false)
   const isHome = actualPath === basename
   const { operator } = useApp()
 
@@ -46,14 +46,17 @@ export const Panel = ({ pages, version, signOut, basename = '' }: PanelProps) =>
   }, [actualPath])
 
   return (
-    <div id="panel" className="flex w-full flex-col overflow-x-hidden">
-      <header className="glass-card relative top-[30px] right-4 left-4 z-97 flex min-h-[calc(128px+env(safe-area-inset-top))] w-[calc(100%-2rem)] items-center justify-between overflow-visible rounded-t-xl rounded-b-xl border-gray-200/60 border-b bg-white/90 pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)] shadow-md backdrop-blur-xl transition-all duration-300 lg:fixed lg:top-[30px] lg:right-20 lg:left-20 lg:w-[calc(100%-10rem)]">
+    <div id="panel" className="flex w-full flex-col overflow-x-hidden lg:h-screen lg:overflow-hidden">
+      <header className="glass-card relative top-[30px] right-4 left-4 z-97 flex min-h-[calc(128px+env(safe-area-inset-top))] w-[calc(100%-2rem)] items-center justify-between overflow-visible rounded-t-xl rounded-b-xl border-gray-200/50 border-b bg-white/90 pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)] backdrop-blur-xl transition-all duration-300 ease-in-out lg:fixed lg:top-[30px] lg:right-20 lg:left-20 lg:w-[calc(100%-10rem)]">
         <div className="mx-auto flex w-full max-w-full items-center justify-between gap-4 px-4 lg:px-20">
           <div className="flex items-center gap-3 lg:flex-1">
             <button
               type="button"
               className="inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 font-medium text-base text-gray-700 outline-hidden transition-all duration-200 hover:bg-gray-100 hover:text-gray-900 active:scale-95 lg:hidden"
-              onClick={() => setSidebarOpened(true)}
+              onClick={() => {
+                setHasInteracted(true)
+                setSidebarOpened(true)
+              }}
               aria-label="Abrir menu lateral"
             >
               <MenuIcon className="h-5 w-5" />
@@ -79,7 +82,7 @@ export const Panel = ({ pages, version, signOut, basename = '' }: PanelProps) =>
                   aria-label={`Menu do usuário ${operator.name || ''}`}
                   aria-haspopup="menu"
                 >
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-linear-to-br from-brand to-pink-500 font-semibold text-base text-white shadow-sm">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-linear-to-br from-brand to-pink-500 font-semibold text-base text-white">
                     {operator.name ? getInitials(operator.name) : <UserIcon className="h-6 w-6" />}
                   </div>
                   <ChevronDownIcon className="h-4 w-4 text-gray-500 transition-transform duration-200 group-data-[state=open]:rotate-180" />
@@ -91,7 +94,7 @@ export const Panel = ({ pages, version, signOut, basename = '' }: PanelProps) =>
                   align="end"
                   sideOffset={8}
                   collisionPadding={16}
-                  className="glass-card data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 z-100 min-w-[200px] overflow-hidden rounded-xl border border-gray-200/50 p-1 shadow-lg"
+                  className="glass-card data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 z-100 min-w-[200px] overflow-hidden rounded-xl border border-gray-200/50 p-1"
                 >
                   <div className="px-3 py-2.5">
                     <p className="font-semibold text-gray-900 text-sm leading-tight">{operator.name || 'Usuário'}</p>
@@ -120,13 +123,19 @@ export const Panel = ({ pages, version, signOut, basename = '' }: PanelProps) =>
         </div>
       </header>
 
-      <div className="mx-auto flex w-full max-w-full flex-auto items-stretch pr-[calc(1rem+env(safe-area-inset-right))] pl-[calc(1rem+env(safe-area-inset-left))] lg:px-20">
+      <div className="mx-auto flex w-full max-w-full flex-auto items-stretch pr-[calc(1rem+env(safe-area-inset-right))] pl-[calc(1rem+env(safe-area-inset-left))] lg:h-[calc(100vh-30px)] lg:overflow-hidden lg:px-20 lg:pt-[calc(30px+128px+30px)] lg:pb-[30px]">
         <ScrollArea.Root>
           <div
             style={{ backfaceVisibility: 'hidden' }}
             className={cn(
-              'glass-card fixed top-0 bottom-0 left-[calc(-295px-env(safe-area-inset-left))] z-1001 flex w-[calc(275px+env(safe-area-inset-left))] max-w-full transform-gpu overflow-y-auto border-gray-200/50 border-r shadow-xl transition-[left] duration-300 lg:fixed lg:top-[calc(30px+128px+30px)] lg:bottom-[30px] lg:left-auto lg:z-94 lg:w-[260px] lg:overflow-hidden lg:rounded-xl lg:py-4',
-              { 'left-0': sidebarOpened },
+              'glass-card fixed top-0 bottom-0 z-1001 flex w-[calc(275px+env(safe-area-inset-left))] max-w-full transform-gpu overflow-y-auto border-gray-200/50 border-r shadow-sm transition-[left] duration-300 ease-in-out lg:top-[calc(30px+128px+30px)] lg:bottom-[30px] lg:left-auto lg:z-94 lg:w-[260px] lg:overflow-hidden lg:rounded-xl lg:py-4',
+              sidebarOpened
+                ? hasInteracted
+                  ? 'slide-in-from-left left-0 animate-in duration-300'
+                  : 'left-0'
+                : hasInteracted
+                  ? 'slide-out-to-left left-[calc(-295px-env(safe-area-inset-left))] animate-out duration-300'
+                  : 'left-[calc(-295px-env(safe-area-inset-left))]',
             )}
           >
             <ScrollArea.Viewport>
@@ -135,19 +144,19 @@ export const Panel = ({ pages, version, signOut, basename = '' }: PanelProps) =>
                   <Link
                     className={cn(
                       'group relative flex h-11 w-full grow items-center rounded-xl px-4 py-2.5 outline-hidden transition-all duration-200',
-                      'hover:bg-linear-to-r hover:from-brand/8 hover:to-brand/5 hover:text-brand hover:shadow-sm',
-                      isHome && 'bg-linear-to-r from-brand/12 to-brand/8 text-brand shadow-sm',
+                      'hover:bg-linear-to-r hover:from-brand/8 hover:to-brand/5 hover:text-brand',
+                      isHome && 'bg-linear-to-r from-brand/12 to-brand/8 text-brand',
                     )}
                     to={basename}
                   >
                     {isHome && (
-                      <span className="-translate-y-1/2 absolute top-1/2 left-0 h-10 w-1 rounded-r-full bg-linear-to-b from-brand to-brand/80 shadow-sm transition-all" />
+                      <span className="-translate-y-1/2 absolute top-1/2 left-0 h-10 w-1 rounded-r-full bg-linear-to-b from-brand to-brand/80 transition-all" />
                     )}
                     <HomeIcon
                       className={cn(
                         'relative z-10 mr-3 h-5 w-5 transition-all duration-200',
-                        'group-hover:scale-110 group-hover:drop-shadow-sm',
-                        isHome ? 'text-brand drop-shadow-sm' : 'text-gray-600 group-hover:text-brand',
+                        'group-hover:scale-110',
+                        isHome ? 'text-brand' : 'text-gray-600 group-hover:text-brand',
                       )}
                     />
                     <span
@@ -181,35 +190,39 @@ export const Panel = ({ pages, version, signOut, basename = '' }: PanelProps) =>
             >
               <ScrollArea.Thumb className="before:-translate-x-1/2 before:-translate-y-1/2 relative flex-1 rounded-[10px] bg-stone-500 before:absolute before:top-1/2 before:left-1/2 before:h-full before:min-h-[44px] before:w-full before:min-w-[44px] before:content-['']" />
             </ScrollArea.Scrollbar>
-            <ScrollArea.Scrollbar
-              className="flex touch-none select-none bg-black/[.114] p-0.5 transition-colors duration-150 ease-out hover:bg-black/22 data-[orientation=horizontal]:h-2.5 data-[orientation=vertical]:w-2.5 data-[orientation=horizontal]:flex-col"
-              orientation="horizontal"
-            >
-              <ScrollArea.Thumb className="before:-translate-x-1/2 before:-translate-y-1/2 relative flex-1 rounded-[10px] bg-stone-500 before:absolute before:top-1/2 before:left-1/2 before:h-full before:min-h-[44px] before:w-full before:min-w-[44px] before:content-['']" />
-            </ScrollArea.Scrollbar>
-            <ScrollArea.Corner className="bg-black/22" />
           </div>
         </ScrollArea.Root>
 
-        {sidebarOpened && (
-          <div
-            className="fixed top-0 right-0 bottom-0 left-0 z-1000 overflow-hidden bg-black/10 lg:hidden"
-            onClick={() => setSidebarOpened(false)}
-          />
-        )}
+        <div
+          className={cn(
+            'fixed top-0 right-0 bottom-0 left-0 z-1000 overflow-hidden bg-black/10 transition-opacity duration-300 ease-in-out lg:hidden',
+            sidebarOpened ? 'opacity-100' : 'pointer-events-none opacity-0',
+          )}
+          onClick={() => {
+            setHasInteracted(true)
+            setSidebarOpened(false)
+          }}
+        />
 
-        <div className="max-w-full flex-auto shrink-0 pt-12 pb-4 lg:flex lg:flex-col lg:pt-[calc(30px+128px+30px)] lg:pl-[285px]">
-          <Outlet />
+        <div className="max-w-full flex-auto shrink-0 pt-12 pb-4 lg:flex lg:h-[calc(100vh-30px-128px-30px-30px)] lg:flex-col lg:overflow-hidden lg:pt-0 lg:pb-0 lg:pl-[285px]">
+          <div className="h-full w-full lg:overflow-hidden lg:rounded-xl">
+            <div className="h-full w-full lg:hidden">
+              <Outlet />
+            </div>
+            <ScrollArea.Root className="hidden h-full w-full lg:block">
+              <ScrollArea.Viewport className="h-full w-full">
+                <Outlet />
+              </ScrollArea.Viewport>
+              <ScrollArea.Scrollbar
+                className="flex touch-none select-none bg-black/[.114] p-0.5 transition-colors duration-150 ease-out hover:bg-black/22 data-[orientation=horizontal]:h-2.5 data-[orientation=vertical]:w-2.5 data-[orientation=horizontal]:flex-col"
+                orientation="vertical"
+              >
+                <ScrollArea.Thumb className="before:-translate-x-1/2 before:-translate-y-1/2 relative flex-1 rounded-[10px] bg-stone-500 before:absolute before:top-1/2 before:left-1/2 before:h-full before:min-h-[44px] before:w-full before:min-w-[44px] before:content-['']" />
+              </ScrollArea.Scrollbar>
+            </ScrollArea.Root>
+          </div>
         </div>
       </div>
-
-      {version && (
-        <footer className="my-3 max-w-full text-base text-gray-400 lg:py-4">
-          <div className="mx-auto w-full pr-[calc(1rem+env(safe-area-inset-right))] pb-[calc(.25rem+env(safe-area-inset-bottom))] pl-[calc(1rem+env(safe-area-inset-left))] lg:ml-[285px] lg:px-20 lg:py-0">
-            {import.meta.env.VITE_APP_CUSTOMER_NAME} v{version}
-          </div>
-        </footer>
-      )}
     </div>
   )
 }

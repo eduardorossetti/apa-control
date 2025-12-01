@@ -9,7 +9,7 @@ const HomeBoxBackground: React.FC<React.InputHTMLAttributes<HTMLDivElement>> = (
       className,
     )}
     style={{
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%)',
+      background: 'linear-gradient(135deg, #b8c4f5 0%, #c4a8d4 25%, #f8d2fe 50%, #fbb5be 75%, #b8dfff 100%)',
       backgroundSize: '400% 400%',
       animation: 'gradient 15s ease infinite',
     }}
