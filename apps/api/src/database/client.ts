@@ -29,24 +29,6 @@ pool.on('error', (err) => {
   logError(err, { context: 'database-pool-error' })
 })
 
-pool.on('connect', () => {
-  if (env.NODE_ENV !== 'production') {
-    console.log('Nova conexão estabelecida com o banco de dados')
-  }
-})
-
-pool.on('acquire', () => {
-  if (env.NODE_ENV !== 'production') {
-    console.log('Conexão adquirida do pool')
-  }
-})
-
-pool.on('remove', () => {
-  if (env.NODE_ENV !== 'production') {
-    console.log('Conexão removida do pool')
-  }
-})
-
 const db = drizzle(pool, { schema, casing: 'snake_case' })
 
 export { db, pool }

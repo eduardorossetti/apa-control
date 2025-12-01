@@ -5,11 +5,9 @@ export class GetDashboardStatsUseCase {
   constructor(private dashboardRepository: DashboardRepository) {}
 
   async execute(data: GetDashboardStatsData): Promise<DashboardResponse> {
-    const [stats, monthlyStats, financialStats] = await Promise.all([
-      this.dashboardRepository.getStats(),
-      this.dashboardRepository.getMonthlyStats(data.year),
-      this.dashboardRepository.getFinancialStats(data.year),
-    ])
+    const stats = await this.dashboardRepository.getStats()
+    const monthlyStats = await this.dashboardRepository.getMonthlyStats(data.year || new Date().getFullYear())
+    const financialStats = await this.dashboardRepository.getFinancialStats(data.year || new Date().getFullYear())
 
     return {
       stats,

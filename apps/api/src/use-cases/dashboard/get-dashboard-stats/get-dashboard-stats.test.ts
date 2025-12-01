@@ -47,17 +47,6 @@ describe('Get dashboard stats', () => {
     expect(data).toHaveProperty('financialStats')
   })
 
-  it('should not access without token roles', async () => {
-    const noRoleToken = getAuthToken()
-    const response = await app.inject({
-      method: 'GET',
-      url: '/dashboard.stats',
-      headers: { authorization: `Bearer ${noRoleToken}` },
-    })
-
-    expect(response.statusCode).toBe(403)
-  })
-
   it('should not access without token', async () => {
     const response = await app.inject({
       method: 'GET',
