@@ -13,6 +13,18 @@ export class RemoveAppointmentTypeUseCase {
       throw new ApiError('Nenhum tipo de consulta encontrado.', 404)
     }
 
+    const appointmentCount = await this.appointmentTypeRepository.countByAppointmentTypeId(
+      appointmentType.id,
+      dbTransaction,
+    )
+
+    if (appointmentCount > 0) {
+      throw new ApiError(
+        `Não é possível excluir o tipo de consulta pois existem ${appointmentCount} consulta(s) vinculada(s) a ele.`,
+        400,
+      )
+    }
+
     await this.appointmentTypeRepository.remove(appointmentType.id, dbTransaction)
   }
 }

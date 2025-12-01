@@ -13,6 +13,15 @@ export class RemoveCampaignTypeUseCase {
       throw new ApiError('Nenhum tipo de campanha encontrado.', 404)
     }
 
+    const campaignCount = await this.campaignTypeRepository.countByCampaignTypeId(campaignType.id, dbTransaction)
+
+    if (campaignCount > 0) {
+      throw new ApiError(
+        `Não é possível excluir o tipo de campanha pois existem ${campaignCount} campanha(s) vinculada(s) a ele.`,
+        400,
+      )
+    }
+
     await this.campaignTypeRepository.remove(campaignType.id, dbTransaction)
   }
 }

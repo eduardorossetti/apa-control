@@ -13,6 +13,15 @@ export class RemoveAdopterUseCase {
       throw new ApiError('Nenhum adotante encontrado.', 404)
     }
 
+    const adoptionCount = await this.adopterRepository.countByAdopterId(adopter.id!, dbTransaction)
+
+    if (adoptionCount > 0) {
+      throw new ApiError(
+        `Não é possível excluir o adotante pois existem ${adoptionCount} adoção(ões) vinculada(s) a ele.`,
+        400,
+      )
+    }
+
     await this.adopterRepository.remove(adopter.id!, dbTransaction)
   }
 }

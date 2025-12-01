@@ -6,6 +6,7 @@ export type AuthEmployeeData = z.infer<typeof authEmployeeSchema>
 export interface AuthEmployeeUser {
   id: number
   name: string
+  profileName: string
   permissions: string[]
 }
 

@@ -19,6 +19,7 @@ export type LoginData = z.infer<typeof loginSchema>
 
 interface Operator {
   name: string
+  profileName?: string
   roles: string[]
 }
 

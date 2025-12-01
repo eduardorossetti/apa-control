@@ -1,5 +1,5 @@
 import { db } from '@/database/client'
-import { finalDestinationType } from '@/database/schema'
+import { finalDestination, finalDestinationType } from '@/database/schema'
 import type { DrizzleTransaction } from '@/database/types'
 import type { FinalDestinationType } from '@/entities'
 import { ApiError } from '@/utils/api-error'
@@ -90,5 +90,11 @@ export class FinalDestinationTypeRepository {
     }
 
     return first
+  }
+
+  async countByDestinationTypeId(destinationTypeId: number, dbTransaction: DrizzleTransaction | null) {
+    const connection = dbTransaction ?? db
+    const count = await connection.$count(finalDestination, eq(finalDestination.destinationTypeId, destinationTypeId))
+    return count
   }
 }

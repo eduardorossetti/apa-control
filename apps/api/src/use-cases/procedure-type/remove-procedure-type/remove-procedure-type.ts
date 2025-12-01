@@ -13,6 +13,18 @@ export class RemoveProcedureTypeUseCase {
       throw new ApiError('Nenhum tipo de procedimento encontrado.', 404)
     }
 
+    const clinicalProcedureCount = await this.procedureTypeRepository.countByProcedureTypeId(
+      procedureType.id,
+      dbTransaction,
+    )
+
+    if (clinicalProcedureCount > 0) {
+      throw new ApiError(
+        `Não é possível excluir o tipo de procedimento pois existem ${clinicalProcedureCount} procedimento(s) clínico(s) vinculado(s) a ele.`,
+        400,
+      )
+    }
+
     await this.procedureTypeRepository.remove(procedureType.id, dbTransaction)
   }
 }

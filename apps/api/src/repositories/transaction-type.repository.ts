@@ -1,5 +1,5 @@
 import { db } from '@/database/client'
-import { transactionType } from '@/database/schema'
+import { financialTransaction, transactionType } from '@/database/schema'
 import type { DrizzleTransaction } from '@/database/types'
 import type { TransactionType } from '@/entities'
 import type {
@@ -108,5 +108,14 @@ export class TransactionTypeRepository {
     }
 
     return first
+  }
+
+  async countByTransactionTypeId(transactionTypeId: number, dbTransaction: DrizzleTransaction | null) {
+    const connection = dbTransaction ?? db
+    const count = await connection.$count(
+      financialTransaction,
+      eq(financialTransaction.transactionTypeId, transactionTypeId),
+    )
+    return count
   }
 }

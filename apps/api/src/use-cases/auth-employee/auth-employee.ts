@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken'
 
 import { env } from '@/env'
+import type { AccessProfileRepository } from '@/repositories/access-profile.repository'
 import type { EmployeeRepository } from '@/repositories/employee.repository'
 import type { PermissionRepository } from '@/repositories/permission.repository'
 import { ApiError } from '@/utils/api-error'
@@ -11,6 +12,7 @@ export class AuthEmployeeUseCase {
   constructor(
     private employeeRepository: EmployeeRepository,
     private permissionRepository: PermissionRepository,
+    private accessProfileRepository: AccessProfileRepository,
   ) {}
 
   async execute(data: AuthEmployeeData): Promise<AuthEmployeeDTO> {
@@ -30,7 +32,10 @@ export class AuthEmployeeUseCase {
       throw new ApiError('Funcionário bloqueado.', 422)
     }
 
-    const permissions = await this.permissionRepository.getPermissionRoles(employee.profileId)
+    const [permissions, profile] = await Promise.all([
+      this.permissionRepository.getPermissionRoles(employee.profileId),
+      this.accessProfileRepository.findById(employee.profileId, null),
+    ])
 
     const roles = ['Employee', ...permissions]
 
@@ -49,6 +54,7 @@ export class AuthEmployeeUseCase {
     const user: AuthEmployeeUser = {
       id: employee.id,
       name: employee.name,
+      profileName: profile?.description || '',
       permissions: roles,
     }
 

@@ -41,20 +41,6 @@ export const Panel = ({ pages, version, signOut, basename = '' }: PanelProps) =>
       .slice(0, 2)
   }
 
-  const formatRole = (role: string) => {
-    return role
-      .replace(/_/g, ' ')
-      .replace(/\b\w/g, (l) => l.toUpperCase())
-      .replace('Employee', '')
-      .trim()
-  }
-
-  const displayRoles =
-    operator.roles
-      ?.filter((role) => role !== 'Employee')
-      .map(formatRole)
-      .filter(Boolean) || []
-
   useEffectExceptOnMount(() => {
     setSidebarOpened(false)
   }, [actualPath])
@@ -85,12 +71,13 @@ export const Panel = ({ pages, version, signOut, basename = '' }: PanelProps) =>
           </Link>
 
           <div className="flex items-center justify-end gap-3 lg:flex-1 lg:justify-end">
-            <DropdownMenu.Root>
+            <DropdownMenu.Root modal={false}>
               <DropdownMenu.Trigger asChild>
                 <button
                   type="button"
                   className="group inline-flex items-center gap-2 rounded-lg px-2 py-1.5 outline-hidden transition-all duration-200 hover:bg-gray-100 active:scale-95"
-                  aria-label="Menu do usuário"
+                  aria-label={`Menu do usuário ${operator.name || ''}`}
+                  aria-haspopup="menu"
                 >
                   <div className="flex h-12 w-12 items-center justify-center rounded-full bg-linear-to-br from-brand to-pink-500 font-semibold text-base text-white shadow-sm">
                     {operator.name ? getInitials(operator.name) : <UserIcon className="h-6 w-6" />}
@@ -103,20 +90,25 @@ export const Panel = ({ pages, version, signOut, basename = '' }: PanelProps) =>
                 <DropdownMenu.Content
                   align="end"
                   sideOffset={8}
+                  collisionPadding={16}
                   className="glass-card data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 z-100 min-w-[200px] overflow-hidden rounded-xl border border-gray-200/50 p-1 shadow-lg"
                 >
                   <div className="px-3 py-2.5">
-                    <p className="font-semibold text-gray-900 text-sm">{operator.name || 'Usuário'}</p>
-                    {displayRoles.length > 0 && (
-                      <p className="mt-0.5 text-gray-500 text-xs">{displayRoles.join(', ')}</p>
+                    <p className="font-semibold text-gray-900 text-sm leading-tight">{operator.name || 'Usuário'}</p>
+                    {operator.profileName && (
+                      <p className="mt-1 text-gray-500 text-xs leading-tight">{operator.profileName}</p>
                     )}
                   </div>
 
                   <DropdownMenu.Separator className="my-1 h-px bg-gray-200" />
 
                   <DropdownMenu.Item
-                    className="flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2.5 text-sm outline-hidden transition-colors hover:bg-red-50 hover:text-red-600 focus:bg-red-50 focus:text-red-600"
+                    className="flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2.5 text-sm outline-hidden transition-colors hover:bg-red-50 hover:text-red-600 focus:bg-red-50 focus:text-red-600 focus:outline-hidden"
                     onClick={signOut}
+                    onSelect={(e) => {
+                      e.preventDefault()
+                      signOut()
+                    }}
                   >
                     <LogOutIcon className="h-4 w-4" />
                     <span>Sair</span>

@@ -1,5 +1,5 @@
 import { db } from '@/database/client'
-import { adopter } from '@/database/schema'
+import { adopter, adoption } from '@/database/schema'
 import type { DrizzleTransaction } from '@/database/types'
 import type { Adopter } from '@/entities'
 import type { ListAdoptersDTO, ListAdoptersData } from '@/use-cases/adopter/list-adopters/list-adopters.dto'
@@ -121,5 +121,11 @@ export class AdopterRepository {
     }
 
     return first
+  }
+
+  async countByAdopterId(adopterId: number, dbTransaction: DrizzleTransaction | null) {
+    const connection = dbTransaction ?? db
+    const count = await connection.$count(adoption, eq(adoption.adopterId, adopterId))
+    return count
   }
 }

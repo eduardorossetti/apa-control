@@ -1,5 +1,5 @@
 import { db } from '@/database/client'
-import { appointmentType } from '@/database/schema'
+import { appointment, appointmentType } from '@/database/schema'
 import type { DrizzleTransaction } from '@/database/types'
 import type { AppointmentType } from '@/entities'
 import { ApiError } from '@/utils/api-error'
@@ -90,5 +90,11 @@ export class AppointmentTypeRepository {
     }
 
     return first
+  }
+
+  async countByAppointmentTypeId(appointmentTypeId: number, dbTransaction: DrizzleTransaction | null) {
+    const connection = dbTransaction ?? db
+    const count = await connection.$count(appointment, eq(appointment.appointmentTypeId, appointmentTypeId))
+    return count
   }
 }

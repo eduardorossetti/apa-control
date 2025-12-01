@@ -20,6 +20,7 @@ body {
   min-height: 100vh;
   font-size: 1rem;
   line-height: 1.6;
+  overflow-x: hidden;
 }
 
 .glass-card {

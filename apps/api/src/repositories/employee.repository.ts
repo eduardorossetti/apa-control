@@ -108,4 +108,10 @@ export class EmployeeRepository {
 
     return item as Pick<EmployeeSelectSchema, K>
   }
+
+  async countByProfileId(profileId: number, dbTransaction: DrizzleTransaction | null) {
+    const connection = dbTransaction ?? db
+    const count = await connection.$count(employee, eq(employee.profileId, profileId))
+    return count
+  }
 }

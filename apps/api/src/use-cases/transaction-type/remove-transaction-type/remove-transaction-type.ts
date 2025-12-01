@@ -13,6 +13,18 @@ export class RemoveTransactionTypeUseCase {
       throw new ApiError('Nenhum tipo de transação encontrado.', 404)
     }
 
+    const financialTransactionCount = await this.transactionTypeRepository.countByTransactionTypeId(
+      transactionType.id,
+      dbTransaction,
+    )
+
+    if (financialTransactionCount > 0) {
+      throw new ApiError(
+        `Não é possível excluir o tipo de transação pois existem ${financialTransactionCount} transação(ões) financeira(s) vinculada(s) a ele.`,
+        400,
+      )
+    }
+
     await this.transactionTypeRepository.remove(transactionType.id, dbTransaction)
   }
 }

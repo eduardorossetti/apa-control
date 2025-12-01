@@ -1,5 +1,5 @@
 import { db } from '@/database/client'
-import { campaignType } from '@/database/schema'
+import { campaign, campaignType } from '@/database/schema'
 import type { DrizzleTransaction } from '@/database/types'
 import type { CampaignType } from '@/entities'
 import { ApiError } from '@/utils/api-error'
@@ -87,5 +87,11 @@ export class CampaignTypeRepository {
     }
 
     return first
+  }
+
+  async countByCampaignTypeId(campaignTypeId: number, dbTransaction: DrizzleTransaction | null) {
+    const connection = dbTransaction ?? db
+    const count = await connection.$count(campaign, eq(campaign.campaignTypeId, campaignTypeId))
+    return count
   }
 }

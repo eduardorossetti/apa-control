@@ -1,5 +1,5 @@
 import { db } from '@/database/client'
-import { procedureType } from '@/database/schema'
+import { clinicalProcedure, procedureType } from '@/database/schema'
 import type { DrizzleTransaction } from '@/database/types'
 import type { ProcedureType } from '@/entities'
 import type {
@@ -110,5 +110,11 @@ export class ProcedureTypeRepository {
     }
 
     return first
+  }
+
+  async countByProcedureTypeId(procedureTypeId: number, dbTransaction: DrizzleTransaction | null) {
+    const connection = dbTransaction ?? db
+    const count = await connection.$count(clinicalProcedure, eq(clinicalProcedure.procedureTypeId, procedureTypeId))
+    return count
   }
 }

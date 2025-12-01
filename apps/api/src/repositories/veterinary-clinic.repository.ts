@@ -1,5 +1,5 @@
 import { db } from '@/database/client'
-import { veterinaryClinic } from '@/database/schema'
+import { appointment, veterinaryClinic } from '@/database/schema'
 import type { DrizzleTransaction } from '@/database/types'
 import type { VeterinaryClinic } from '@/entities'
 import type {
@@ -126,5 +126,11 @@ export class VeterinaryClinicRepository {
     }
 
     return first
+  }
+
+  async countByClinicId(clinicId: number, dbTransaction: DrizzleTransaction | null) {
+    const connection = dbTransaction ?? db
+    const count = await connection.$count(appointment, eq(appointment.clinicId, clinicId))
+    return count
   }
 }
