@@ -1,0 +1,73 @@
+import { beforeAll, describe, expect, it } from 'vitest'
+
+import { ProcedureTypeFactory } from '@/tests/factories/procedure-type'
+import { getAuthToken } from '@/tests/utils'
+import { createBaseApp } from '@/utils/fastify/create-base-app'
+
+import { procedureTypeRoutes } from '@/http/controllers/procedure-type/routes'
+
+describe('Update procedure-type', () => {
+  const app = createBaseApp()
+
+  beforeAll(async () => {
+    await app.register(procedureTypeRoutes)
+  })
+
+  it('should update procedure-type', async () => {
+    const procedureType = await ProcedureTypeFactory.create()
+    const token = getAuthToken({ roles: ['AdminPanel', 'Registrations', 'ProcedureTypes'] })
+    const updatedData = ProcedureTypeFactory.buildCreate()
+
+    const response = await app.inject({
+      method: 'PUT',
+      url: '/procedure-type.update',
+      headers: { authorization: `Bearer ${token}` },
+      payload: {
+        id: procedureType.id,
+        ...updatedData,
+      },
+    })
+
+    expect(response.statusCode).toBe(204)
+
+    // Verify the update
+    const getResponse = await app.inject({
+      method: 'GET',
+      url: `/procedure-type.key/${procedureType.id}`,
+      headers: { authorization: `Bearer ${token}` },
+    })
+
+    const data = getResponse.json()
+    expect(data.name).toBe(updatedData.name)
+  })
+
+  it('should return 404 when procedure-type not found', async () => {
+    const token = getAuthToken({ roles: ['AdminPanel', 'Registrations', 'ProcedureTypes'] })
+    const response = await app.inject({
+      method: 'PUT',
+      url: '/procedure-type.update',
+      headers: { authorization: `Bearer ${token}` },
+      payload: {
+        id: 99999,
+        ...ProcedureTypeFactory.buildCreate(),
+      },
+    })
+
+    expect(response.statusCode).toBe(404)
+  })
+
+  it('should not access without token roles', async () => {
+    const noRoleToken = getAuthToken()
+    const response = await app.inject({
+      method: 'PUT',
+      url: '/procedure-type.update',
+      headers: { authorization: `Bearer ${noRoleToken}` },
+      payload: {
+        id: 99999,
+        ...ProcedureTypeFactory.buildCreate(),
+      },
+    })
+
+    expect(response.statusCode).toBe(403)
+  })
+})

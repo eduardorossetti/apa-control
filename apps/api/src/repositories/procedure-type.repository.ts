@@ -23,6 +23,11 @@ const querifySettings: QuerySettings = {
 }
 
 export class ProcedureTypeRepository {
+  async hasName(name: string) {
+    const count = await db.$count(procedureType, eq(procedureType.name, name))
+    return count > 0
+  }
+
   async create(data: ProcedureType) {
     const [result] = await db.insert(procedureType).values(data).returning({ id: procedureType.id })
 

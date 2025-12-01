@@ -13,6 +13,11 @@ const querifySettings: QuerySettings = {
 }
 
 export class FinalDestinationTypeRepository {
+  async hasName(name: string) {
+    const count = await db.$count(finalDestinationType, eq(finalDestinationType.name, name))
+    return count > 0
+  }
+
   async create(data: FinalDestinationType) {
     const [result] = await db.insert(finalDestinationType).values(data).returning({ id: finalDestinationType.id })
 

@@ -12,6 +12,10 @@ export class UpdateCampaignTypeUseCase {
       throw new ApiError('Tipo de campanha não encontrado.', 404)
     }
 
+    if (oldData.name !== data.name && (await this.campaignTypeRepository.hasName(data.name))) {
+      throw new ApiError('Já existe um tipo de campanha cadastrado com o nome informado.', 409)
+    }
+
     await this.campaignTypeRepository.update(data.id, {
       name: data.name,
       description: data.description,

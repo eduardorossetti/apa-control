@@ -12,6 +12,10 @@ export class UpdateFinalDestinationTypeUseCase {
       throw new ApiError('Tipo de destino final não encontrado.', 404)
     }
 
+    if (oldData.name !== data.name && (await this.finalDestinationTypeRepository.hasName(data.name))) {
+      throw new ApiError('Já existe um tipo de destino final cadastrado com o nome informado.', 409)
+    }
+
     await this.finalDestinationTypeRepository.update(data.id, {
       name: data.name,
       description: data.description,

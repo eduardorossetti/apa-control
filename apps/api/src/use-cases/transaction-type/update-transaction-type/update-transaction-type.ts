@@ -12,6 +12,10 @@ export class UpdateTransactionTypeUseCase {
       throw new ApiError('Tipo de transação não encontrado.', 404)
     }
 
+    if (oldData.name !== data.name && (await this.transactionTypeRepository.hasName(data.name))) {
+      throw new ApiError('Já existe um tipo de transação cadastrado com o nome informado.', 409)
+    }
+
     await this.transactionTypeRepository.update(data.id, {
       name: data.name,
       category: data.category,

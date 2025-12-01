@@ -12,6 +12,10 @@ export class UpdateAppointmentTypeUseCase {
       throw new ApiError('Tipo de consulta não encontrado.', 404)
     }
 
+    if (oldData.name !== data.name && (await this.appointmentTypeRepository.hasName(data.name))) {
+      throw new ApiError('Já existe um tipo de consulta cadastrado com o nome informado.', 409)
+    }
+
     await this.appointmentTypeRepository.update(data.id, {
       name: data.name,
       description: data.description,

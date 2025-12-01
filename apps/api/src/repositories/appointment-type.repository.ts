@@ -13,6 +13,11 @@ const querifySettings: QuerySettings = {
 }
 
 export class AppointmentTypeRepository {
+  async hasName(name: string) {
+    const count = await db.$count(appointmentType, eq(appointmentType.name, name))
+    return count > 0
+  }
+
   async create(data: AppointmentType) {
     const [result] = await db.insert(appointmentType).values(data).returning({ id: appointmentType.id })
 

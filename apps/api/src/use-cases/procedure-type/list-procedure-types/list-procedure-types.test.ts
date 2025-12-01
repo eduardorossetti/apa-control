@@ -1,0 +1,53 @@
+import { beforeAll, describe, expect, it } from 'vitest'
+
+import { ProcedureTypeFactory } from '@/tests/factories/procedure-type'
+import { getAuthToken } from '@/tests/utils'
+import { createBaseApp } from '@/utils/fastify/create-base-app'
+
+import { procedureTypeRoutes } from '@/http/controllers/procedure-type/routes'
+
+describe('List procedure-type', () => {
+  const app = createBaseApp()
+
+  beforeAll(async () => {
+    await app.register(procedureTypeRoutes)
+  })
+
+  it('should list procedure-type', async () => {
+    await ProcedureTypeFactory.create()
+    await ProcedureTypeFactory.create()
+
+    const token = getAuthToken({ roles: ['AdminPanel', 'Registrations', 'ProcedureTypes'] })
+    const response = await app.inject({
+      method: 'GET',
+      url: '/procedure-type.list',
+      headers: { authorization: `Bearer ${token}` },
+    })
+
+    const data = response.json()
+
+    expect(response.statusCode).toBe(200)
+    expect(Array.isArray(data)).toBe(true)
+    expect(data.length).toBeGreaterThanOrEqual(2)
+  })
+
+  it('should not access without token roles', async () => {
+    const noRoleToken = getAuthToken()
+    const response = await app.inject({
+      method: 'GET',
+      url: '/procedure-type.list',
+      headers: { authorization: `Bearer ${noRoleToken}` },
+    })
+
+    expect(response.statusCode).toBe(403)
+  })
+
+  it('should not access without token', async () => {
+    const response = await app.inject({
+      method: 'GET',
+      url: '/procedure-type.list',
+    })
+
+    expect(response.statusCode).toBe(401)
+  })
+})

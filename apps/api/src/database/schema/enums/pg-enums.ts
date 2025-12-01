@@ -1,23 +1,21 @@
 import { pgEnum } from 'drizzle-orm/pg-core'
-import {
-  AdoptionStatusValues,
-  AnimalStatusValues,
-  AppointmentStatusValues,
-  CampaignStatusValues,
-  ConsultationTypeValues,
-  HealthConditionValues,
-  PostStatusValues,
-  PostTypeValues,
-  ProcedureCategoryValues,
-  ProcedureStatusValues,
-  ProfileTypeValues,
-  SexValues,
-  SizeValues,
-  SpeciesValues,
-  TransactionCategoryValues,
-  TransactionStatusValues,
-  UrgencyLevelValues,
-} from '.'
+import { AdoptionStatusValues } from './adoption-status'
+import { AnimalStatusValues } from './animal-status'
+import { AppointmentStatusValues } from './appointment-status'
+import { CampaignStatusValues } from './campaign-status'
+import { ConsultationTypeValues } from './consultation-type'
+import { HealthConditionValues } from './health-condition'
+import { PostStatusValues } from './post-status'
+import { PostTypeValues } from './post-type'
+import { ProcedureCategoryValues } from './procedure-category'
+import { ProcedureStatusValues } from './procedure-status'
+import { ProfileTypeValues } from './profile-type'
+import { SexValues } from './sex'
+import { SizeValues } from './size'
+import { SpeciesValues } from './species'
+import { TransactionCategoryValues } from './transaction-category'
+import { TransactionStatusValues } from './transaction-status'
+import { UrgencyLevelValues } from './urgency-level'
 
 export const profileTypeEnum = pgEnum('profile_type', ProfileTypeValues)
 export const procedureCategoryEnum = pgEnum('procedure_category', ProcedureCategoryValues)

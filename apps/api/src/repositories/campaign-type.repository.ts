@@ -13,6 +13,11 @@ const querifySettings: QuerySettings = {
 }
 
 export class CampaignTypeRepository {
+  async hasName(name: string) {
+    const count = await db.$count(campaignType, eq(campaignType.name, name))
+    return count > 0
+  }
+
   async create(data: CampaignType) {
     const [result] = await db.insert(campaignType).values(data).returning({ id: campaignType.id })
 

@@ -13,6 +13,10 @@ export class UpdateProcedureTypeUseCase {
       throw new ApiError('Tipo de procedimento não encontrado.', 404)
     }
 
+    if (oldData.name !== data.name && (await this.procedureTypeRepository.hasName(data.name))) {
+      throw new ApiError('Já existe um tipo de procedimento cadastrado com o nome informado.', 409)
+    }
+
     await this.procedureTypeRepository.update(data.id, {
       name: data.name,
       description: data.description,

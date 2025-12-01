@@ -11,6 +11,7 @@
     "dev": "tsx watch --inspect --env-file .env src/server.ts",
     "test": "vitest",
     "test:coverage": "vitest run --coverage",
+    "test:reset": "tsx --env-file .env.test src/tests/reset-database.ts",
     "lint": "tsc --noEmit",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
@@ -49,6 +50,7 @@
   },
   "devDependencies": {
     "@apa-control/tsconfig": "workspace:*",
+    "@faker-js/faker": "^10.1.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/ejs": "^3.1.5",
     "@types/jsonwebtoken": "^9.0.10",
@@ -61,6 +63,7 @@
     "tsup": "^8.5.0",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3",
+    "vite-tsconfig-paths": "^5.1.2",
     "vitest": "^3.2.4"
   }
 }

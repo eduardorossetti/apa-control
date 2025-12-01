@@ -23,6 +23,11 @@ const querifySettings: QuerySettings = {
 }
 
 export class TransactionTypeRepository {
+  async hasName(name: string) {
+    const count = await db.$count(transactionType, eq(transactionType.name, name))
+    return count > 0
+  }
+
   async create(data: TransactionType) {
     const [result] = await db.insert(transactionType).values(data).returning({ id: transactionType.id })
 
