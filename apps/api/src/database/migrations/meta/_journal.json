@@ -29,6 +29,13 @@
       "when": 1762559675543,
       "tag": "0003_remove-email-unique-employee",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1764590746423,
+      "tag": "0004_change-painel-adm-module-title",
+      "breakpoints": true
     }
   ]
 }
