@@ -2,6 +2,7 @@ import { db } from '@/database/client'
 import { AnimalHistoryType } from '@/database/schema/enums/animal-history-type'
 import { AnimalHistory } from '@/entities'
 import type { AnimalHistoryRepository } from '@/repositories/animal-history.repository'
+import type { AnimalRepository } from '@/repositories/animal.repository'
 import type { RescueRepository } from '@/repositories/rescue.repository'
 import { ApiError } from '@/utils/api-error'
 import type { RemoveRescueData } from './remove-rescue.dto'
@@ -9,6 +10,7 @@ import type { RemoveRescueData } from './remove-rescue.dto'
 export class RemoveRescueUseCase {
   constructor(
     private rescueRepository: RescueRepository,
+    private animalRepository: AnimalRepository,
     private animalHistoryRepository: AnimalHistoryRepository,
   ) {}
 
@@ -24,6 +26,7 @@ export class RemoveRescueUseCase {
 
     await db.transaction(async (tx) => {
       await this.rescueRepository.delete(data.id, tx)
+      await this.animalRepository.update(rescue.animalId, { status: 'pendente', rescueAt: null }, tx)
 
       await this.animalHistoryRepository.create(
         new AnimalHistory({

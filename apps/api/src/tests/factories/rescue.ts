@@ -26,7 +26,7 @@ const RescueFactory = {
     props?: Partial<Omit<CreateRescueBody, 'animalId'>> & { animal?: Partial<CreateRescueBody['animal']> },
   ): CreateRescueBody => ({
     ...rescueFields(),
-    animal: { ...AnimalFactory.buildCreate({ status: 'em_tratamento' }), ...props?.animal },
+    animal: { ...AnimalFactory.buildCreate({ status: 'pendente' }), ...props?.animal },
     ...props,
   }),
 }

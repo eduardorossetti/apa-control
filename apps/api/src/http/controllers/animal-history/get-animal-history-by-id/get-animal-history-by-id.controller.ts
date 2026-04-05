@@ -59,7 +59,7 @@ function formatHistoryValue(value: string | null) {
       size: { pequeno: 'Pequeno', medio: 'Médio', grande: 'Grande' },
       sex: { macho: 'Macho', femea: 'Fêmea' },
       healthCondition: { saudavel: 'Saudável', estavel: 'Estável', critica: 'Crítica' },
-      status: { disponivel: 'Disponível', em_tratamento: 'Em Tratamento', adotado: 'Adotado' },
+      status: { pendente: 'Pendente', ativo: 'Ativo', inativo: 'Inativo' },
     }
     const translateValue = (fieldKey: string, fieldValue: unknown): unknown => {
       if (typeof fieldValue === 'string') {
@@ -164,9 +164,9 @@ export async function getAnimalHistoryByIdController(request: FastifyRequest, re
           critica: 'Crítica',
         }),
         status: mapEnum(animal.status, {
-          disponivel: 'Disponível',
-          em_tratamento: 'Em Tratamento',
-          adotado: 'Adotado',
+          pendente: 'Pendente',
+          ativo: 'Ativo',
+          inativo: 'Inativo',
         }),
         entryDate: animal.entryDate ? new Date(animal.entryDate).toLocaleDateString('pt-BR') : '-',
       },

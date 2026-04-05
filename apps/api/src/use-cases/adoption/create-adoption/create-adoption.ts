@@ -23,8 +23,8 @@ export class CreateAdoptionUseCase {
 
     const animal = await this.animalRepository.findById(data.animalId)
     if (!animal) throw new ApiError('Animal não encontrado.', 404)
-    if (animal.status === AnimalStatus.ADOPTED) {
-      throw new ApiError('O animal já consta como adotado.', 409)
+    if (animal.status === AnimalStatus.INACTIVE) {
+      throw new ApiError('O animal já consta como inativo.', 409)
     }
 
     const adopter = await this.adopterRepository.findById(data.adopterId)
@@ -48,7 +48,7 @@ export class CreateAdoptionUseCase {
       )
 
       if (data.status === AdoptionStatus.COMPLETED) {
-        await this.animalRepository.update(data.animalId, { status: AnimalStatus.ADOPTED }, tx)
+        await this.animalRepository.update(data.animalId, { status: AnimalStatus.INACTIVE }, tx)
       }
 
       return row!.id

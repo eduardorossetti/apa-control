@@ -56,9 +56,9 @@ const healthConditionOptions = [
 ]
 
 const statusOptions = [
-  { value: 'disponivel', label: 'Disponível' },
-  { value: 'em_tratamento', label: 'Em Tratamento' },
-  { value: 'adotado', label: 'Adotado' },
+  { value: 'pendente', label: 'Pendente' },
+  { value: 'ativo', label: 'Ativo' },
+  { value: 'inativo', label: 'Inativo' },
 ]
 
 const rescueFormSchema = z.object({
@@ -119,7 +119,7 @@ export const RescueForm = () => {
     mode: 'onSubmit',
     defaultValues: {
       animalId: '',
-      status: 'disponivel',
+      status: 'pendente',
       entryDate: new Date().toISOString().split('T')[0],
       rescueDate: new Date().toISOString().split('T')[0],
     },
@@ -148,6 +148,7 @@ export const RescueForm = () => {
         perPage: 50,
         fields: 'id,name',
         sort: 'name',
+        status: 'pendente',
       })
       const { data } = await api.get<AnimalOption[]>(`animal.list?${qs}`, config)
       const list = Array.isArray(data) ? data : []
@@ -253,7 +254,7 @@ export const RescueForm = () => {
         size: { pequeno: 'Pequeno', medio: 'Médio', grande: 'Grande' },
         sex: { macho: 'Macho', femea: 'Fêmea' },
         healthCondition: { saudavel: 'Saudável', estavel: 'Estável', critica: 'Crítica' },
-        status: { disponivel: 'Disponível', em_tratamento: 'Em Tratamento', adotado: 'Adotado' },
+        status: { pendente: 'Pendente', ativo: 'Ativo', inativo: 'Inativo' },
       }
 
       const translateValue = (fieldKey: string, fieldValue: unknown): unknown => {
@@ -315,7 +316,7 @@ export const RescueForm = () => {
           healthCondition: 'saudavel',
           entryDate: '',
           observations: null,
-          status: 'disponivel',
+          status: 'pendente',
           rescueDate: data.rescueDate?.split('T')[0] ?? '',
           locationFound: data.locationFound,
           circumstances: data.circumstances,

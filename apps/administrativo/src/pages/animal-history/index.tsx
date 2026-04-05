@@ -303,7 +303,7 @@ function formatHistoryValue(value: string, showDashWhenEmpty = true) {
       size: { pequeno: 'Pequeno', medio: 'Médio', grande: 'Grande' },
       sex: { macho: 'Macho', femea: 'Fêmea' },
       healthCondition: { saudavel: 'Saudável', estavel: 'Estável', critica: 'Crítica' },
-      status: { disponivel: 'Disponível', em_tratamento: 'Em Tratamento', adotado: 'Adotado' },
+      status: { pendente: 'Pendente', ativo: 'Ativo', inativo: 'Inativo' },
     }
 
     const translateValue = (fieldKey: string, fieldValue: unknown): unknown => {

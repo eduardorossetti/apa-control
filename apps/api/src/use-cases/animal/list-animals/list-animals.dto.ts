@@ -3,6 +3,7 @@ export interface ListAnimalsData {
   species?: string
   breed?: string
   status?: string
+  available?: boolean
   show?: 'all' | 'disabled' | 'enabled'
   page?: number
   perPage?: number

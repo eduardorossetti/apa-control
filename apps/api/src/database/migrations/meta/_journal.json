@@ -71,6 +71,13 @@
       "when": 1775394262430,
       "tag": "0009_add-payment-date-financial-transaction",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1775400051495,
+      "tag": "0010_animal-status-refactor",
+      "breakpoints": true
     }
   ]
 }

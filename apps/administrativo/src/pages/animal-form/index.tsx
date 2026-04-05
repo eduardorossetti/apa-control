@@ -68,9 +68,9 @@ const healthConditionOptions = [
 ]
 
 const statusOptions = [
-  { value: 'disponivel', label: 'Disponível' },
-  { value: 'em_tratamento', label: 'Em Tratamento' },
-  { value: 'adotado', label: 'Adotado' },
+  { value: 'pendente', label: 'Pendente' },
+  { value: 'ativo', label: 'Ativo' },
+  { value: 'inativo', label: 'Inativo' },
 ]
 
 interface AnimalHistoryItem {
@@ -98,7 +98,7 @@ export const AnimalForm = () => {
   const animalForm = useForm({
     resolver: zodResolver(animalSchema),
     defaultValues: {
-      status: 'disponivel',
+      status: 'pendente',
       entryDate: new Date().toISOString().split('T')[0],
     },
   })
@@ -218,7 +218,7 @@ export const AnimalForm = () => {
         size: { pequeno: 'Pequeno', medio: 'Médio', grande: 'Grande' },
         sex: { macho: 'Macho', femea: 'Fêmea' },
         healthCondition: { saudavel: 'Saudável', estavel: 'Estável', critica: 'Crítica' },
-        status: { disponivel: 'Disponível', em_tratamento: 'Em Tratamento', adotado: 'Adotado' },
+        status: { pendente: 'Pendente', ativo: 'Ativo', inativo: 'Inativo' },
       }
 
       const translateValue = (fieldKey: string, fieldValue: unknown): unknown => {

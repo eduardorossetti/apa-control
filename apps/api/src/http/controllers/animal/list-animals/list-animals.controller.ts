@@ -31,7 +31,7 @@ export async function listAnimalsController(request: FastifyRequest, reply: Fast
       size: mapEnum(item.size, { pequeno: 'Pequeno', medio: 'Médio', grande: 'Grande' }),
       sex: mapEnum(item.sex, { macho: 'Macho', femea: 'Fêmea' }),
       healthCondition: mapEnum(item.healthCondition, { saudavel: 'Saudável', estavel: 'Estável', critica: 'Crítica' }),
-      status: mapEnum(item.status, { disponivel: 'Disponível', em_tratamento: 'Em Tratamento', adotado: 'Adotado' }),
+      status: mapEnum(item.status, { pendente: 'Pendente', ativo: 'Ativo', inativo: 'Inativo' }),
     }))
 
     const rows = formattedItems.map((item) => ({

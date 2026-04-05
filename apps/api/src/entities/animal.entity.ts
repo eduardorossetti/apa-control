@@ -10,6 +10,7 @@ export class Animal {
   entryDate: string
   observations?: string | null
   status: string
+  rescueAt?: Date | null
   createdAt: Date
   updatedAt?: Date | null
 
@@ -25,6 +26,7 @@ export class Animal {
     this.entryDate = props.entryDate
     this.observations = props.observations
     this.status = props.status
+    this.rescueAt = props.rescueAt
     this.createdAt = props.createdAt
     this.updatedAt = props.updatedAt
   }

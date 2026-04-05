@@ -39,9 +39,9 @@ export class UpdateAdoptionUseCase {
       )
 
       if (willComplete && !wasCompleted) {
-        await this.animalRepository.update(existing.animalId, { status: AnimalStatus.ADOPTED }, tx)
+        await this.animalRepository.update(existing.animalId, { status: AnimalStatus.INACTIVE }, tx)
       } else if (!willComplete && wasCompleted) {
-        await this.animalRepository.update(existing.animalId, { status: AnimalStatus.AVAILABLE }, tx)
+        await this.animalRepository.update(existing.animalId, { status: AnimalStatus.ACTIVE }, tx)
       }
     })
   }

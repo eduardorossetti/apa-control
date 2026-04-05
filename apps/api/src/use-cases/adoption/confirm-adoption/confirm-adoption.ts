@@ -29,7 +29,7 @@ export class ConfirmAdoptionUseCase {
         },
         tx,
       )
-      await this.animalRepository.update(existing.animalId, { status: AnimalStatus.ADOPTED }, tx)
+      await this.animalRepository.update(existing.animalId, { status: AnimalStatus.INACTIVE }, tx)
     })
   }
 }

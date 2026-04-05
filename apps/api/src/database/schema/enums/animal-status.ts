@@ -1,7 +1,7 @@
 export const AnimalStatus = {
-  AVAILABLE: 'disponivel',
-  IN_TREATMENT: 'em_tratamento',
-  ADOPTED: 'adotado',
+  PENDING: 'pendente',
+  ACTIVE: 'ativo',
+  INACTIVE: 'inativo',
 } as const
 
 export type AnimalStatusValue = (typeof AnimalStatus)[keyof typeof AnimalStatus]

@@ -31,7 +31,7 @@ export class AnimalRepository {
   }
 
   async list(data: ListAnimalsData) {
-    const { name, species, breed, status, show } = data
+    const { name, species, breed, status, available, show } = data
     const whereList: SQL[] = []
 
     if (name) {
@@ -50,10 +50,14 @@ export class AnimalRepository {
       whereList.push(eq(animal.status, status))
     }
 
+    if (available) {
+      whereList.push(eq(animal.status, 'ativo'))
+    }
+
     if (show === 'enabled') {
-      whereList.push(eq(animal.status, 'disponivel'))
+      whereList.push(eq(animal.status, 'ativo'))
     } else if (show === 'disabled') {
-      whereList.push(eq(animal.status, 'adotado'))
+      whereList.push(eq(animal.status, 'inativo'))
     }
 
     const [sqlQuery, countQuery] = querifyString<AnimalWithDetails>(data, whereList, querifyStringSettings)

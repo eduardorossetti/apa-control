@@ -59,9 +59,9 @@ const healthConditionOptions = [
   { value: 'critica', label: 'Crítica' },
 ]
 const animalStatusOptions = [
-  { value: 'disponivel', label: 'Disponível' },
-  { value: 'em_tratamento', label: 'Em Tratamento' },
-  { value: 'adotado', label: 'Adotado' },
+  { value: 'pendente', label: 'Pendente' },
+  { value: 'ativo', label: 'Ativo' },
+  { value: 'inativo', label: 'Inativo' },
 ]
 
 const adoptionStatusOptions = [
@@ -116,11 +116,9 @@ export const AdoptionForm = () => {
   const searchAnimalOptions = useCallback(
     async (query: string): Promise<{ value: string; label: string }[]> => {
       const config = { headers: { Authorization: `Bearer ${token}` } }
-      const qs = toQueryString({ name: query.trim(), perPage: 50, fields: 'id,name,status', sort: 'name' })
+      const qs = toQueryString({ name: query.trim(), perPage: 50, fields: 'id,name', sort: 'name', status: 'ativo' })
       const { data } = await api.get<AnimalOption[]>(`animal.list?${qs}`, config)
-      const list = (Array.isArray(data) ? data : []).filter(
-        (a) => a.status === 'disponivel' || a.status === 'em_tratamento',
-      )
+      const list = Array.isArray(data) ? data : []
       return list.map((a) => ({ value: String(a.id), label: a.name }))
     },
     [token],

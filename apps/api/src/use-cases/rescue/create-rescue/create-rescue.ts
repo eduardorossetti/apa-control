@@ -34,13 +34,17 @@ export class CreateRescueUseCase {
         if (!animal) {
           throw new ApiError('Animal não encontrado.', 404)
         }
+        if (animal.rescueAt != null) {
+          throw new ApiError('Este animal já possui um resgate ativo.', 400)
+        }
         animalId = data.animalId
       } else if (data.animal) {
         const [animalRow] = await this.animalRepository.create(
           new Animal({
             ...data.animal!,
             birthYear: data.animal!.birthYear ?? null,
-            status: 'disponivel',
+            status: 'ativo',
+            rescueAt: new Date(),
             createdAt: new Date(),
           }),
           tx,
@@ -66,7 +70,7 @@ export class CreateRescueUseCase {
               healthCondition: data.animal.healthCondition,
               entryDate: data.animal.entryDate,
               observations: data.animal.observations ?? null,
-              status: 'disponivel',
+              status: 'ativo',
             }),
             createdAt: new Date(),
           }),
@@ -74,6 +78,10 @@ export class CreateRescueUseCase {
         )
       } else {
         throw new ApiError('Informe o animal (animalId ou dados do animal) para registrar o resgate.', 400)
+      }
+
+      if (!isNewAnimal) {
+        await this.animalRepository.update(animalId, { status: 'ativo', rescueAt: new Date() }, tx)
       }
 
       const [rescueRow] = await this.rescueRepository.create(

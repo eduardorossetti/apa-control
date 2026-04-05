@@ -26,6 +26,8 @@ export class CreateFinalDestinationUseCase {
     if (!animal) throw new ApiError('Animal não encontrado.', 404)
     if (!destinationType) throw new ApiError('Tipo de destino final não encontrado.', 404)
     if (alreadyExists) throw new ApiError('Este animal já possui destino final registrado.', 409)
+    if (!animal.rescueAt)
+      throw new ApiError('O animal precisa ter um resgate registrado para receber destino final.', 400)
 
     return await db.transaction(async (tx) => {
       const [result] = await this.finalDestinationRepository.create(
@@ -41,6 +43,8 @@ export class CreateFinalDestinationUseCase {
         }),
         tx,
       )
+
+      await this.animalRepository.update(data.animalId, { status: 'inativo' }, tx)
 
       await this.animalHistoryRepository.create(
         new AnimalHistory({

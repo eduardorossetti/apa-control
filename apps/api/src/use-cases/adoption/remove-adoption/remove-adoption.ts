@@ -20,7 +20,7 @@ export class RemoveAdoptionUseCase {
       await this.adoptionRepository.delete(data.id, tx)
 
       if (existing.status === AdoptionStatus.COMPLETED) {
-        await this.animalRepository.update(existing.animalId, { status: AnimalStatus.AVAILABLE }, tx)
+        await this.animalRepository.update(existing.animalId, { status: AnimalStatus.ACTIVE }, tx)
       }
     })
   }

@@ -10,6 +10,7 @@ import {
   HistoryIcon,
   PencilIcon,
   PlusIcon,
+  RefreshCwIcon,
   SearchIcon,
   XIcon,
 } from 'lucide-react'
@@ -18,6 +19,7 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { useApp } from '../../App'
+import { Badge } from '../../components/badge'
 import { Button } from '../../components/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardToolbar } from '../../components/card'
 import { Form } from '../../components/form-hook'
@@ -67,9 +69,9 @@ const speciesOptions = [
 ]
 
 const statusOptions = [
-  { value: 'disponivel', label: 'Disponível' },
-  { value: 'em_tratamento', label: 'Em Tratamento' },
-  { value: 'adotado', label: 'Adotado' },
+  { value: 'pendente', label: 'Pendente' },
+  { value: 'ativo', label: 'Ativo' },
+  { value: 'inativo', label: 'Inativo' },
 ]
 
 export const AnimalList = () => {
@@ -106,6 +108,34 @@ export const AnimalList = () => {
                 headers: { Authorization: `Bearer ${token}` },
               })
               .then(refresh.force)
+              .catch((err) => modal.alert(errorMessageHandler(err)))
+          }
+        },
+      })
+    },
+    [token],
+  )
+
+  const reactivateAnimal = useCallback(
+    (values: AnimalListValues) => {
+      modal.confirm({
+        title: 'Reativar animal',
+        message: `Deseja reativar o animal ${values.name}? O destino final será removido e o animal voltará ao status ativo.`,
+        confirmText: 'Reativar',
+        callback: (confirmed) => {
+          if (confirmed) {
+            api
+              .post(
+                `animal.reactivate/${values.id}`,
+                {},
+                {
+                  headers: { Authorization: `Bearer ${token}` },
+                },
+              )
+              .then(() => {
+                toast.success(`Animal ${values.name} reativado com sucesso!`)
+                refresh.force()
+              })
               .catch((err) => modal.alert(errorMessageHandler(err)))
           }
         },
@@ -302,7 +332,7 @@ export const AnimalList = () => {
                     <TableCell>{item.breed}</TableCell>
                     <TableCell>{item.birthYear ? `${new Date().getFullYear() - item.birthYear} anos` : ''}</TableCell>
                     <TableCell>{formatHealthCondition(item.healthCondition)}</TableCell>
-                    <TableCell>{formatStatus(item.status)}</TableCell>
+                    <TableCell>{animalStatusBadge(item.status)}</TableCell>
                     <TableCell className="w-[1%] whitespace-nowrap">
                       <ActionsList
                         primaryKey="id"
@@ -310,6 +340,12 @@ export const AnimalList = () => {
                         actions={[
                           { icon: PencilIcon, title: 'Editar', action: ':id' },
                           { icon: HistoryIcon, title: 'Ver Histórico', action: ':id/historico' },
+                          {
+                            icon: RefreshCwIcon,
+                            title: 'Reativar',
+                            action: reactivateAnimal,
+                            hideWhen: (item) => item.status !== 'inativo',
+                          },
                           { icon: XIcon, title: 'Remover', action: removeAnimal },
                         ]}
                       />
@@ -357,11 +393,9 @@ function formatHealthCondition(condition: string) {
   return conditionMap[condition] || condition
 }
 
-function formatStatus(status: string) {
-  const statusMap: Record<string, string> = {
-    disponivel: 'Disponível',
-    em_tratamento: 'Em Tratamento',
-    adotado: 'Adotado',
-  }
-  return statusMap[status] || status
+function animalStatusBadge(status: string) {
+  if (status === 'pendente') return <Badge variant="warning">Pendente</Badge>
+  if (status === 'ativo') return <Badge variant="success">Ativo</Badge>
+  if (status === 'inativo') return <Badge variant="danger">Inativo</Badge>
+  return <Badge>{status}</Badge>
 }

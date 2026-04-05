@@ -111,4 +111,9 @@ export class FinalDestinationRepository {
     const connection = dbTransaction ?? db
     await connection.delete(finalDestination).where(eq(finalDestination.id, id))
   }
+
+  async deleteByAnimalId(animalId: number, dbTransaction: DrizzleTransaction | null = null) {
+    const connection = dbTransaction ?? db
+    await connection.delete(finalDestination).where(eq(finalDestination.animalId, animalId))
+  }
 }
