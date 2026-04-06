@@ -17,8 +17,7 @@
     "db:create-schema": "tsx src/database/create-drizzle-schema.ts",
     "db:migrate": "tsx src/database/run-migrations.ts",
     "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio",
-    "postinstall": "playwright install chromium --with-deps 2>/dev/null || playwright install chromium"
+    "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
     "@date-fns/tz": "^1.2.0",
@@ -29,6 +28,7 @@
     "@fastify/rate-limit": "^10.3.0",
     "@fastify/static": "^9.0.0",
     "@sentry/node": "^10.20.0",
+    "@sparticuz/chromium": "^143.0.4",
     "axios": "^1.12.2",
     "bcryptjs": "^3.0.2",
     "csv-stringify": "^6.7.0",
@@ -46,7 +46,7 @@
     "linebreak": "^1.1.0",
     "nodemailer": "^7.0.9",
     "pg": "^8.16.3",
-    "playwright": "^1.48.2",
+    "playwright-core": "^1.59.1",
     "request-ip": "^3.3.0",
     "sharp": "^0.34.4",
     "uuid": "^13.0.0",

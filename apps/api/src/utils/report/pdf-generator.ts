@@ -1,5 +1,6 @@
+import chromium from '@sparticuz/chromium'
 import ejs from 'ejs'
-import { type Browser, chromium } from 'playwright'
+import { type Browser, chromium as playwrightChromium } from 'playwright-core'
 
 import { ApiError } from '@/utils/api-error'
 
@@ -9,17 +10,10 @@ export async function generatePdfFromTemplate(templatePath: string, data: Record
   try {
     const html = await ejs.renderFile(templatePath, data)
 
-    browser = await chromium.launch({
+    browser = await playwrightChromium.launch({
+      args: chromium.args,
+      executablePath: await chromium.executablePath(),
       headless: true,
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-accelerated-2d-canvas',
-        '--no-first-run',
-        '--no-zygote',
-        '--disable-gpu',
-      ],
     })
 
     const page = await browser.newPage()

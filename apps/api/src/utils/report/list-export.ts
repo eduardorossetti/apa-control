@@ -9,7 +9,7 @@ import type { FastifyReply } from 'fastify'
 type ExportType = 'csv' | 'xlsx' | 'pdf'
 
 function getApaControlLogoDataUrl() {
-  const logoPath = getRootFolder('../../administrativo/src/assets/img/logo.png')
+  const logoPath = getRootFolder('assets/img/logo.png')
   const logoBuffer = readFileSync(logoPath)
   return `data:image/png;base64,${logoBuffer.toString('base64')}`
 }
