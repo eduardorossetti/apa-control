@@ -27,7 +27,15 @@ import { Pagination } from '../../components/list/Pagination'
 import { LoadingCard } from '../../components/loading-card'
 import { Separator } from '../../components/separator'
 import { Spinner } from '../../components/spinner'
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '../../components/table'
+import {
+  SelectableTable,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '../../components/table'
 import { appConfig } from '../../config'
 import { errorMessageHandler } from '../../helpers/axios'
 import { formatDate } from '../../helpers/date'
@@ -70,9 +78,9 @@ const expenseFilterSchema = z
     perPage: z.number(),
     sort: z.string().optional(),
     description: z.string().nullish(),
+    animalName: z.string().nullish(),
     transactionTypeId: z.number().nullish(),
     campaignId: z.number().nullish(),
-    animalId: z.number().nullish(),
     status: z.string().nullish(),
     createdAtStart: z.string().optional(),
     createdAtEnd: z.string().optional(),
@@ -99,7 +107,6 @@ export const ExpenseList = () => {
   const [total, setTotal] = useState(0)
   const [transactionTypeOptions, setTransactionTypeOptions] = useState<SelectOption[]>([])
   const [campaignOptions, setCampaignOptions] = useState<SelectOption[]>([])
-  const [animalOptions, setAnimalOptions] = useState<SelectOption[]>([])
   const [selectedIds, setSelectedIds] = useState<number[]>([])
   const [batchLoading, setBatchLoading] = useState(false)
 
@@ -115,9 +122,9 @@ export const ExpenseList = () => {
         'id,transactionTypeId,description,value,createdAt,status,paymentDate,proof,transactionTypeName,campaignTitle,animalName,employeeName',
       sort: '-createdAt',
       description: '',
+      animalName: '',
       transactionTypeId: null,
       campaignId: null,
-      animalId: null,
       status: null,
       createdAtStart: '',
       createdAtEnd: '',
@@ -236,9 +243,8 @@ export const ExpenseList = () => {
         config,
       ),
       api.get(`campaign.list?${toQueryString({ page: 0, fields: 'id,title', sort: '-startDate' })}`, config),
-      api.get(`animal.list?${toQueryString({ page: 0, perPage: 500, fields: 'id,name', sort: 'name' })}`, config),
     ])
-      .then(([typesRes, campaignsRes, animalsRes]) => {
+      .then(([typesRes, campaignsRes]) => {
         const types = Array.isArray(typesRes.data) ? typesRes.data : []
         setTransactionTypeOptions(
           types
@@ -253,9 +259,6 @@ export const ExpenseList = () => {
         setCampaignOptions(
           campaigns.map((item: { id: number; title: string }) => ({ value: item.id, label: item.title })),
         )
-
-        const animals = Array.isArray(animalsRes.data) ? animalsRes.data : []
-        setAnimalOptions(animals.map((item: { id: number; name: string }) => ({ value: item.id, label: item.name })))
       })
       .catch((error) => toast.error(errorMessageHandler(error)))
   }, [token, modal])
@@ -339,7 +342,6 @@ export const ExpenseList = () => {
                 </>
               )}
             </Button>
-
             <Button variant="danger" asChild>
               <Link to="cadastro">
                 <PlusIcon className="mr-2 h-5 w-5" />
@@ -389,9 +391,9 @@ export const ExpenseList = () => {
                   <Form.ErrorMessage field="campaignId" />
                 </div>
                 <div>
-                  <Form.Label htmlFor="animalId">Animal</Form.Label>
-                  <Form.Select name="animalId" type="number" isClearable placeholder="Todos" options={animalOptions} />
-                  <Form.ErrorMessage field="animalId" />
+                  <Form.Label htmlFor="animalName">Animal</Form.Label>
+                  <Form.Input type="search" name="animalName" />
+                  <Form.ErrorMessage field="animalName" />
                 </div>
                 <div>
                   <Form.Label htmlFor="createdAtStart">Data inicial</Form.Label>
@@ -436,7 +438,7 @@ export const ExpenseList = () => {
           <Separator />
 
           <div className="relative">
-            <Table>
+            <SelectableTable>
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-[1%]">
@@ -451,9 +453,11 @@ export const ExpenseList = () => {
                   <TableHead>Tipo</TableHead>
                   <TableHead>Valor</TableHead>
                   <TableHead>Data</TableHead>
-                  <TableHead>Registrado por</TableHead>
+                  <TableHead>Campanha</TableHead>
+                  <TableHead>Animal</TableHead>
+                  <TableHead>Por</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>Data de Pagamento</TableHead>
+                  <TableHead>Pagamento</TableHead>
                   <TableHead aria-label="Ações" />
                 </TableRow>
               </TableHeader>
@@ -481,6 +485,12 @@ export const ExpenseList = () => {
                       )}
                     </TableCell>
                     <TableCell>{formatDate(item.createdAt)}</TableCell>
+                    <TableCell className="max-w-[180px] truncate" title={item.campaignTitle ?? ''}>
+                      {item.campaignTitle ?? ''}
+                    </TableCell>
+                    <TableCell className="max-w-[180px] truncate" title={item.animalName ?? ''}>
+                      {item.animalName ?? ''}
+                    </TableCell>
                     <TableCell>{item.employeeName ?? ''}</TableCell>
                     <TableCell>{expenseStatusBadge(item.status)}</TableCell>
                     <TableCell>{item.paymentDate ? formatDate(item.paymentDate) : ''}</TableCell>
@@ -505,7 +515,7 @@ export const ExpenseList = () => {
               </TableBody>
 
               {items.length === 0 && <TableCaption>Nenhum item foi encontrado.</TableCaption>}
-            </Table>
+            </SelectableTable>
 
             {fetching && <LoadingCard position="absolute" />}
           </div>

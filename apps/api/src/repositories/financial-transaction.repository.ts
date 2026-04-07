@@ -44,11 +44,21 @@ export class FinancialTransactionRepository {
     data: ListExpensesData,
     category: (typeof TransactionCategory)[keyof typeof TransactionCategory],
   ): Promise<[number, ExpenseWithDetails[]]> {
-    const { description, transactionTypeId, campaignId, animalId, employeeId, status, createdAtStart, createdAtEnd } =
-      data
+    const {
+      description,
+      animalName,
+      transactionTypeId,
+      campaignId,
+      animalId,
+      employeeId,
+      status,
+      createdAtStart,
+      createdAtEnd,
+    } = data
     const whereList: SQL[] = [eq(transactionType.category, category)]
 
     if (description) whereList.push(ilike(financialTransaction.description, `%${description}%`))
+    if (animalName) whereList.push(ilike(animal.name, `%${animalName}%`))
     if (transactionTypeId) whereList.push(eq(financialTransaction.transactionTypeId, transactionTypeId))
     if (campaignId) whereList.push(eq(financialTransaction.campaignId, campaignId))
     if (animalId) whereList.push(eq(financialTransaction.animalId, animalId))

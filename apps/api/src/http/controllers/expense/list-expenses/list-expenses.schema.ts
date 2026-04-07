@@ -5,6 +5,7 @@ import { z } from 'zod'
 export const listExpensesSchema = apiQueryStringSchema
   .extend({
     description: z.string().optional(),
+    animalName: z.string().optional(),
     transactionTypeId: z.coerce.number().int().positive().optional(),
     campaignId: z.coerce.number().int().positive().optional(),
     animalId: z.coerce.number().int().positive().optional(),

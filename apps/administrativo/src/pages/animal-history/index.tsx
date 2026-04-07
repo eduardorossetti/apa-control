@@ -49,9 +49,9 @@ const historyTypeOptions = [
 
 const historyFilterSchema = z.object({
   historyTypes: z.array(z.string()),
-  startDate: z.string().optional(),
-  endDate: z.string().optional(),
-  employeeId: z.number().nullable().optional(),
+  startDate: z.string().nullish(),
+  endDate: z.string().nullish(),
+  employeeId: z.number().nullable().nullish(),
 })
 
 export function AnimalHistoryPage() {
@@ -65,8 +65,8 @@ export function AnimalHistoryPage() {
     resolver: zodResolver(historyFilterSchema),
     defaultValues: {
       historyTypes: [],
-      startDate: '',
-      endDate: '',
+      startDate: null,
+      endDate: null,
       employeeId: null,
     },
   })

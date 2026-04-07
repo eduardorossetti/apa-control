@@ -3,6 +3,7 @@ import { beforeAll, describe, expect, it } from 'vitest'
 import { TransactionCategory } from '@/database/schema/enums/transaction-category'
 import { expenseRoutes } from '@/http/controllers/expense/routes'
 import { AccessProfileFactory } from '@/tests/factories/access-profile'
+import { AnimalFactory } from '@/tests/factories/animal'
 import { EmployeeFactory } from '@/tests/factories/employee'
 import { ExpenseFactory } from '@/tests/factories/expense'
 import { TransactionTypeFactory } from '@/tests/factories/transaction-type'
@@ -54,6 +55,29 @@ describe('List expenses', () => {
     const data = response.json()
     expect(response.statusCode).toBe(200)
     expect(Array.isArray(data)).toBe(true)
+  })
+
+  it('should filter by animalName', async () => {
+    const animal = await AnimalFactory.create({ name: 'Filtro Despesa Animal' })
+    const transactionType = await TransactionTypeFactory.create({ category: TransactionCategory.EXPENSE })
+
+    await app.inject({
+      method: 'POST',
+      url: '/expense.add',
+      headers: { authorization: `Bearer ${token}` },
+      payload: ExpenseFactory.buildCreate({ transactionTypeId: transactionType.id, animalId: animal.id }),
+    })
+
+    const response = await app.inject({
+      method: 'GET',
+      url: '/expense.list?page=1&perPage=10&animalName=Filtro%20Despesa',
+      headers: { authorization: `Bearer ${token}` },
+    })
+
+    const data = response.json()
+    expect(response.statusCode).toBe(200)
+    expect(Array.isArray(data)).toBe(true)
+    expect(data.some((item: { animalName?: string | null }) => item.animalName?.includes('Filtro Despesa'))).toBe(true)
   })
 
   it('should not access without role', async () => {

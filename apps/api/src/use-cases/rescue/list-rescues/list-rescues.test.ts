@@ -59,6 +59,20 @@ describe('List rescues', () => {
     expect(Array.isArray(data)).toBe(true)
   })
 
+  it('should export rescue report with rescue date as date only', async () => {
+    const token = getAuthToken({ id: employeeId, roles: ['AdminPanel', 'Rescues'] })
+    const response = await app.inject({
+      method: 'GET',
+      url: '/rescue.list?page=1&perPage=10&fields=id,animalId,rescueDate,locationFound,animalName&rescueDateStart=2020-01-01&rescueDateEnd=2100-12-31&exportType=csv',
+      headers: { authorization: `Bearer ${token}` },
+    })
+
+    expect(response.statusCode).toBe(200)
+    expect(response.headers['content-type']).toContain('text/csv')
+    expect(response.body).toContain('Data do resgate')
+    expect(response.body).not.toMatch(/\d{2}\/\d{2}\/\d{4}\s+\d{2}:\d{2}/)
+  })
+
   it('should not access without token roles', async () => {
     const noRoleToken = getAuthToken({ id: employeeId })
     const response = await app.inject({

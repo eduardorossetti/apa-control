@@ -36,19 +36,28 @@ const CardTitle = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HT
 CardTitle.displayName = 'CardTitle'
 
 const CardToolbar = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
+  ({ className, children, ...props }, ref) => (
     <div
       ref={ref}
+      data-card-toolbar
       className={cn('mt-6 flex flex-col gap-3 sm:mt-0 sm:flex-row sm:flex-wrap sm:justify-end sm:gap-2', className)}
       {...props}
-    />
+    >
+      <div data-card-toolbar-start className="contents" />
+      {children}
+    </div>
   ),
 )
 
 CardToolbar.displayName = 'CardToolbar'
 
 const CardContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => <div ref={ref} className={cn('p-6 pt-0', className)} {...props} />,
+  ({ className, children, ...props }, ref) => (
+    <div ref={ref} className={cn('p-6 pt-0', className)} {...props}>
+      <div data-card-content-start className="contents" />
+      {children}
+    </div>
+  ),
 )
 
 CardContent.displayName = 'CardContent'

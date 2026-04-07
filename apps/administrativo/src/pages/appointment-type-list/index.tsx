@@ -12,7 +12,15 @@ import { ActionsList } from '../../components/list/ActionList'
 import { LoadingCard } from '../../components/loading-card'
 import { Separator } from '../../components/separator'
 import { Spinner } from '../../components/spinner'
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '../../components/table'
+import {
+  SelectableTable,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '../../components/table'
 import { errorMessageHandler } from '../../helpers/axios'
 import { toQueryString } from '../../helpers/qs'
 import { type ReportExportType, downloadReportBlob } from '../../helpers/report-download'
@@ -153,7 +161,7 @@ export const AppointmentTypeList = () => {
         <div className="relative">
           <Separator />
 
-          <Table>
+          <SelectableTable>
             <TableHeader>
               <TableRow>
                 <TableHead>Nome</TableHead>
@@ -190,7 +198,7 @@ export const AppointmentTypeList = () => {
             </TableBody>
 
             {items.length === 0 && <TableCaption>Nenhum item foi encontrado.</TableCaption>}
-          </Table>
+          </SelectableTable>
 
           {fetching && <LoadingCard position="absolute" />}
         </div>

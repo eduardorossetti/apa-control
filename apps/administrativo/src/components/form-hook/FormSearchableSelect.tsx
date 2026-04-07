@@ -189,7 +189,7 @@ export function FormSearchableSelect({
                     tabIndex={0}
                     role="option"
                     aria-selected={false}
-                    className="w-full cursor-pointer px-3 py-2 text-left text-sm hover:bg-brand hover:text-white dark:hover:bg-brand/90"
+                    className="w-full cursor-pointer px-3 py-2 text-left text-base hover:bg-brand hover:text-white dark:hover:bg-brand/90"
                     onMouseDown={(e) => {
                       e.preventDefault()
                       const value =
@@ -214,7 +214,7 @@ export function FormSearchableSelect({
                     tabIndex={0}
                     role="option"
                     aria-selected={false}
-                    className="w-full cursor-pointer px-3 py-2 text-left text-sm hover:bg-brand hover:text-white dark:hover:bg-brand/90"
+                    className="w-full cursor-pointer px-3 py-2 text-left text-base hover:bg-brand hover:text-white dark:hover:bg-brand/90"
                     onMouseDown={(e) => {
                       e.preventDefault()
                       const value = type === 'number' ? (item.value === '' ? null : Number(item.value)) : item.value

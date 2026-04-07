@@ -62,7 +62,7 @@ export function getSelectClassNames<
       ),
     control: ({ isDisabled, isFocused }) =>
       cn(
-        'flex !min-h-[2.75rem] flex-wrap rounded-md border bg-white text-sm shadow-xs',
+        'flex !min-h-[2.75rem] flex-wrap rounded-md border bg-white text-base shadow-xs',
         'dark:bg-gray-800 dark:border-gray-700',
         isFocused ? 'border-primary' : 'border-zinc-200',
         isDisabled && 'opacity-50',
@@ -89,7 +89,7 @@ export function getSelectClassNames<
       'bg-white rounded-sm shadow-[0_0_0_1px_rgba(0,0,0,0.1)] my-1 dark:bg-gray-800 dark:border dark:border-gray-700',
     menuList: () => 'py-1',
     multiValue: () => 'flex bg-neutral-200/70 rounded-md m-0.5 dark:bg-gray-700',
-    multiValueLabel: () => 'rounded-md text-neutral-800 text-sm p-1 pl-2 dark:text-gray-200',
+    multiValueLabel: () => 'rounded-md text-neutral-800 text-base p-1 pl-2 dark:text-gray-200',
     multiValueRemove: ({ isFocused }) =>
       clsx(
         'flex items-center rounded-md rounded-l-none',
@@ -101,7 +101,7 @@ export function getSelectClassNames<
     noOptionsMessage: () => 'text-neutral-400 py-2 px-3 dark:text-gray-500',
     option: ({ isDisabled, isFocused, isSelected }) =>
       clsx(
-        'px-3 py-2 text-sm!',
+        'px-3 py-2 text-base!',
         isSelected ? 'bg-brand/90' : isFocused ? 'bg-light/50 dark:bg-gray-700/50' : 'bg-transparent',
         isDisabled
           ? 'text-neutral-200 dark:text-gray-600'

@@ -16,7 +16,15 @@ import { ActionsList } from '../../components/list/ActionList'
 import { Pagination } from '../../components/list/Pagination'
 import { LoadingCard } from '../../components/loading-card'
 import { Spinner } from '../../components/spinner'
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '../../components/table'
+import {
+  SelectableTable,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '../../components/table'
 import { errorMessageHandler } from '../../helpers/axios'
 import { itemCountMessage } from '../../helpers/item-count'
 import { toQueryString } from '../../helpers/qs'
@@ -190,7 +198,7 @@ export const ProfileList = () => {
           <Separator />
 
           <div className="relative">
-            <Table>
+            <SelectableTable>
               <TableHeader>
                 <TableRow>
                   <TableHead>Descrição</TableHead>
@@ -217,7 +225,7 @@ export const ProfileList = () => {
               </TableBody>
 
               {items.length === 0 && <TableCaption>Nenhum item foi encontrado.</TableCaption>}
-            </Table>
+            </SelectableTable>
 
             {fetching && <LoadingCard position="absolute" />}
           </div>

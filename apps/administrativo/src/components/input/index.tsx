@@ -10,6 +10,7 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(({ className, type, asChild, ...props }, ref) => {
   const Comp = asChild ? Slot : 'input'
+
   return (
     <Comp
       ref={ref}

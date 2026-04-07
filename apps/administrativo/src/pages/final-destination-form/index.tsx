@@ -51,7 +51,7 @@ const finalDestinationSchema = z.object({
   id: z.number().nullish(),
   animalId: z.number({ message: RequiredMessage }).int().positive(),
   destinationTypeId: z.number({ message: RequiredMessage }).int().positive(),
-  destinationDate: z.string().min(1, RequiredMessage),
+  destinationDate: z.string({ message: RequiredMessage }),
   reason: z.string().min(1, RequiredMessage),
   observations: z.string().nullish(),
   proof: z.string().nullish(),
@@ -245,17 +245,19 @@ export const FinalDestinationForm = () => {
                   <TabsTrigger value="destino">Dados do Destino</TabsTrigger>
                 </TabsList>
                 <TabsContent value="animal">
-                  <div className="mb-6">
-                    <Form.Label htmlFor="animalId">Animal</Form.Label>
-                    <Form.SearchableSelect
-                      name="animalId"
-                      type="number"
-                      searchOptions={searchAnimalOptions}
-                      minChars={3}
-                      debounceMs={300}
-                      displayLabel={animalNamePreview || undefined}
-                    />
-                  </div>
+                  {!isEdit && (
+                    <div className="mb-6">
+                      <Form.Label htmlFor="animalId">Animal</Form.Label>
+                      <Form.SearchableSelect
+                        name="animalId"
+                        type="number"
+                        searchOptions={searchAnimalOptions}
+                        minChars={3}
+                        debounceMs={300}
+                        displayLabel={animalNamePreview || undefined}
+                      />
+                    </div>
+                  )}
                   <div className="mb-6 grid gap-4 lg:grid-cols-2 xl:auto-cols-fr xl:grid-flow-col">
                     <div>
                       <Form.Label htmlFor="animalNamePreview">Nome</Form.Label>

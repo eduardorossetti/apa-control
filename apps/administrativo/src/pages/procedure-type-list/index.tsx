@@ -26,7 +26,15 @@ import { Pagination } from '../../components/list/Pagination'
 import { LoadingCard } from '../../components/loading-card'
 import { Separator } from '../../components/separator'
 import { Spinner } from '../../components/spinner'
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '../../components/table'
+import {
+  SelectableTable,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '../../components/table'
 import { errorMessageHandler } from '../../helpers/axios'
 import { itemCountMessage } from '../../helpers/item-count'
 import { maskMoney } from '../../helpers/mask/decimal'
@@ -231,7 +239,7 @@ export const ProcedureTypeList = () => {
         <div className="relative">
           <Separator />
 
-          <Table>
+          <SelectableTable>
             <TableHeader>
               <TableRow>
                 <TableHead>Nome</TableHead>
@@ -270,7 +278,7 @@ export const ProcedureTypeList = () => {
             </TableBody>
 
             {items.length === 0 && <TableCaption>Nenhum item foi encontrado.</TableCaption>}
-          </Table>
+          </SelectableTable>
 
           {fetching && <LoadingCard position="absolute" />}
         </div>

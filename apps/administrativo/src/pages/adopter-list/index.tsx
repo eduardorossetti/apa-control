@@ -17,7 +17,15 @@ import { Pagination } from '../../components/list/Pagination'
 import { LoadingCard } from '../../components/loading-card'
 import { Separator } from '../../components/separator'
 import { Spinner } from '../../components/spinner'
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '../../components/table'
+import {
+  SelectableTable,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '../../components/table'
 import { errorMessageHandler } from '../../helpers/axios'
 import { itemCountMessage } from '../../helpers/item-count'
 import { maskCpfCnpj } from '../../helpers/mask/cpf-cnpj'
@@ -247,7 +255,7 @@ export const AdopterList = () => {
           <Separator />
 
           <div className="relative">
-            <Table>
+            <SelectableTable>
               <TableHeader>
                 <TableRow>
                   <TableHead>Nome</TableHead>
@@ -280,7 +288,7 @@ export const AdopterList = () => {
               </TableBody>
 
               {items.length === 0 && <TableCaption>Nenhum item foi encontrado.</TableCaption>}
-            </Table>
+            </SelectableTable>
 
             {fetching && <LoadingCard position="absolute" />}
           </div>

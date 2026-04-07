@@ -2,6 +2,7 @@ import type Decimal from 'decimal.js'
 
 export interface ListExpensesData {
   description?: string
+  animalName?: string
   transactionTypeId?: number
   campaignId?: number
   animalId?: number

@@ -23,7 +23,15 @@ import { Pagination } from '../../components/list/Pagination'
 import { LoadingCard } from '../../components/loading-card'
 import { Separator } from '../../components/separator'
 import { Spinner } from '../../components/spinner'
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '../../components/table'
+import {
+  SelectableTable,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '../../components/table'
 import { errorMessageHandler } from '../../helpers/axios'
 import { formatDateTime } from '../../helpers/date'
 import { itemCountMessage } from '../../helpers/item-count'
@@ -261,7 +269,7 @@ export const OccurrenceList = () => {
           <Separator />
 
           <div className="relative">
-            <Table>
+            <SelectableTable>
               <TableHeader>
                 <TableRow>
                   <TableHead>Animal</TableHead>
@@ -294,7 +302,7 @@ export const OccurrenceList = () => {
                 ))}
               </TableBody>
               {items.length === 0 && <TableCaption>Nenhuma ocorrência encontrada.</TableCaption>}
-            </Table>
+            </SelectableTable>
 
             {fetching && <LoadingCard position="absolute" />}
           </div>
