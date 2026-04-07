@@ -1,0 +1,18 @@
+app = "apa-control-api"
+primary_region = "gru"
+
+[build]
+  dockerfile = "apps/api/Dockerfile"
+  build-context = "."
+
+[env]
+  NODE_ENV = "production"
+  PORT = "3000"
+
+[http_service]
+  internal_port = 3000
+  force_https = true
+  auto_start_machines = true
+  auto_stop_machines = "stop"
+  min_machines_running = 0
+
