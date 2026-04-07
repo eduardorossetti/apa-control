@@ -2,42 +2,49 @@
 
 Sistema de Controle da Associação dos Protetores de Animais. Centraliza informações, organiza processos internos e oferece suporte à tomada de decisões por meio de relatórios e análises.
 
-## 📦 Módulos Implementados
+## Módulos Implementados
 
-- **Resgate**: Cadastro detalhado do animal, histórico de eventos e rastreabilidade
-- **Consultas**: Agendamento em clínica ou domiciliar, integrado ao histórico clínico
+- **Resgate**: Cadastro e ciclo de vida do animal, integrado ao histórico de eventos
+- **Consultas**: Agendamento clínico e domiciliar, integrado ao histórico clínico
 - **Anamnese**: Registro de diagnóstico e encaminhamento a procedimentos
 - **Procedimentos Clínicos**: Vacinas, medicações, exames e cirurgias
-- **Adoção**: Cadastro de adotante e registro da adoção
+- **Adoção**: Cadastro de adotante, registro da adoção e confirmação em lote
 - **Destino Final**: Registro de saídas definitivas (óbito, transferência, etc.)
 - **Ocorrências**: Classificação de eventos relevantes do animal
-- **Postagens**: Gerenciamento de conteúdo público (animais para adoção, campanhas)
-- **Financeiro**: Controle de receitas e despesas
-- **Relatórios**: Exportação em CSV, Excel e PDF
+- **Financeiro**: Controle de receitas e despesas, confirmação/cancelamento em lote, download de comprovante
+- **Campanhas**: Controle de campanhas com receitas/despesas vinculadas
+- **Relatórios**: Exportação em CSV, Excel e PDF em todas as listagens
 
-## ✅ Atualizações Recentes (mar/2026)
+## Ciclo de Vida do Animal
 
-- CRUD completo de **Consultas**, **Anamnese**, **Procedimentos Clínicos**, **Adoção**, **Destino Final**, **Ocorrências** e **Tipos de Ocorrência** (API + Administrativo).
-- Integração de histórico do animal com rastreabilidade (`oldValue`/`newValue`) nos fluxos clínicos e operacionais:
-  - `appointment.created|updated|deleted`
-  - `anamnesis.created|updated|deleted`
-  - `clinical-procedure.created|updated|deleted`
-  - `final-destination.created|updated|deleted`
-  - `occurrence.created|updated|deleted`
-- Relatórios de listagens padronizados em **CSV, Excel e PDF** (com filtros aplicados e sem paginação no export).
-- Padronização visual das listagens administrativas (toolbar, botões de exportação, paginação e loading em overlay).
-- Formulários com seleção de animal via componente de busca e organização por abas conforme padrão do projeto.
-- Em anamnese/procedimento, seleção de consulta com **modal de busca dedicado** (overlay global via portal), evitando conflito com sidebar/topbar.
+O animal passa por três status ao longo do sistema:
 
-## 📋 Pré-requisitos
+| Status | Descrição |
+|---|---|
+| `pendente` | Animal cadastrado, aguardando resgate vinculado |
+| `ativo` | Resgate vinculado (`rescueAt` preenchido) |
+| `inativo` | Destino final registrado (adoção, óbito, transferência, etc.) |
 
-- **Node.js**: versão 20 ou superior
-- **pnpm**: versão 10.13.1 ou superior
-- **PostgreSQL**: banco de dados para armazenamento (local ou [Neon](https://neon.tech))
-- **Git**: para controle de versão
-- **GitHub**: para integração com Neon e workflows automatizados (opcional)
+- Ao **criar um resgate**, o animal passa para `ativo` e `rescueAt` é preenchido.
+- Ao **remover um resgate**, o animal volta para `pendente` e `rescueAt` é zerado.
+- Ao **registrar destino final**, o animal passa para `inativo`.
+- Ao **reativar** (remover destino final), o animal volta para `ativo` e o destino final é excluído.
 
-## 🚀 Instalação
+## Rastreabilidade (Histórico do Animal)
+
+Todas as operações relevantes geram uma entrada no histórico do animal (`animal_history`):
+
+- Tipos de evento (enum): `resgate`, `cadastro`, `consulta`, `procedimento`, `destino_final`, `ocorrencia`, `adocao`, `despesa`, `receita`
+- Updates preenchem `oldValue`/`newValue`; criações e deleções deixam esses campos nulos
+- Despesas e receitas vinculadas ao animal geram entrada somente ao **confirmar** (não ao cancelar)
+
+## Pré-requisitos
+
+- **Node.js**: 20 ou superior
+- **pnpm**: 10.13.1 ou superior
+- **PostgreSQL**: local ou [Neon](https://neon.tech)
+
+## Instalação
 
 1. **Clone o repositório**
 
@@ -51,156 +58,158 @@ Sistema de Controle da Associação dos Protetores de Animais. Centraliza inform
    pnpm install
    ```
 
-## ⚙️ Configuração
+## Configuração
 
-### Banco de Dados
+### Variáveis de Ambiente
 
-1. **Configure o PostgreSQL**
+Copie o arquivo de exemplo e ajuste os valores:
 
-   - Crie um banco de dados para o projeto
-   - Anote as credenciais de conexão
+```bash
+cp apps/api/.env.example apps/api/.env
+```
 
-2. **Configure as variáveis de ambiente**
+Edite `apps/api/.env`:
 
-   Crie um arquivo `.env` na pasta `apps/api/` com as seguintes variáveis:
+```bash
+# Servidor
+PORT=3333
+NODE_ENV=development
 
-   ```bash
-   # Servidor
-   PORT=3333
-   NODE_ENV=development
+# Aplicação
+API_URL=http://localhost:3333
+APP_SECRET=seu-secret-key-aqui
+APP_NAME=APA Control
+APP_LOG_DIR=./logs
 
-   # Aplicação
-   API_URL=http://localhost:3333
-   APP_SECRET=seu-secret-key-aqui
-   APP_NAME=APA Control
-   APP_LOG_DIR=./logs
+# Banco de Dados
+DATABASE_URL=postgresql://usuario:senha@localhost:5432/nome_do_banco
 
-   # Banco de Dados
-   DATABASE_URL=postgresql://usuario:senha@localhost:5432/nome_do_banco
+# Email
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USER=seu-email@gmail.com
+EMAIL_PASSWORD=sua-senha-de-app
+OVERRIDE_EMAIL=email-para-testes@exemplo.com
+```
 
-   # Email (para envio de notificações)
-   EMAIL_HOST=smtp.gmail.com
-   EMAIL_PORT=587
-   EMAIL_USER=seu-email@gmail.com
-   EMAIL_PASSWORD=sua-senha-de-app
-   OVERRIDE_EMAIL=email-para-testes@exemplo.com
-   ```
+Crie `apps/administrativo/.env`:
 
-3. **Configure as variáveis de ambiente do Frontend**
-
-   Crie um arquivo `.env` na pasta `apps/administrativo/` com:
-
-   ```bash
-   VITE_API_URL=http://localhost:3333
-   ```
-
-   **Nota:** Se não configurar, o frontend usará `http://localhost:3333` como padrão.
+```bash
+VITE_API_URL=http://localhost:3333
+```
 
 ### Migração do Banco de Dados
-
-Execute as migrações para criar as tabelas:
 
 ```bash
 cd apps/api
 pnpm drizzle-kit migrate
 ```
 
-**Criando uma nova migração:**
+**Criando nova migração:**
 
 ```bash
 cd apps/api
 pnpm drizzle-kit generate --name nome_da_migracao
 ```
 
-Exemplo:
+**Variáveis opcionais:** `EMAIL_*` e `OVERRIDE_EMAIL` só são necessárias se o sistema enviar e-mails. `API_URL` é usado internamente pelo backend (padrão: `http://localhost:3333`).
 
-```bash
-pnpm drizzle-kit generate --name add_user_table
+### Criação do Primeiro Usuário Admin
+
+Não existe endpoint público para cadastro. O primeiro administrador deve ser inserido diretamente no banco após rodar as migrações:
+
+```sql
+-- 1. Criar perfil de administrador
+INSERT INTO access_profile (description, type) VALUES ('Administrador', 'administrador');
+
+-- 2. Criar o funcionário admin (substitua os valores)
+INSERT INTO employee (name, login, password, profile_id)
+VALUES (
+  'Admin',
+  'admin',
+  -- hash bcrypt da senha desejada (custo 10)
+  '$2b$10$...',
+  (SELECT id FROM access_profile WHERE type = 'administrador' LIMIT 1)
+);
 ```
 
-### Playwright (para geração de PDFs)
+Para gerar o hash da senha via Node.js:
 
-O Playwright é instalado automaticamente ao executar `pnpm install`. Caso precise reinstalar manualmente:
+```bash
+node -e "require('bcrypt').hash('sua-senha', 10).then(console.log)"
+```
+
+### Playwright (geração de PDFs)
+
+Instalado automaticamente via `pnpm install`. Para reinstalar manualmente:
 
 ```bash
 cd apps/api
 pnpm exec playwright install chromium
 ```
 
-**Nota:** Em ambientes sem sudo, o comando tentará instalar sem dependências do sistema automaticamente.
-
-## 🏃‍♂️ Executando a Aplicação
+## Executando
 
 ### Desenvolvimento
 
-Para executar tanto o frontend quanto o backend em modo de desenvolvimento:
-
 ```bash
 pnpm dev
 ```
 
-Este comando irá iniciar:
+- **Frontend**: http://localhost:5173
+- **Backend**: http://localhost:3333
 
-- **Frontend (Administrativo)**: http://localhost:5173
-- **Backend (API)**: http://localhost:3333 (porta padrão, configurável via variável `PORT`)
-
-### Executando Aplicações Separadamente
-
-**Frontend apenas:**
+### Separadamente
 
 ```bash
-cd apps/administrativo
-pnpm dev
-```
+# Frontend
+cd apps/administrativo && pnpm dev
 
-**Backend apenas:**
-
-```bash
-cd apps/api
-pnpm dev
+# Backend
+cd apps/api && pnpm dev
 ```
 
 ### Produção
 
-1. **Build das aplicações**
+```bash
+pnpm build
+cd apps/api && pnpm start
+```
 
-   ```bash
-   pnpm build
-   ```
+## Docker (Backend)
 
-2. **Executar o backend**
+O backend possui Dockerfile em `apps/api/Dockerfile`, baseado em `node:20-slim` com as dependências do Chromium (Playwright).
 
-   ```bash
-   cd apps/api
-   pnpm start
-   ```
+```bash
+# Build da imagem
+docker build -f apps/api/Dockerfile -t apa-control-api .
 
-3. **Servir o frontend**
-   ```bash
-   cd apps/administrativo
-   pnpm preview
-   ```
+# Executar (expõe porta 3000)
+docker run -p 3000:3000 --env-file apps/api/.env apa-control-api
+```
 
-## 📁 Estrutura do Projeto
+**Variável necessária no container:** `DATABASE_URL` com a connection string do banco.
+
+## Estrutura do Projeto
 
 ```
 apa-control/
 ├── apps/
 │   ├── administrativo/     # Frontend React
 │   └── api/               # Backend Node.js
-├── config/                # Configurações compartilhadas
-├── package.json           # Configuração do monorepo
-└── turbo.json            # Configuração do Turbo
+├── config/                # Configurações compartilhadas (TypeScript)
+├── package.json           # Monorepo (pnpm workspaces)
+└── turbo.json             # Turborepo
 ```
 
 ### Frontend (Administrativo)
 
 - **Framework**: React 19 + TypeScript
-- **Build Tool**: Vite
-- **Styling**: Tailwind CSS
+- **Build Tool**: Vite 7
+- **Styling**: Tailwind CSS 4
 - **UI Components**: Radix UI
 - **Formulários**: React Hook Form + Zod
-- **Roteamento**: React Router DOM
+- **Roteamento**: React Router 7
 
 ### Backend (API)
 
@@ -213,66 +222,78 @@ apa-control/
 - **PDFs**: Playwright
 - **Exports**: CSV (csv-stringify), Excel (exceljs)
 
-## 🛠️ Scripts Disponíveis
+## Scripts Disponíveis
 
-### Scripts do Monorepo
+### Monorepo
 
-- `pnpm dev` - Executa todas as aplicações em modo desenvolvimento
-- `pnpm build` - Build de todas as aplicações
-- `pnpm lint` - Executa linting em todas as aplicações
-- `pnpm reinstall` - Remove node_modules e reinstala dependências
+- `pnpm dev` — todas as apps em desenvolvimento
+- `pnpm build` — build de todas as apps
+- `pnpm lint` — linting em todas as apps
+- `pnpm reinstall` — remove `node_modules` e reinstala
 
-### Scripts do Frontend
+### Backend
 
-- `pnpm dev` - Servidor de desenvolvimento
-- `pnpm build` - Build para produção
-- `pnpm preview` - Preview do build de produção
-- `pnpm lint` - Verificação de tipos TypeScript
+- `pnpm dev` — servidor com hot reload
+- `pnpm build` — build para produção
+- `pnpm start` — executa o build
+- `pnpm test` — testes (vitest)
+- `pnpm test:coverage` — testes com coverage
+- `pnpm test -- --run <arquivo>` — subconjunto de testes
 
-### Scripts do Backend
-
-- `pnpm dev` - Servidor de desenvolvimento com hot reload
-- `pnpm build` - Build para produção
-- `pnpm start` - Executa o build de produção
-- `pnpm test` - Executa os testes
-- `pnpm test:coverage` - Executa testes com coverage
-- `pnpm test -- --run <arquivos>` - Executa subconjunto de testes (ex.: por caso de uso)
-
-## 🧪 Testes
+## Testes
 
 ```bash
 cd apps/api
 pnpm test
 ```
 
-## 📝 Desenvolvimento
+208 testes em 61 arquivos (integração com banco real — sem mocks de repositório).
 
-### Convenções de Código
+## Desenvolvimento
 
-- **Linter**: Biome
-- **Formatação**: Biome
-- **Commits**: Conventional Commits com Husky
+- **Linter/Formatter**: Biome
+- **Commits**: Conventional Commits + Husky + commitlint
+- **ORM/Migrações**: Drizzle ORM + Drizzle Kit
+- **Schema**: `apps/api/src/database/schema/`
+- **Controle de acesso**: Perfis com roles por módulo, autenticação JWT com refresh token
 
-### Banco de Dados
+### Roles Disponíveis
 
-- **ORM**: Drizzle ORM
-- **Migrações**: Drizzle Kit (`pnpm db:generate`, `pnpm db:migrate`)
-- **Schema**: Definido em `apps/api/src/database/schema/`
+Cada perfil de acesso define quais módulos o funcionário pode acessar:
 
-### Controle de Acesso
+| Role | Módulo |
+|---|---|
+| `AdminPanel` | Painel administrativo (necessário em todas as rotas) |
+| `Animals` | Animais |
+| `Rescues` | Resgates |
+| `Appointments` | Consultas |
+| `AppointmentTypes` | Tipos de consulta |
+| `Anamnesis` | Anamnese |
+| `ClinicalProcedures` | Procedimentos clínicos |
+| `ProcedureTypes` | Tipos de procedimento |
+| `Adoptions` | Adoções |
+| `Adopters` | Adotantes |
+| `FinalDestinations` | Destinos finais |
+| `FinalDestinationTypes` | Tipos de destino final |
+| `Registrations` | Ocorrências |
+| `Financial` | Financeiro (geral) |
+| `Expenses` | Despesas |
+| `Revenues` | Receitas |
+| `TransactionTypes` | Tipos de transação |
+| `Campaigns` | Campanhas |
+| `CampaignTypes` | Tipos de campanha |
+| `VeterinaryClinics` | Clínicas veterinárias |
+| `Employees` | Funcionários |
+| `AccessProfiles` | Perfis de acesso |
 
-- **Perfis**: Administrador e Atendente (configuráveis)
-- **Permissões**: Por módulo/roles, permitindo customização sem alterar código
-- **Autenticação**: JWT com refresh token
+## Integração com Neon Database
 
-## 🚀 Integração com Neon Database (Opcional)
+O projeto está configurado para usar o **Neon** (PostgreSQL serverless com database branching).
 
-O projeto está configurado para usar o **Neon** - um PostgreSQL serverless com database branching.
-
-### Setup Rápido
+### Setup
 
 1. Crie conta em [https://neon.tech](https://neon.tech)
-2. Crie projeto e copie a Connection String
+2. Crie o projeto e copie a Connection String
 3. Atualize `apps/api/.env`:
    ```env
    DATABASE_URL=postgresql://user:password@ep-xyz.region.aws.neon.tech/neondb?sslmode=require
@@ -282,89 +303,60 @@ O projeto está configurado para usar o **Neon** - um PostgreSQL serverless com 
 
 ```bash
 # 1. Criar tabelas no Neon
-cd apps/api
-pnpm db:migrate
+cd apps/api && pnpm db:migrate
 
-# 2. Exportar dados do local
+# 2. Exportar dados locais
 pg_dump -h localhost -U postgres -d apacontrol --data-only --column-inserts --no-owner --disable-triggers -f data_only.sql
 
 # 3. Importar no Neon
 psql "YOUR_NEON_CONNECTION_STRING" -f data_only.sql
-
-# 4. Testar
-pnpm dev
 ```
-
-### Integração GitHub
-
-1. No Neon Console → **Integrations** → **GitHub** → **Add**
-2. Autorize o repositório
-3. Workflows em [.github/workflows/](.github/workflows/) criarão branches de banco automaticamente para cada PR
 
 ### Comandos Úteis
 
-**Limpar e recriar banco:**
 ```bash
+# Limpar e recriar banco
 psql "YOUR_NEON_CONNECTION_STRING" -c "DROP SCHEMA IF EXISTS public CASCADE; DROP SCHEMA IF EXISTS drizzle CASCADE; CREATE SCHEMA public;"
 cd apps/api && pnpm db:migrate
-```
 
-**Importante:** Sempre dropar `drizzle` junto com `public`, senão as migrations não são aplicadas.
-
-**Verificar tabelas:**
-```bash
+# Verificar tabelas
 psql "YOUR_NEON_CONNECTION_STRING" -c "\dt"
 ```
 
-## 🐛 Troubleshooting
+**Importante:** Sempre dropar `drizzle` junto com `public`, senão as migrações não são reaplicadas.
 
-### Problemas Comuns
+## Troubleshooting
 
-**Erro de conexão com banco de dados:**
-
+**Erro de conexão com banco:**
 - Verifique se o PostgreSQL está rodando
-- Confirme as credenciais no arquivo `.env`
-- Teste a conexão: `psql -h localhost -U usuario -d nome_do_banco`
-- Em caso de múltiplas requisições simultâneas, verifique se o pool de conexões está configurado adequadamente (padrão: mínimo 2, máximo 30 conexões)
+- Confirme `DATABASE_URL` no `.env`
+- Teste: `psql -h localhost -U usuario -d nome_do_banco`
 
 **Erro de dependências:**
-
 ```bash
 pnpm reinstall
 ```
 
 **Porta já em uso:**
-
 - Frontend: altere a porta no `vite.config.ts`
-- Backend: altere a variável `PORT` no `.env`
+- Backend: altere `PORT` no `.env`
 
-## 📋 Arquitetura e Decisões
+## Decisões de Arquitetura
 
-**Histórico do Animal:**
-- Rastreabilidade completa com `oldValue`/`newValue`
-- Logs separados por tipo via enum (`resgate`, `cadastro`, `consulta`, `procedimento`, `destino_final`, `ocorrencia`)
-- Visualização contextual por tipo de evento
+**Uploads:** Comprovantes de destino final e transações financeiras salvos em `apps/api/uploads/`. Preparado para migração futura para S3.
 
-**Uploads:**
-- Comprovantes de destino final salvos em `apps/api/uploads/final-destination`
-- Preparado para migração futura para S3/storage externo
+**Campanha:** Tratada como cabeçalho (dados gerais). Receitas/despesas vinculadas opcionalmente à campanha via `campaignId`.
 
-**Campanha:**
-- Tratada como cabeçalho (dados gerais)
-- Receitas/despesas vinculadas opcionalmente à campanha
+**Modelo financeiro:** Sem campo `transactionDate` — a data do lançamento é o `createdAt` (automático). Filtros usam `createdAtStart`/`createdAtEnd` com cast `::date` no backend.
 
-**Formulários:**
-- Anamnese e procedimentos com modal de busca de consulta (overlay global via portal)
-- Resgate com abordagem híbrida (animal novo ou existente)
+**Formulários multi-tab:** Botão "Continuar" apenas avança a aba sem disparar validação. Validação ocorre apenas no "Salvar" (submit).
 
-**Pendências futuras:**
-- Formulário de adoção configurável (template + respostas)
-- Página pública para consumo de dados (API dedicada)
+**Preview de animal:** Formulários que selecionam um animal (consulta, procedimento, etc.) usam campos `xxxPreview` no schema Zod, preenchidos via `setValue` no `useEffect` do `animalId`. Esses campos não são submetidos.
 
-## 📄 Licença
+## Licença
 
-Este projeto está licenciado sob a Licença MIT.
+MIT
 
-## 📚 Documentação Adicional
+## Documentação Adicional
 
-- [REQUIREMENTS.md](REQUIREMENTS.md) - Requisitos funcionais, escopo e decisões de implementação
+- [REQUIREMENTS.md](REQUIREMENTS.md) — Requisitos funcionais, escopo e decisões de implementação
