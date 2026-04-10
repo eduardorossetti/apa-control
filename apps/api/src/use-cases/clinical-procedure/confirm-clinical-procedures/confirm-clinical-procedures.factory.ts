@@ -1,10 +1,10 @@
 import { AnimalHistoryRepository } from '@/repositories/animal-history.repository'
 import { ClinicalProcedureRepository } from '@/repositories/clinical-procedure.repository'
 import { ProcedureTypeRepository } from '@/repositories/procedure-type.repository'
-import { RemoveClinicalProcedureUseCase } from './remove-clinical-procedure'
+import { ConfirmClinicalProceduresUseCase } from './confirm-clinical-procedures'
 
-export function makeRemoveClinicalProcedureUseCase() {
-  return new RemoveClinicalProcedureUseCase(
+export function makeConfirmClinicalProceduresUseCase() {
+  return new ConfirmClinicalProceduresUseCase(
     new ClinicalProcedureRepository(),
     new ProcedureTypeRepository(),
     new AnimalHistoryRepository(),

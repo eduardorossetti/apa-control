@@ -81,9 +81,14 @@ const revenueFilterSchema = z
     animalName: z.string().nullish(),
     transactionTypeId: z.number().nullish(),
     campaignId: z.number().nullish(),
+    employeeId: z.number().nullish(),
     status: z.string().nullish(),
     createdAtStart: z.string().optional(),
     createdAtEnd: z.string().optional(),
+    dueDateStart: z.string().optional(),
+    dueDateEnd: z.string().optional(),
+    reversalDateStart: z.string().optional(),
+    reversalDateEnd: z.string().optional(),
   })
   .refine(
     (data) => {
@@ -93,6 +98,26 @@ const revenueFilterSchema = z
     {
       message: 'A data inicial deve ser menor ou igual à data final.',
       path: ['createdAtEnd'],
+    },
+  )
+  .refine(
+    (data) => {
+      if (!data.dueDateStart || !data.dueDateEnd) return true
+      return new Date(data.dueDateStart) <= new Date(data.dueDateEnd)
+    },
+    {
+      message: 'A data inicial de vencimento deve ser menor ou igual à data final.',
+      path: ['dueDateEnd'],
+    },
+  )
+  .refine(
+    (data) => {
+      if (!data.reversalDateStart || !data.reversalDateEnd) return true
+      return new Date(data.reversalDateStart) <= new Date(data.reversalDateEnd)
+    },
+    {
+      message: 'A data inicial de estorno deve ser menor ou igual à data final.',
+      path: ['reversalDateEnd'],
     },
   )
 
@@ -107,6 +132,7 @@ export const RevenueList = () => {
   const [total, setTotal] = useState(0)
   const [transactionTypeOptions, setTransactionTypeOptions] = useState<SelectOption[]>([])
   const [campaignOptions, setCampaignOptions] = useState<SelectOption[]>([])
+  const [employeeOptions, setEmployeeOptions] = useState<SelectOption[]>([])
   const [selectedIds, setSelectedIds] = useState<number[]>([])
   const [batchLoading, setBatchLoading] = useState(false)
 
@@ -125,9 +151,14 @@ export const RevenueList = () => {
       animalName: '',
       transactionTypeId: null,
       campaignId: null,
+      employeeId: null,
       status: null,
       createdAtStart: '',
       createdAtEnd: '',
+      dueDateStart: '',
+      dueDateEnd: '',
+      reversalDateStart: '',
+      reversalDateEnd: '',
     },
   })
 
@@ -238,8 +269,9 @@ export const RevenueList = () => {
         config,
       ),
       api.get(`campaign.list?${toQueryString({ page: 0, fields: 'id,title', sort: '-startDate' })}`, config),
+      api.get(`employee.list?${toQueryString({ page: 0, fields: 'id,name', sort: 'name' })}`, config),
     ])
-      .then(([typesRes, campaignsRes]) => {
+      .then(([typesRes, campaignsRes, employeesRes]) => {
         const types = Array.isArray(typesRes.data) ? typesRes.data : []
         setTransactionTypeOptions(
           types
@@ -253,6 +285,11 @@ export const RevenueList = () => {
         const campaigns = Array.isArray(campaignsRes.data) ? campaignsRes.data : []
         setCampaignOptions(
           campaigns.map((item: { id: number; title: string }) => ({ value: item.id, label: item.title })),
+        )
+
+        const employees = Array.isArray(employeesRes.data) ? employeesRes.data : []
+        setEmployeeOptions(
+          employees.map((item: { id: number; name: string }) => ({ value: item.id, label: item.name })),
         )
       })
       .catch((error) => toast.error(errorMessageHandler(error)))
@@ -349,7 +386,7 @@ export const RevenueList = () => {
         <CardContent>
           <FormProvider {...revenueFilterForm}>
             <form onSubmit={handleSubmit(listRevenues)}>
-              <div className="mb-6 grid gap-4 lg:grid-cols-3 2xl:grid-cols-3">
+              <div className="mb-6 grid gap-4 lg:grid-cols-4">
                 <div>
                   <Form.Label htmlFor="description">Descrição</Form.Label>
                   <Form.Input type="search" name="description" />
@@ -370,6 +407,17 @@ export const RevenueList = () => {
                   <Form.Label htmlFor="status">Status</Form.Label>
                   <Form.Select name="status" isClearable placeholder="Todos" options={revenueStatusOptions} />
                   <Form.ErrorMessage field="status" />
+                </div>
+                <div>
+                  <Form.Label htmlFor="employeeId">Por</Form.Label>
+                  <Form.Select
+                    name="employeeId"
+                    type="number"
+                    isClearable
+                    placeholder="Todos"
+                    options={employeeOptions}
+                  />
+                  <Form.ErrorMessage field="employeeId" />
                 </div>
               </div>
 
@@ -399,6 +447,29 @@ export const RevenueList = () => {
                   <Form.Label htmlFor="createdAtEnd">Data final</Form.Label>
                   <Form.DateInput name="createdAtEnd" />
                   <Form.ErrorMessage field="createdAtEnd" />
+                </div>
+              </div>
+
+              <div className="mb-6 grid gap-4 lg:grid-cols-2 2xl:grid-cols-4">
+                <div>
+                  <Form.Label htmlFor="dueDateStart">Data inicial vencimento</Form.Label>
+                  <Form.DateInput name="dueDateStart" />
+                  <Form.ErrorMessage field="dueDateStart" />
+                </div>
+                <div>
+                  <Form.Label htmlFor="dueDateEnd">Data final vencimento</Form.Label>
+                  <Form.DateInput name="dueDateEnd" />
+                  <Form.ErrorMessage field="dueDateEnd" />
+                </div>
+                <div>
+                  <Form.Label htmlFor="reversalDateStart">Data inicial estorno</Form.Label>
+                  <Form.DateInput name="reversalDateStart" />
+                  <Form.ErrorMessage field="reversalDateStart" />
+                </div>
+                <div>
+                  <Form.Label htmlFor="reversalDateEnd">Data final estorno</Form.Label>
+                  <Form.DateInput name="reversalDateEnd" />
+                  <Form.ErrorMessage field="reversalDateEnd" />
                 </div>
               </div>
 

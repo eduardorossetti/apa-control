@@ -1,5 +1,6 @@
 import { db } from '@/database/client'
-import { animal, appointment, clinicalProcedure, employee, procedureType } from '@/database/schema'
+import { animal, appointment, appointmentType, clinicalProcedure, employee, procedureType } from '@/database/schema'
+import { ProcedureStatus } from '@/database/schema/enums/procedure-status'
 import type { DrizzleTransaction } from '@/database/types'
 import type { ClinicalProcedure } from '@/entities'
 import type {
@@ -11,7 +12,7 @@ import { type QueryStringSettings, querifyString } from '@/utils/drizzle/querify
 import { timeZoneName } from '@/utils/time-zone'
 import { tz } from '@date-fns/tz'
 import { endOfDay, parseISO, startOfDay } from 'date-fns'
-import { type SQL, eq, gte, ilike, lte } from 'drizzle-orm'
+import { type SQL, eq, gte, ilike, inArray, lte, sql } from 'drizzle-orm'
 
 const querifyStringSettings: QueryStringSettings = {
   table: clinicalProcedure,
@@ -20,11 +21,13 @@ const querifyStringSettings: QueryStringSettings = {
     [animal, eq(animal.id, clinicalProcedure.animalId)],
     [procedureType, eq(procedureType.id, clinicalProcedure.procedureTypeId)],
     [appointment, eq(appointment.id, clinicalProcedure.appointmentId)],
+    [appointmentType, eq(appointmentType.id, appointment.appointmentTypeId)],
     [employee, eq(employee.id, clinicalProcedure.employeeId)],
   ],
   customFields: {
     animalName: animal.name,
     procedureTypeName: procedureType.name,
+    appointmentTypeName: appointmentType.name,
     appointmentDate: appointment.appointmentDate,
     employeeName: employee.name,
   },
@@ -37,15 +40,29 @@ export class ClinicalProcedureRepository {
   }
 
   async list(data: ListClinicalProceduresData): Promise<[number, ClinicalProcedureWithDetails[]]> {
-    const { animalName, procedureTypeId, appointmentId, employeeId, status, procedureDateStart, procedureDateEnd } =
-      data
+    const {
+      animalName,
+      procedureTypeId,
+      appointmentTypeId,
+      appointmentId,
+      employeeId,
+      status,
+      procedureDateStart,
+      procedureDateEnd,
+    } = data
     const whereList: SQL[] = []
 
     if (animalName) whereList.push(ilike(animal.name, `%${animalName}%`))
     if (procedureTypeId) whereList.push(eq(clinicalProcedure.procedureTypeId, procedureTypeId))
+    if (appointmentTypeId) whereList.push(eq(appointment.appointmentTypeId, appointmentTypeId))
     if (appointmentId) whereList.push(eq(clinicalProcedure.appointmentId, appointmentId))
     if (employeeId) whereList.push(eq(clinicalProcedure.employeeId, employeeId))
-    if (status) whereList.push(eq(clinicalProcedure.status, status))
+    if (status === 'pendente') {
+      whereList.push(eq(clinicalProcedure.status, ProcedureStatus.SCHEDULED))
+      whereList.push(sql`${clinicalProcedure.procedureDate} < NOW()`)
+    } else if (status) {
+      whereList.push(eq(clinicalProcedure.status, status))
+    }
     if (procedureDateStart)
       whereList.push(
         gte(
@@ -78,6 +95,7 @@ export class ClinicalProcedureRepository {
         employeeId: clinicalProcedure.employeeId,
         procedureDate: clinicalProcedure.procedureDate,
         description: clinicalProcedure.description,
+        proof: clinicalProcedure.proof,
         actualCost: clinicalProcedure.actualCost,
         observations: clinicalProcedure.observations,
         status: clinicalProcedure.status,
@@ -109,6 +127,18 @@ export class ClinicalProcedureRepository {
     return await connection.$count(clinicalProcedure, eq(clinicalProcedure.appointmentId, appointmentId))
   }
 
+  async findByIds(ids: number[]) {
+    return await db
+      .select({
+        id: clinicalProcedure.id,
+        animalId: clinicalProcedure.animalId,
+        procedureTypeId: clinicalProcedure.procedureTypeId,
+        status: clinicalProcedure.status,
+      })
+      .from(clinicalProcedure)
+      .where(inArray(clinicalProcedure.id, ids))
+  }
+
   async update(
     id: number,
     data: Partial<Omit<ClinicalProcedure, 'id'>>,
@@ -121,5 +151,14 @@ export class ClinicalProcedureRepository {
   async delete(id: number, dbTransaction: DrizzleTransaction | null = null) {
     const connection = dbTransaction ?? db
     await connection.delete(clinicalProcedure).where(eq(clinicalProcedure.id, id))
+  }
+
+  async updateStatusByIds(
+    ids: number[],
+    status: (typeof ProcedureStatus)[keyof typeof ProcedureStatus],
+    dbTransaction: DrizzleTransaction | null = null,
+  ) {
+    const connection = dbTransaction ?? db
+    await connection.update(clinicalProcedure).set({ status }).where(inArray(clinicalProcedure.id, ids))
   }
 }

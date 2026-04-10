@@ -1,4 +1,4 @@
-import { integer, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core'
+import { integer, pgTable, serial, text, timestamp, varchar } from 'drizzle-orm/pg-core'
 import { decimalJs } from '../decimal-type'
 import { animal } from './animal'
 import { appointment } from './appointment'
@@ -20,7 +20,8 @@ export const clinicalProcedure = pgTable('clinical_procedure', {
     .references(() => employee.id),
   procedureDate: timestamp({ withTimezone: true }).notNull(),
   description: text().notNull(),
-  actualCost: decimalJs({ precision: 10, scale: 2 }).notNull(),
+  proof: varchar({ length: 255 }),
+  actualCost: decimalJs({ precision: 10, scale: 2 }),
   observations: text(),
   status: procedureStatusEnum().notNull(),
   createdAt: timestamp({ withTimezone: true }).notNull(),

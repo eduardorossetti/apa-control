@@ -8,9 +8,9 @@ import { endOfMonth, format, startOfMonth } from 'date-fns'
 import {
   CalendarHeartIcon,
   CheckCircle2Icon,
+  EyeIcon,
   FileSpreadsheetIcon,
   FileTextIcon,
-  PencilIcon,
   PlusIcon,
   SearchIcon,
   XCircleIcon,
@@ -480,8 +480,8 @@ export const AppointmentList = () => {
                         primaryKey="id"
                         actions={[
                           {
-                            title: 'Editar',
-                            icon: PencilIcon,
+                            title: 'Visualizar',
+                            icon: EyeIcon,
                             action: '/consultas/:id',
                             hideWhen: (currentItem) => currentItem.status !== 'agendado',
                           },

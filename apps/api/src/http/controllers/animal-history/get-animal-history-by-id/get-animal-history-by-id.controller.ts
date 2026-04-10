@@ -68,7 +68,7 @@ function formatHistoryValue(value: string | null) {
       presumptiveDiagnosis: 'Diagnóstico Presuntivo',
       procedureTypeId: 'Tipo de Procedimento',
       procedureDate: 'Data do Procedimento',
-      actualCost: 'Custo Real',
+      actualCost: 'Custo',
       destinationTypeId: 'Tipo de Destino Final',
       destinationDate: 'Data do Destino Final',
       reason: 'Motivo',

@@ -9,7 +9,8 @@ export async function listAnamnesesController(request: FastifyRequest, reply: Fa
   const [count, items] = await useCase.execute(data)
 
   if (data.exportType) {
-    return exportListData(reply, data.exportType, 'Anamneses', 'anamneses', items)
+    const reportItems = items.map(({ proof: _proof, ...item }) => item)
+    return exportListData(reply, data.exportType, 'Anamneses', 'anamneses', reportItems, { pdfLandscape: true })
   }
 
   reply.header('X-Total-Count', count)

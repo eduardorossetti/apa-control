@@ -49,11 +49,10 @@ const healthConditionOptions = [
   { value: 'estavel', label: 'Estável' },
   { value: 'critica', label: 'Crítica' },
 ]
-const statusOptions = [
-  { value: 'agendado', label: 'Agendado' },
-  { value: 'realizado', label: 'Realizado' },
-  { value: 'cancelado', label: 'Cancelado' },
-]
+const optionalCost: z.ZodType<number | null> = z.preprocess(
+  (v) => (v === '' || v === null || v === undefined ? null : v),
+  z.union([z.coerce.number().nonnegative('Custo deve ser maior ou igual a zero'), z.null()]),
+)
 
 const schema = z.object({
   id: z.number().nullish(),
@@ -62,9 +61,10 @@ const schema = z.object({
   appointmentId: z.number().nullish(),
   procedureDate: z.string({ message: RequiredMessage }).min(1, RequiredMessage),
   description: z.string().min(1, RequiredMessage),
-  actualCost: z.number({ message: RequiredMessage }).nonnegative(RequiredMessage),
+  proof: z.string().nullish(),
+  proofFile: z.any().nullish(),
+  actualCost: optionalCost,
   observations: z.string().nullish(),
-  status: z.enum(['agendado', 'realizado', 'cancelado']),
   animalNamePreview: z.string().nullish(),
   speciesPreview: z.string().nullish(),
   breedPreview: z.string().nullish(),
@@ -75,7 +75,7 @@ const schema = z.object({
   entryDatePreview: z.string().nullish(),
   animalObservationsPreview: z.string().nullish(),
 })
-type Data = z.infer<typeof schema>
+type Data = z.input<typeof schema>
 
 export const ClinicalProcedureForm = () => {
   const { token } = useApp()
@@ -85,6 +85,7 @@ export const ClinicalProcedureForm = () => {
   const [fetching, setFetching] = useState(false)
   const [activeTab, setActiveTab] = useState<'animal' | 'procedimento'>('animal')
   const [appointmentDisplayLabel, setAppointmentDisplayLabel] = useState('')
+  const [currentProof, setCurrentProof] = useState('')
   const [openAppointmentModal, setOpenAppointmentModal] = useState(false)
   const searchAnimalOptions = useCallback(
     async (query: string): Promise<{ value: string; label: string }[]> => {
@@ -100,7 +101,7 @@ export const ClinicalProcedureForm = () => {
   const [procedureTypeOptions, setProcedureTypeOptions] = useState<SelectOption[]>([])
   const form = useForm<Data>({
     resolver: zodResolver(schema),
-    defaultValues: { status: 'agendado', appointmentId: null, observations: '' },
+    defaultValues: { appointmentId: null, observations: '', proof: '', proofFile: null },
   })
   const {
     handleSubmit,
@@ -115,20 +116,26 @@ export const ClinicalProcedureForm = () => {
 
   async function submit(values: Data) {
     try {
-      const payload = {
-        id: values.id,
-        animalId: values.animalId,
-        procedureTypeId: values.procedureTypeId,
-        appointmentId: values.appointmentId,
-        procedureDate: values.procedureDate,
-        description: values.description,
-        actualCost: values.actualCost,
-        observations: values.observations,
-        status: values.status,
+      const normalizedActualCost = typeof values.actualCost === 'number' ? values.actualCost : null
+      const formData = new FormData()
+      if (values.id) formData.append('id', String(values.id))
+      formData.append('animalId', String(values.animalId))
+      formData.append('procedureTypeId', String(values.procedureTypeId))
+      if (values.appointmentId !== null && values.appointmentId !== undefined) {
+        formData.append('appointmentId', String(values.appointmentId))
       }
+      formData.append('procedureDate', values.procedureDate)
+      formData.append('description', values.description)
+      if (normalizedActualCost !== null) {
+        formData.append('actualCost', String(normalizedActualCost))
+      }
+      if (values.observations) formData.append('observations', values.observations)
+      if (currentProof) formData.append('proof', currentProof)
+      if (values.proofFile?.length) formData.append('proofFile', values.proofFile[0])
+
       await api[params.id ? 'put' : 'post'](
         params.id ? 'clinical-procedure.update' : 'clinical-procedure.add',
-        payload,
+        formData,
         { headers: { Authorization: `Bearer ${token}` } },
       )
       toast.success(`Procedimento ${params.id ? 'atualizado' : 'registrado'} com sucesso!`)
@@ -163,11 +170,13 @@ export const ClinicalProcedureForm = () => {
             appointmentId: key.appointmentId ?? null,
             procedureDate: local,
             description: key.description,
-            actualCost: Number(key.actualCost),
+            proof: key.proof ?? '',
+            proofFile: null,
+            actualCost: key.actualCost === null || key.actualCost === undefined ? null : Number(key.actualCost),
             observations: key.observations ?? '',
-            status: key.status,
             animalNamePreview: key.animalName ?? '',
           })
+          setCurrentProof(key.proof ?? '')
           if (key.appointmentId) {
             try {
               const { data: appointment } = await api.get(`appointment.key/${key.appointmentId}`, config)
@@ -322,13 +331,19 @@ export const ClinicalProcedureForm = () => {
                           disabled
                           placeholder="Nenhuma"
                         />
-                        <Button type="button" variant="outline" onClick={() => setOpenAppointmentModal(true)}>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="h-11"
+                          onClick={() => setOpenAppointmentModal(true)}
+                        >
                           <SearchIcon className="mr-2 h-4 w-4" />
                           Buscar
                         </Button>
                         <Button
                           type="button"
                           variant="outline"
+                          className="h-11"
                           onClick={() => {
                             setValue('appointmentId', null, { shouldValidate: true })
                             setAppointmentDisplayLabel('')
@@ -347,22 +362,23 @@ export const ClinicalProcedureForm = () => {
                       <Form.ErrorMessage field="procedureDate" />
                     </div>
                     <div>
-                      <Form.Label htmlFor="actualCost">Custo real (R$)</Form.Label>
+                      <Form.Label htmlFor="actualCost">Custo (R$)</Form.Label>
                       <Form.DecimalInput name="actualCost" />
                       <Form.ErrorMessage field="actualCost" />
-                    </div>
-                  </div>
-                  <div className="mb-6 grid gap-4 lg:grid-cols-2">
-                    <div>
-                      <Form.Label htmlFor="status">Status</Form.Label>
-                      <Form.Select name="status" options={statusOptions} />
-                      <Form.ErrorMessage field="status" />
                     </div>
                   </div>
                   <div className="mb-6">
                     <Form.Label htmlFor="description">Descrição</Form.Label>
                     <Form.TextArea name="description" rows={3} />
                     <Form.ErrorMessage field="description" />
+                  </div>
+                  <div className="mb-6">
+                    <Form.Label htmlFor="proofFile">Arquivo</Form.Label>
+                    <Form.FileInput name="proofFile" />
+                    <Form.ErrorMessage field="proofFile" />
+                    {currentProof ? (
+                      <span className="mt-2 block text-muted-foreground text-xs">Arquivo atual: {currentProof}</span>
+                    ) : null}
                   </div>
                   <div className="mb-6">
                     <Form.Label htmlFor="observations">Observações</Form.Label>

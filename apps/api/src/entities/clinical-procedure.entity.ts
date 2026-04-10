@@ -8,7 +8,8 @@ export class ClinicalProcedure {
   employeeId: number
   procedureDate: Date
   description: string
-  actualCost: Decimal
+  proof?: string | null
+  actualCost: Decimal | null
   observations?: string | null
   status: string
   createdAt: Date
@@ -21,6 +22,7 @@ export class ClinicalProcedure {
     this.employeeId = props.employeeId
     this.procedureDate = props.procedureDate
     this.description = props.description
+    this.proof = props.proof
     this.actualCost = props.actualCost
     this.observations = props.observations
     this.status = props.status

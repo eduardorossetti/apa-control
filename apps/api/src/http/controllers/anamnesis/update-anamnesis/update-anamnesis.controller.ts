@@ -20,6 +20,10 @@ export async function updateAnamnesisController(request: FastifyRequest, reply: 
 
       payload[part.fieldname] = part.value
     }
+
+    if (uploadedProofPath) {
+      payload.proof = uploadedProofPath
+    }
   }
 
   const body = updateAnamnesisSchema.parse(payload)

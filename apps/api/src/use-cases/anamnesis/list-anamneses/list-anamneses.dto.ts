@@ -1,5 +1,6 @@
 export interface ListAnamnesesData {
   animalName?: string
+  appointmentTypeId?: number
   appointmentId?: number
   employeeId?: number
   createdDateStart?: string
@@ -21,6 +22,7 @@ export interface AnamnesisWithDetails {
   observations: string | null
   proof: string | null
   createdAt: Date
+  appointmentTypeName?: string | null
   animalName?: string | null
   appointmentDate?: Date | null
   employeeName?: string | null

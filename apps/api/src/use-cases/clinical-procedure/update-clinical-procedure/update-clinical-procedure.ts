@@ -1,5 +1,6 @@
 import { db } from '@/database/client'
 import { AnimalHistoryType } from '@/database/schema/enums/animal-history-type'
+import { ProcedureStatus } from '@/database/schema/enums/procedure-status'
 import { AnimalHistory } from '@/entities'
 import type { AnimalHistoryRepository } from '@/repositories/animal-history.repository'
 import type { AnimalRepository } from '@/repositories/animal.repository'
@@ -25,6 +26,9 @@ export class UpdateClinicalProcedureUseCase {
   async execute(data: UpdateClinicalProcedureData, employeeId: number): Promise<void> {
     const existing = await this.clinicalProcedureRepository.findById(data.id)
     if (!existing) throw new ApiError('Procedimento clínico não encontrado.', 404)
+    if (existing.status !== ProcedureStatus.SCHEDULED) {
+      throw new ApiError('Apenas procedimentos clínicos agendados podem ser editados.', 409)
+    }
 
     const [animal, procedureType] = await Promise.all([
       this.animalRepository.findById(data.animalId),
@@ -51,9 +55,10 @@ export class UpdateClinicalProcedureUseCase {
       appointmentId: data.appointmentId ?? null,
       procedureDate,
       description: data.description,
-      actualCost: data.actualCost,
+      proof: data.proof ?? null,
+      actualCost: data.actualCost ?? null,
       observations: data.observations ?? null,
-      status: data.status,
+      status: existing.status,
     } as const
 
     const comparableExisting = {
@@ -62,7 +67,8 @@ export class UpdateClinicalProcedureUseCase {
       appointmentId: existing.appointmentId ?? null,
       procedureDate: existing.procedureDate.getTime(),
       description: existing.description,
-      actualCost: String(existing.actualCost),
+      proof: existing.proof ?? null,
+      actualCost: existing.actualCost === null ? null : String(existing.actualCost),
       observations: existing.observations ?? null,
       status: existing.status,
     } as const
@@ -73,7 +79,8 @@ export class UpdateClinicalProcedureUseCase {
       appointmentId: normalizedData.appointmentId,
       procedureDate: normalizedData.procedureDate.getTime(),
       description: normalizedData.description,
-      actualCost: String(normalizedData.actualCost),
+      proof: normalizedData.proof,
+      actualCost: normalizedData.actualCost === null ? null : String(normalizedData.actualCost),
       observations: normalizedData.observations,
       status: normalizedData.status,
     } as const
@@ -110,7 +117,8 @@ export class UpdateClinicalProcedureUseCase {
           appointmentId: normalizedData.appointmentId,
           procedureDate,
           description: normalizedData.description,
-          actualCost: new Decimal(normalizedData.actualCost),
+          proof: normalizedData.proof,
+          actualCost: normalizedData.actualCost === null ? null : new Decimal(normalizedData.actualCost),
           observations: normalizedData.observations,
           status: normalizedData.status,
         },
@@ -124,7 +132,7 @@ export class UpdateClinicalProcedureUseCase {
           employeeId,
           type: AnimalHistoryType.PROCEDURE,
           action: 'clinical-procedure.updated',
-          description: 'Procedimento clínico atualizado',
+          description: `Procedimento ${procedureType.name} atualizado`,
           oldValue: JSON.stringify(oldValues),
           newValue: JSON.stringify(newValues),
           createdAt: new Date(),

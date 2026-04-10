@@ -54,6 +54,12 @@ export class FinancialTransactionRepository {
       status,
       createdAtStart,
       createdAtEnd,
+      dueDateStart,
+      dueDateEnd,
+      paymentDateStart,
+      paymentDateEnd,
+      reversalDateStart,
+      reversalDateEnd,
     } = data
     const whereList: SQL[] = [eq(transactionType.category, category)]
 
@@ -72,6 +78,12 @@ export class FinancialTransactionRepository {
     }
     if (createdAtStart) whereList.push(sql`${financialTransaction.createdAt}::date >= ${createdAtStart}`)
     if (createdAtEnd) whereList.push(sql`${financialTransaction.createdAt}::date <= ${createdAtEnd}`)
+    if (dueDateStart) whereList.push(sql`${financialTransaction.dueDate} >= ${dueDateStart}`)
+    if (dueDateEnd) whereList.push(sql`${financialTransaction.dueDate} <= ${dueDateEnd}`)
+    if (paymentDateStart) whereList.push(sql`${financialTransaction.paymentDate}::date >= ${paymentDateStart}`)
+    if (paymentDateEnd) whereList.push(sql`${financialTransaction.paymentDate}::date <= ${paymentDateEnd}`)
+    if (reversalDateStart) whereList.push(sql`${financialTransaction.reversalDate}::date >= ${reversalDateStart}`)
+    if (reversalDateEnd) whereList.push(sql`${financialTransaction.reversalDate}::date <= ${reversalDateEnd}`)
 
     const [sqlQuery, countQuery] = querifyString<ExpenseWithDetails>(data, whereList, transactionListQuerifySettings)
     const items = await sqlQuery

@@ -10,6 +10,7 @@ import { formatDate, formatDateTime } from '../helpers/date'
 import { toQueryString } from '../helpers/qs'
 import { api } from '../service'
 import { Button } from './button'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './form/select'
 import { Input } from './input'
 import { LoadingCard } from './loading-card'
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from './table'
@@ -25,13 +26,12 @@ interface AppointmentItem {
   animalName?: string | null
   appointmentDate?: string
   appointmentTypeName?: string | null
-  status?: string | null
 }
 
-const statusLabel: Record<string, string> = {
-  agendado: 'Agendado',
-  realizado: 'Realizado',
-  cancelado: 'Cancelado',
+interface AppointmentTypeOption {
+  id: number
+  name: string
+  active: boolean
 }
 
 export function AppointmentSearchModal({ open, onClose, onSelect }: AppointmentSearchModalProps) {
@@ -39,19 +39,33 @@ export function AppointmentSearchModal({ open, onClose, onSelect }: AppointmentS
   const [fetching, setFetching] = useState(false)
   const [items, setItems] = useState<AppointmentItem[]>([])
   const [animalName, setAnimalName] = useState('')
+  const [appointmentTypeId, setAppointmentTypeId] = useState('all')
+  const [appointmentTypeOptions, setAppointmentTypeOptions] = useState<{ value: string; label: string }[]>([])
   const [dateStart, setDateStart] = useState('')
   const [dateEnd, setDateEnd] = useState('')
 
   useEffect(() => {
     if (!open) return
     const today = new Date()
-    const monthAgo = new Date()
-    monthAgo.setMonth(monthAgo.getMonth() - 1)
-    const toDateInput = (date: Date) => date.toISOString().split('T')[0]
-    setDateStart(toDateInput(monthAgo))
-    setDateEnd(toDateInput(today))
+    const monthStart = new Date(today.getFullYear(), today.getMonth(), 1)
+    const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0)
+    const toDateInput = (date: Date) =>
+      `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+    setDateStart(toDateInput(monthStart))
+    setDateEnd(toDateInput(monthEnd))
     setAnimalName('')
-  }, [open])
+    setAppointmentTypeId('all')
+
+    api
+      .get('appointment-type.list?page=0&fields=id,name,active', { headers: { Authorization: `Bearer ${token}` } })
+      .then(({ data }) => {
+        const list = Array.isArray(data) ? (data as AppointmentTypeOption[]) : []
+        setAppointmentTypeOptions(
+          list.filter((item) => item.active).map((item) => ({ value: String(item.id), label: item.name })),
+        )
+      })
+      .catch((error) => toast.error(errorMessageHandler(error)))
+  }, [open, token])
 
   async function loadAppointments() {
     if (!dateStart || !dateEnd) {
@@ -63,9 +77,11 @@ export function AppointmentSearchModal({ open, onClose, onSelect }: AppointmentS
       const qs = toQueryString({
         page: 1,
         perPage: 50,
-        fields: 'id,animalName,appointmentDate,appointmentTypeName,status',
+        fields: 'id,animalName,appointmentDate,appointmentTypeName',
         sort: '-appointmentDate',
+        status: 'realizado',
         animalName: animalName || undefined,
+        appointmentTypeId: appointmentTypeId !== 'all' ? Number(appointmentTypeId) : undefined,
         appointmentDateStart: dateStart,
         appointmentDateEnd: dateEnd,
       })
@@ -91,7 +107,7 @@ export function AppointmentSearchModal({ open, onClose, onSelect }: AppointmentS
         </div>
 
         <div className="space-y-4 p-6">
-          <div className="grid gap-4 lg:grid-cols-3">
+          <div className="grid gap-4 lg:grid-cols-4">
             <div>
               <label htmlFor="appointmentSearchAnimal" className="mb-2 block font-medium text-sm">
                 Animal
@@ -104,6 +120,24 @@ export function AppointmentSearchModal({ open, onClose, onSelect }: AppointmentS
                 onChange={(e) => setAnimalName(e.target.value)}
                 placeholder="Nome do animal"
               />
+            </div>
+            <div>
+              <label htmlFor="appointmentTypeModal" className="mb-2 block font-medium text-sm">
+                Tipo de consulta
+              </label>
+              <Select value={appointmentTypeId} onValueChange={setAppointmentTypeId}>
+                <SelectTrigger id="appointmentTypeModal" name="appointmentTypeModal" className="w-full">
+                  <SelectValue placeholder="Todos" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos</SelectItem>
+                  {appointmentTypeOptions.map((item) => (
+                    <SelectItem key={item.value} value={item.value}>
+                      {item.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <label htmlFor="appointmentDateStartModal" className="mb-2 block font-medium text-sm">
@@ -142,24 +176,20 @@ export function AppointmentSearchModal({ open, onClose, onSelect }: AppointmentS
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>#</TableHead>
                   <TableHead>Animal</TableHead>
                   <TableHead>Tipo</TableHead>
                   <TableHead>Data</TableHead>
-                  <TableHead>Status</TableHead>
                   <TableHead aria-label="Selecionar" />
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {items.map((item) => {
-                  const label = `#${item.id} - ${item.animalName ?? 'Animal'} (${item.appointmentDate ? formatDate(item.appointmentDate) : ''})`
+                  const label = `${item.appointmentTypeName ?? 'Tipo não informado'} - ${item.animalName ?? 'Animal'} (${item.appointmentDate ? formatDate(item.appointmentDate) : ''})`
                   return (
                     <TableRow key={item.id}>
-                      <TableCell>#{item.id}</TableCell>
                       <TableCell>{item.animalName ?? ''}</TableCell>
                       <TableCell>{item.appointmentTypeName ?? ''}</TableCell>
                       <TableCell>{item.appointmentDate ? formatDateTime(item.appointmentDate) : ''}</TableCell>
-                      <TableCell>{item.status ? (statusLabel[item.status] ?? item.status) : ''}</TableCell>
                       <TableCell className="w-[1%] whitespace-nowrap">
                         <Button type="button" variant="success" onClick={() => onSelect({ id: item.id, label })}>
                           <CalendarIcon className="mr-2 h-4 w-4" />

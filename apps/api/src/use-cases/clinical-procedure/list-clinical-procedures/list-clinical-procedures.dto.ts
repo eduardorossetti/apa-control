@@ -3,6 +3,7 @@ import type Decimal from 'decimal.js'
 export interface ListClinicalProceduresData {
   animalName?: string
   procedureTypeId?: number
+  appointmentTypeId?: number
   appointmentId?: number
   employeeId?: number
   status?: string
@@ -22,12 +23,14 @@ export interface ClinicalProcedureWithDetails {
   employeeId: number
   procedureDate: Date
   description: string
-  actualCost: Decimal
+  proof: string | null
+  actualCost: Decimal | null
   observations: string | null
   status: string
   createdAt: Date
   animalName?: string | null
   procedureTypeName?: string | null
+  appointmentTypeName?: string | null
   appointmentDate?: Date | null
   employeeName?: string | null
 }

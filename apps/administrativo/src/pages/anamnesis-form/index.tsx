@@ -20,18 +20,47 @@ import { RequiredMessage } from '../../helpers/constants'
 import { formatDate } from '../../helpers/date'
 import { api } from '../../service'
 
-const schema = z.object({
-  id: z.number().nullish(),
-  appointmentId: z.number({ message: RequiredMessage }).int().positive(),
-  symptomsPresented: z.string().nullish(),
-  dietaryHistory: z.string().nullish(),
-  behavioralHistory: z.string().nullish(),
-  requestedExams: z.string().nullish(),
-  presumptiveDiagnosis: z.string().nullish(),
-  observations: z.string().nullish(),
-  proofFile: z.any().nullish(),
-  currentProof: z.string().nullish(),
-})
+const schema = z
+  .object({
+    id: z.number().nullish(),
+    appointmentId: z.number({ message: RequiredMessage }).int().positive(),
+    symptomsPresented: z.string().nullish(),
+    dietaryHistory: z.string().nullish(),
+    behavioralHistory: z.string().nullish(),
+    requestedExams: z.string().nullish(),
+    presumptiveDiagnosis: z.string().nullish(),
+    observations: z.string().nullish(),
+    proofFile: z.any().nullish(),
+    currentProof: z.string().nullish(),
+  })
+  .superRefine((data, ctx) => {
+    const hasText = (value: unknown) => typeof value === 'string' && value.trim().length > 0
+    const hasFile = Boolean(data.proofFile?.length) || hasText(data.currentProof)
+    const requiredFields = [
+      'symptomsPresented',
+      'dietaryHistory',
+      'behavioralHistory',
+      'requestedExams',
+      'presumptiveDiagnosis',
+    ] as const
+    const missingRequiredFields = requiredFields.filter((field) => !hasText(data[field]))
+
+    if (hasFile || missingRequiredFields.length === 0) return
+
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Anexe um arquivo ou preencha os campos obrigatórios da anamnese.',
+      path: ['proofFile'],
+    })
+
+    for (const field of missingRequiredFields) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Campo obrigatório quando não houver arquivo.',
+        path: [field],
+      })
+    }
+  })
 type Data = z.infer<typeof schema>
 
 export const AnamnesisForm = () => {
@@ -99,7 +128,7 @@ export const AnamnesisForm = () => {
           try {
             const { data: appointment } = await api.get(`appointment.key/${key.appointmentId}`, config)
             setAppointmentDisplayLabel(
-              `#${appointment.id} - ${appointment.animalName ?? 'Animal'} (${formatDate(appointment.appointmentDate)})`,
+              `${appointment.appointmentTypeName ?? 'Tipo não informado'} - ${appointment.animalName ?? 'Animal'} (${formatDate(appointment.appointmentDate)})`,
             )
           } catch {
             setAppointmentDisplayLabel(`#${key.appointmentId}`)
@@ -138,7 +167,12 @@ export const AnamnesisForm = () => {
                       disabled
                       placeholder="Nenhuma consulta selecionada"
                     />
-                    <Button type="button" variant="outline" onClick={() => setOpenAppointmentModal(true)}>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="h-11"
+                      onClick={() => setOpenAppointmentModal(true)}
+                    >
                       <SearchIcon className="mr-2 h-4 w-4" />
                       Buscar
                     </Button>

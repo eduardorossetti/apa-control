@@ -1,5 +1,5 @@
 import { db } from '@/database/client'
-import { anamnesis, animal, appointment, employee } from '@/database/schema'
+import { anamnesis, animal, appointment, appointmentType, employee } from '@/database/schema'
 import type { DrizzleTransaction } from '@/database/types'
 import type { Anamnesis } from '@/entities'
 import type { AnamnesisWithDetails, ListAnamnesesData } from '@/use-cases/anamnesis/list-anamneses/list-anamneses.dto'
@@ -16,9 +16,11 @@ const querifyStringSettings: QueryStringSettings = {
   includes: [
     [appointment, eq(appointment.id, anamnesis.appointmentId)],
     [animal, eq(animal.id, appointment.animalId)],
+    [appointmentType, eq(appointmentType.id, appointment.appointmentTypeId)],
     [employee, eq(employee.id, appointment.employeeId)],
   ],
   customFields: {
+    appointmentTypeName: appointmentType.name,
     animalName: animal.name,
     appointmentDate: appointment.appointmentDate,
     employeeName: employee.name,
@@ -32,10 +34,11 @@ export class AnamnesisRepository {
   }
 
   async list(data: ListAnamnesesData): Promise<[number, AnamnesisWithDetails[]]> {
-    const { animalName, appointmentId, employeeId, createdDateStart, createdDateEnd } = data
+    const { animalName, appointmentTypeId, appointmentId, employeeId, createdDateStart, createdDateEnd } = data
     const whereList: SQL[] = []
 
     if (animalName) whereList.push(ilike(animal.name, `%${animalName}%`))
+    if (appointmentTypeId) whereList.push(eq(appointment.appointmentTypeId, appointmentTypeId))
     if (appointmentId) whereList.push(eq(anamnesis.appointmentId, appointmentId))
     if (employeeId) whereList.push(eq(appointment.employeeId, employeeId))
     if (createdDateStart)
@@ -94,6 +97,7 @@ export class AnamnesisRepository {
         observations: anamnesis.observations,
         proof: anamnesis.proof,
         createdAt: anamnesis.createdAt,
+        appointmentTypeName: appointmentType.name,
         animalName: animal.name,
         appointmentDate: appointment.appointmentDate,
         employeeName: employee.name,
@@ -101,6 +105,7 @@ export class AnamnesisRepository {
       .from(anamnesis)
       .leftJoin(appointment, eq(appointment.id, anamnesis.appointmentId))
       .leftJoin(animal, eq(animal.id, appointment.animalId))
+      .leftJoin(appointmentType, eq(appointmentType.id, appointment.appointmentTypeId))
       .leftJoin(employee, eq(employee.id, appointment.employeeId))
       .where(eq(anamnesis.id, id))
 

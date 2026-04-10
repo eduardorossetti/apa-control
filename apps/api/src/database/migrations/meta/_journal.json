@@ -148,6 +148,13 @@
       "when": 1775762493294,
       "tag": "0020_appointment-reminder-table",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1775781288390,
+      "tag": "0021_add-proof-clinical-procedures",
+      "breakpoints": true
     }
   ]
 }

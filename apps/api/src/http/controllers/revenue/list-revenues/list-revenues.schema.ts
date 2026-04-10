@@ -12,6 +12,10 @@ export const listRevenuesSchema = apiQueryStringSchema
     status: z.enum(['confirmado', 'estornado']).optional(),
     createdAtStart: z.string().optional(),
     createdAtEnd: z.string().optional(),
+    dueDateStart: z.string().optional(),
+    dueDateEnd: z.string().optional(),
+    reversalDateStart: z.string().optional(),
+    reversalDateEnd: z.string().optional(),
   })
   .refine(
     (data) => {
@@ -21,5 +25,25 @@ export const listRevenuesSchema = apiQueryStringSchema
     {
       message: 'A data inicial deve ser menor ou igual à data final.',
       path: ['createdAtEnd'],
+    },
+  )
+  .refine(
+    (data) => {
+      if (!data.dueDateStart || !data.dueDateEnd) return true
+      return new Date(data.dueDateStart) <= new Date(data.dueDateEnd)
+    },
+    {
+      message: 'A data inicial de vencimento deve ser menor ou igual à data final.',
+      path: ['dueDateEnd'],
+    },
+  )
+  .refine(
+    (data) => {
+      if (!data.reversalDateStart || !data.reversalDateEnd) return true
+      return new Date(data.reversalDateStart) <= new Date(data.reversalDateEnd)
+    },
+    {
+      message: 'A data inicial de estorno deve ser menor ou igual à data final.',
+      path: ['reversalDateEnd'],
     },
   )

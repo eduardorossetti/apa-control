@@ -1,31 +1,27 @@
 import { db } from '@/database/client'
 import { AnimalHistoryType } from '@/database/schema/enums/animal-history-type'
+import { ProcedureStatus } from '@/database/schema/enums/procedure-status'
 import { AnimalHistory } from '@/entities'
 import type { AnimalHistoryRepository } from '@/repositories/animal-history.repository'
 import type { ClinicalProcedureRepository } from '@/repositories/clinical-procedure.repository'
+import type { ProcedureTypeRepository } from '@/repositories/procedure-type.repository'
 import { ApiError } from '@/utils/api-error'
 import type { RemoveClinicalProcedureData } from './remove-clinical-procedure.dto'
 
 export class RemoveClinicalProcedureUseCase {
   constructor(
     private clinicalProcedureRepository: ClinicalProcedureRepository,
+    private procedureTypeRepository: ProcedureTypeRepository,
     private animalHistoryRepository: AnimalHistoryRepository,
   ) {}
 
   async execute(data: RemoveClinicalProcedureData, employeeId: number): Promise<void> {
     const existing = await this.clinicalProcedureRepository.findById(data.id)
     if (!existing) throw new ApiError('Procedimento clínico não encontrado.', 404)
-
-    const oldValues = {
-      animalId: existing.animalId,
-      procedureTypeId: existing.procedureTypeId,
-      appointmentId: existing.appointmentId ?? null,
-      procedureDate: existing.procedureDate,
-      description: existing.description,
-      actualCost: existing.actualCost,
-      observations: existing.observations ?? null,
-      status: existing.status,
+    if (existing.status !== ProcedureStatus.SCHEDULED) {
+      throw new ApiError('Apenas procedimentos clínicos agendados podem ser removidos.', 409)
     }
+    const procedureType = await this.procedureTypeRepository.findById(existing.procedureTypeId)
 
     await db.transaction(async (tx) => {
       await this.clinicalProcedureRepository.delete(data.id, tx)
@@ -37,7 +33,7 @@ export class RemoveClinicalProcedureUseCase {
           employeeId,
           type: AnimalHistoryType.PROCEDURE,
           action: 'clinical-procedure.deleted',
-          description: 'Procedimento clínico removido',
+          description: `Procedimento ${procedureType?.name ?? `#${existing.procedureTypeId}`} removido`,
           oldValue: null,
           newValue: null,
           createdAt: new Date(),

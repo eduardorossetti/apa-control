@@ -3,12 +3,13 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { endOfMonth, format, startOfMonth } from 'date-fns'
 import {
   ClipboardListIcon,
   DownloadIcon,
+  EyeIcon,
   FileSpreadsheetIcon,
   FileTextIcon,
-  PencilIcon,
   PlusIcon,
   SearchIcon,
   XIcon,
@@ -37,6 +38,7 @@ import {
 } from '../../components/table'
 import { appConfig } from '../../config'
 import { errorMessageHandler } from '../../helpers/axios'
+import { formatDate, formatDateTime } from '../../helpers/date'
 import { itemCountMessage } from '../../helpers/item-count'
 import { toQueryString } from '../../helpers/qs'
 import { type ReportExportType, downloadReportBlob } from '../../helpers/report-download'
@@ -46,11 +48,18 @@ import { api } from '../../service'
 interface Item {
   id: number
   appointmentId: number
+  appointmentTypeName?: string | null
   animalName?: string | null
   appointmentDate?: string | null
+  createdAt?: string | null
   employeeName?: string | null
   symptomsPresented: string
   proof?: string | null
+}
+
+interface SelectOption {
+  value: number
+  label: string
 }
 
 const schema = z
@@ -60,6 +69,7 @@ const schema = z
     perPage: z.number(),
     sort: z.string().optional(),
     animalName: z.string().nullish(),
+    appointmentTypeId: z.number().nullish(),
     createdDateStart: z.string().min(1, 'Data inicial é obrigatória.'),
     createdDateEnd: z.string().min(1, 'Data final é obrigatória.'),
   })
@@ -82,22 +92,23 @@ export const AnamnesisList = () => {
   const [downloading, setDownloading] = useState<ReportExportType | null>(null)
   const [items, setItems] = useState<Item[]>([])
   const [total, setTotal] = useState(0)
+  const [appointmentTypeOptions, setAppointmentTypeOptions] = useState<SelectOption[]>([])
 
-  const today = new Date()
-  const monthAgo = new Date()
-  monthAgo.setMonth(monthAgo.getMonth() - 1)
-  const toDateInput = (date: Date) => date.toISOString().split('T')[0]
+  const currentDate = new Date()
+  const toDateInput = (date: Date) => format(date, 'yyyy-MM-dd')
 
   const form = useForm<FilterData>({
     resolver: zodResolver(schema),
     defaultValues: {
       page: 1,
       perPage: 10,
-      fields: 'id,animalName,appointmentDate,employeeName,symptomsPresented,proof',
+      fields:
+        'id,appointmentId,appointmentTypeName,animalName,appointmentDate,createdAt,employeeName,symptomsPresented,proof',
       sort: '-createdAt',
       animalName: '',
-      createdDateStart: toDateInput(monthAgo),
-      createdDateEnd: toDateInput(today),
+      appointmentTypeId: null,
+      createdDateStart: toDateInput(startOfMonth(currentDate)),
+      createdDateEnd: toDateInput(endOfMonth(currentDate)),
     },
   })
   const { handleSubmit, getValues, setValue } = form
@@ -143,8 +154,10 @@ export const AnamnesisList = () => {
     setDownloading(exportType)
     try {
       const values = getValues()
+      const exportFields =
+        'id,appointmentTypeName,animalName,appointmentDate,createdAt,employeeName,symptomsPresented,dietaryHistory,behavioralHistory,requestedExams,presumptiveDiagnosis,observations'
       const response = await api.get(
-        `anamnesis.list?${toQueryString({ ...values, page: 1, perPage: 100000, exportType })}`,
+        `anamnesis.list?${toQueryString({ ...values, fields: exportFields, page: 1, perPage: 100000, exportType })}`,
         { headers: { Authorization: `Bearer ${token}` }, responseType: 'blob' },
       )
       const blob = response.data instanceof Blob ? response.data : new Blob([response.data])
@@ -155,6 +168,20 @@ export const AnamnesisList = () => {
       setDownloading(null)
     }
   }
+
+  useEffect(() => {
+    const config = { headers: { Authorization: `Bearer ${token}` } }
+    api
+      .get(`appointment-type.list?${toQueryString({ page: 0, fields: 'id,name,active' })}`, config)
+      .then((response) => {
+        setAppointmentTypeOptions(
+          (Array.isArray(response.data) ? response.data : [])
+            .filter((item: { active: boolean }) => item.active)
+            .map((item: { id: number; name: string }) => ({ value: item.id, label: item.name })),
+        )
+      })
+      .catch((error) => toast.error(errorMessageHandler(error)))
+  }, [token])
 
   useEffect(() => {
     handleSubmit(list)()
@@ -229,11 +256,22 @@ export const AnamnesisList = () => {
         <CardContent>
           <FormProvider {...form}>
             <form onSubmit={handleSubmit(list)}>
-              <div className="mb-6 grid gap-4 lg:grid-cols-3">
+              <div className="mb-6 grid gap-4 lg:grid-cols-4">
                 <div>
                   <Form.Label htmlFor="animalName">Animal</Form.Label>
                   <Form.Input name="animalName" />
                   <Form.ErrorMessage field="animalName" />
+                </div>
+                <div>
+                  <Form.Label htmlFor="appointmentTypeId">Tipo de consulta</Form.Label>
+                  <Form.Select
+                    name="appointmentTypeId"
+                    type="number"
+                    isClearable
+                    placeholder="Todos"
+                    options={appointmentTypeOptions}
+                  />
+                  <Form.ErrorMessage field="appointmentTypeId" />
                 </div>
                 <div>
                   <Form.Label htmlFor="createdDateStart">Data inicial</Form.Label>
@@ -263,7 +301,7 @@ export const AnamnesisList = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead>Consulta</TableHead>
-                  <TableHead>Animal</TableHead>
+                  <TableHead>Criado em</TableHead>
                   <TableHead>Sintomas</TableHead>
                   <TableHead>Ações</TableHead>
                 </TableRow>
@@ -271,15 +309,17 @@ export const AnamnesisList = () => {
               <TableBody>
                 {items.map((item) => (
                   <TableRow key={item.id}>
-                    <TableCell>#{item.appointmentId}</TableCell>
-                    <TableCell>{item.animalName ?? ''}</TableCell>
+                    <TableCell>
+                      {`${item.appointmentTypeName ?? 'Tipo não informado'} - ${item.animalName ?? 'Animal'} (${item.appointmentDate ? formatDate(item.appointmentDate) : ''})`}
+                    </TableCell>
+                    <TableCell>{formatDateTime(item.createdAt)}</TableCell>
                     <TableCell className="max-w-[320px] truncate">{item.symptomsPresented}</TableCell>
                     <TableCell>
                       <ActionsList
                         values={item}
                         primaryKey="id"
                         actions={[
-                          { title: 'Editar', icon: PencilIcon, action: '/anamnese/:id' },
+                          { title: 'Visualizar', icon: EyeIcon, action: '/anamnese/:id' },
                           {
                             title: 'Baixar arquivo',
                             icon: DownloadIcon,

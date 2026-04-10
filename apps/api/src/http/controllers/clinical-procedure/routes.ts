@@ -1,5 +1,7 @@
 import { authorize } from '@/http/middlewares/authorize'
 import type { FastifyInstance } from 'fastify'
+import { cancelClinicalProceduresController } from './cancel-clinical-procedures/cancel-clinical-procedures.controller'
+import { confirmClinicalProceduresController } from './confirm-clinical-procedures/confirm-clinical-procedures.controller'
 import { createClinicalProcedureController } from './create-clinical-procedure/create-clinical-procedure.controller'
 import { getClinicalProcedureByIdController } from './get-clinical-procedure-by-id/get-clinical-procedure-by-id.controller'
 import { listClinicalProceduresController } from './list-clinical-procedures/list-clinical-procedures.controller'
@@ -8,6 +10,16 @@ import { updateClinicalProcedureController } from './update-clinical-procedure/u
 
 export async function clinicalProcedureRoutes(app: FastifyInstance) {
   app.post('/clinical-procedure.add', authorize('AdminPanel', 'ClinicalProcedures'), createClinicalProcedureController)
+  app.post(
+    '/clinical-procedure.confirm',
+    authorize('AdminPanel', 'ClinicalProcedures'),
+    confirmClinicalProceduresController,
+  )
+  app.post(
+    '/clinical-procedure.cancel',
+    authorize('AdminPanel', 'ClinicalProcedures'),
+    cancelClinicalProceduresController,
+  )
   app.put(
     '/clinical-procedure.update',
     authorize('AdminPanel', 'ClinicalProcedures'),

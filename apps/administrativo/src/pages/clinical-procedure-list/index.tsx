@@ -3,12 +3,25 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { FileSpreadsheetIcon, FileTextIcon, PencilIcon, PlusIcon, SearchIcon, SyringeIcon, XIcon } from 'lucide-react'
+import { isAxiosError } from 'axios'
+import {
+  CheckCircle2Icon,
+  DownloadIcon,
+  EyeIcon,
+  FileSpreadsheetIcon,
+  FileTextIcon,
+  PlusIcon,
+  SearchIcon,
+  SyringeIcon,
+  XCircleIcon,
+  XIcon,
+} from 'lucide-react'
 import { Helmet } from 'react-helmet-async'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { useApp } from '../../App'
+import { Badge } from '../../components/badge'
 import { Button } from '../../components/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardToolbar } from '../../components/card'
 import { Form } from '../../components/form-hook'
@@ -26,6 +39,7 @@ import {
   TableHeader,
   TableRow,
 } from '../../components/table'
+import { appConfig } from '../../config'
 import { errorMessageHandler } from '../../helpers/axios'
 import { formatDateTime } from '../../helpers/date'
 import { itemCountMessage } from '../../helpers/item-count'
@@ -38,9 +52,11 @@ interface Item {
   id: number
   animalName?: string | null
   procedureTypeName?: string | null
+  appointmentTypeName?: string | null
   procedureDate: string
   status: string
-  actualCost: number
+  proof?: string | null
+  actualCost: number | null
 }
 interface SelectOption {
   value: number
@@ -55,6 +71,7 @@ const schema = z
     sort: z.string().optional(),
     animalName: z.string().nullish(),
     procedureTypeId: z.number().nullish(),
+    appointmentTypeId: z.number().nullish(),
     status: z.string().nullish(),
     procedureDateStart: z.string().min(1, 'Data inicial é obrigatória.'),
     procedureDateEnd: z.string().min(1, 'Data final é obrigatória.'),
@@ -73,6 +90,7 @@ type FilterData = z.infer<typeof schema>
 
 const statusOptions = [
   { value: 'agendado', label: 'Agendado' },
+  { value: 'pendente', label: 'Pendente' },
   { value: 'realizado', label: 'Realizado' },
   { value: 'cancelado', label: 'Cancelado' },
 ]
@@ -85,10 +103,15 @@ export const ClinicalProcedureList = () => {
   const [items, setItems] = useState<Item[]>([])
   const [total, setTotal] = useState(0)
   const [procedureTypeOptions, setProcedureTypeOptions] = useState<SelectOption[]>([])
+  const [appointmentTypeOptions, setAppointmentTypeOptions] = useState<SelectOption[]>([])
+  const [selectedIds, setSelectedIds] = useState<number[]>([])
+  const [batchLoading, setBatchLoading] = useState<'confirm' | 'cancel' | null>(null)
+  const selectableItems = items.filter((item) => item.status === 'agendado')
+  const allSelected = selectableItems.length > 0 && selectableItems.every((item) => selectedIds.includes(item.id))
 
-  const today = new Date()
-  const monthAgo = new Date()
-  monthAgo.setMonth(monthAgo.getMonth() - 1)
+  const now = new Date()
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
+  const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0)
   const toDateInput = (date: Date) => date.toISOString().split('T')[0]
 
   const form = useForm<FilterData>({
@@ -96,17 +119,22 @@ export const ClinicalProcedureList = () => {
     defaultValues: {
       page: 1,
       perPage: 10,
-      fields: 'id,animalName,procedureTypeName,procedureDate,status,actualCost',
+      fields: 'id,animalName,procedureTypeName,appointmentTypeName,procedureDate,status,proof,actualCost',
       sort: '-procedureDate',
       animalName: '',
       procedureTypeId: null,
+      appointmentTypeId: null,
       status: null,
-      procedureDateStart: toDateInput(monthAgo),
-      procedureDateEnd: toDateInput(today),
+      procedureDateStart: toDateInput(monthStart),
+      procedureDateEnd: toDateInput(monthEnd),
     },
   })
   const { handleSubmit, getValues, setValue } = form
   const pages = Math.ceil(total / getValues('perPage')) || 1
+
+  useEffect(() => {
+    setSelectedIds([])
+  }, [items])
 
   const removeItem = useCallback(
     (item: Item) => {
@@ -122,7 +150,13 @@ export const ClinicalProcedureList = () => {
                 toast.success('Registro removido com sucesso!')
                 refresh.force()
               })
-              .catch((err) => toast.error(errorMessageHandler(err)))
+              .catch((err) => {
+                if (isAxiosError(err) && err.response?.status === 409) {
+                  toast.error('Esse procedimento não pode mais ser removido porque não está agendado.')
+                  return
+                }
+                toast.error(errorMessageHandler(err))
+              })
           }
         },
       })
@@ -144,12 +178,74 @@ export const ClinicalProcedureList = () => {
     setFetching(false)
   }
 
+  function handleSelectAll(checked: boolean) {
+    setSelectedIds(checked ? selectableItems.map((item) => item.id) : [])
+  }
+
+  function handleSelectItem(id: number, checked: boolean) {
+    setSelectedIds((previous) => (checked ? [...previous, id] : previous.filter((itemId) => itemId !== id)))
+  }
+
+  function confirmProceduresBatch() {
+    modal.confirm({
+      title: 'Confirmar procedimentos',
+      message: `Deseja confirmar ${selectedIds.length} procedimento(s) selecionado(s) como realizado(s)?`,
+      confirmText: 'Confirmar procedimentos',
+      callback: async (confirmed) => {
+        if (!confirmed) return
+        setBatchLoading('confirm')
+        try {
+          await api.post(
+            'clinical-procedure.confirm',
+            { ids: selectedIds },
+            { headers: { Authorization: `Bearer ${token}` } },
+          )
+          toast.success(`${selectedIds.length} procedimento(s) confirmado(s) com sucesso.`)
+          setSelectedIds([])
+          refresh.force()
+        } catch (error) {
+          toast.error(errorMessageHandler(error))
+        } finally {
+          setBatchLoading(null)
+        }
+      },
+    })
+  }
+
+  function cancelProceduresBatch() {
+    modal.confirm({
+      title: 'Cancelar procedimentos',
+      message: `Deseja cancelar ${selectedIds.length} procedimento(s) selecionado(s)?`,
+      confirmText: 'Cancelar procedimentos',
+      callback: async (confirmed) => {
+        if (!confirmed) return
+        setBatchLoading('cancel')
+        try {
+          await api.post(
+            'clinical-procedure.cancel',
+            { ids: selectedIds },
+            { headers: { Authorization: `Bearer ${token}` } },
+          )
+          toast.success(`${selectedIds.length} procedimento(s) cancelado(s) com sucesso.`)
+          setSelectedIds([])
+          refresh.force()
+        } catch (error) {
+          toast.error(errorMessageHandler(error))
+        } finally {
+          setBatchLoading(null)
+        }
+      },
+    })
+  }
+
   async function exportClinicalProcedures(exportType: ReportExportType) {
     setDownloading(exportType)
     try {
       const values = getValues()
+      const exportFields =
+        'id,animalName,procedureTypeName,appointmentTypeName,appointmentDate,employeeName,procedureDate,description,actualCost,observations,status,createdAt'
       const response = await api.get(
-        `clinical-procedure.list?${toQueryString({ ...values, page: 1, perPage: 100000, exportType })}`,
+        `clinical-procedure.list?${toQueryString({ ...values, fields: exportFields, page: 1, perPage: 100000, exportType })}`,
         { headers: { Authorization: `Bearer ${token}` }, responseType: 'blob' },
       )
       const blob = response.data instanceof Blob ? response.data : new Blob([response.data])
@@ -162,19 +258,25 @@ export const ClinicalProcedureList = () => {
   }
 
   useEffect(() => {
-    api
-      .get(`procedure-type.list?${toQueryString({ page: 0, fields: 'id,name,active' })}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((res) =>
+    const config = { headers: { Authorization: `Bearer ${token}` } }
+    Promise.all([
+      api.get(`procedure-type.list?${toQueryString({ page: 0, fields: 'id,name,active' })}`, config),
+      api.get(`appointment-type.list?${toQueryString({ page: 0, fields: 'id,name,active' })}`, config),
+    ])
+      .then(([procedureTypeResponse, appointmentTypeResponse]) => {
         setProcedureTypeOptions(
-          (Array.isArray(res.data) ? res.data : [])
-            .filter((i: { active: boolean }) => i.active)
-            .map((i: { id: number; name: string }) => ({ value: i.id, label: i.name })),
-        ),
-      )
+          (Array.isArray(procedureTypeResponse.data) ? procedureTypeResponse.data : [])
+            .filter((item: { active: boolean }) => item.active)
+            .map((item: { id: number; name: string }) => ({ value: item.id, label: item.name })),
+        )
+        setAppointmentTypeOptions(
+          (Array.isArray(appointmentTypeResponse.data) ? appointmentTypeResponse.data : [])
+            .filter((item: { active: boolean }) => item.active)
+            .map((item: { id: number; name: string }) => ({ value: item.id, label: item.name })),
+        )
+      })
       .catch((error) => toast.error(errorMessageHandler(error)))
-  }, [token, modal])
+  }, [token])
 
   useEffect(() => {
     handleSubmit(list)()
@@ -272,7 +374,18 @@ export const ClinicalProcedureList = () => {
                   <Form.ErrorMessage field="status" />
                 </div>
               </div>
-              <div className="mb-6 grid gap-4 lg:grid-cols-2">
+              <div className="mb-6 grid gap-4 lg:grid-cols-3">
+                <div>
+                  <Form.Label htmlFor="appointmentTypeId">Tipo de consulta</Form.Label>
+                  <Form.Select
+                    name="appointmentTypeId"
+                    type="number"
+                    isClearable
+                    placeholder="Todos"
+                    options={appointmentTypeOptions}
+                  />
+                  <Form.ErrorMessage field="appointmentTypeId" />
+                </div>
                 <div>
                   <Form.Label htmlFor="procedureDateStart">Data inicial</Form.Label>
                   <Form.DateInput name="procedureDateStart" />
@@ -285,6 +398,36 @@ export const ClinicalProcedureList = () => {
                 </div>
               </div>
               <CardFooter className="gap-4 p-0">
+                <Button
+                  type="button"
+                  variant="success"
+                  disabled={selectedIds.length === 0 || batchLoading !== null}
+                  onClick={confirmProceduresBatch}
+                >
+                  {batchLoading === 'confirm' ? (
+                    <Spinner />
+                  ) : (
+                    <>
+                      <CheckCircle2Icon className="mr-2 h-5 w-5" />
+                      Confirmar realizados
+                    </>
+                  )}
+                </Button>
+                <Button
+                  type="button"
+                  variant="danger"
+                  disabled={selectedIds.length === 0 || batchLoading !== null}
+                  onClick={cancelProceduresBatch}
+                >
+                  {batchLoading === 'cancel' ? (
+                    <Spinner />
+                  ) : (
+                    <>
+                      <XCircleIcon className="mr-2 h-5 w-5" />
+                      Confirmar cancelamento
+                    </>
+                  )}
+                </Button>
                 <Button type="submit">
                   <SearchIcon className="mr-2 h-5 w-5" />
                   Consultar
@@ -300,9 +443,19 @@ export const ClinicalProcedureList = () => {
             <SelectableTable>
               <TableHeader>
                 <TableRow>
+                  <TableHead className="w-[1%]">
+                    <input
+                      type="checkbox"
+                      checked={allSelected}
+                      onChange={(e) => handleSelectAll(e.target.checked)}
+                      className="h-4 w-4 cursor-pointer"
+                    />
+                  </TableHead>
                   <TableHead>Animal</TableHead>
                   <TableHead>Procedimento</TableHead>
+                  <TableHead>Tipo de consulta</TableHead>
                   <TableHead>Data</TableHead>
+                  <TableHead>Status</TableHead>
                   <TableHead>Custo</TableHead>
                   <TableHead>Ações</TableHead>
                 </TableRow>
@@ -310,19 +463,49 @@ export const ClinicalProcedureList = () => {
               <TableBody>
                 {items.map((item) => (
                   <TableRow key={item.id}>
+                    <TableCell className="w-[1%]">
+                      {item.status === 'agendado' ? (
+                        <input
+                          type="checkbox"
+                          checked={selectedIds.includes(item.id)}
+                          onChange={(e) => handleSelectItem(item.id, e.target.checked)}
+                          className="h-4 w-4 cursor-pointer"
+                        />
+                      ) : null}
+                    </TableCell>
                     <TableCell>{item.animalName ?? ''}</TableCell>
                     <TableCell>{item.procedureTypeName ?? ''}</TableCell>
+                    <TableCell>{item.appointmentTypeName ?? ''}</TableCell>
                     <TableCell>{formatDateTime(item.procedureDate)}</TableCell>
+                    <TableCell>{procedureStatusBadge(item.status, item.procedureDate)}</TableCell>
                     <TableCell>
-                      {Number(item.actualCost).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                      {item.actualCost === null
+                        ? ''
+                        : Number(item.actualCost).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                     </TableCell>
                     <TableCell>
                       <ActionsList
                         values={item}
                         primaryKey="id"
                         actions={[
-                          { title: 'Editar', icon: PencilIcon, action: '/procedimentos/:id' },
-                          { title: 'Remover', icon: XIcon, action: () => removeItem(item) },
+                          {
+                            title: 'Visualizar',
+                            icon: EyeIcon,
+                            action: '/procedimentos/:id',
+                            hideWhen: (currentItem) => currentItem.status !== 'agendado',
+                          },
+                          {
+                            title: 'Baixar arquivo',
+                            icon: DownloadIcon,
+                            action: (currentItem) => window.open(`${appConfig.API_URL}${currentItem.proof}`, '_blank'),
+                            hideWhen: (currentItem) => !currentItem.proof,
+                          },
+                          {
+                            title: 'Remover',
+                            icon: XIcon,
+                            action: () => removeItem(item),
+                            hideWhen: (currentItem) => currentItem.status !== 'agendado',
+                          },
                         ]}
                       />
                     </TableCell>
@@ -339,6 +522,9 @@ export const ClinicalProcedureList = () => {
             <span className="text-sm dark:text-gray-300">
               {itemCountMessage('procedimentos', getValues('page'), pages, total)}
             </span>
+            {selectedIds.length > 0 && (
+              <span className="text-sm dark:text-gray-300">{selectedIds.length} item(s) selecionado(s).</span>
+            )}
             <Pagination
               current={getValues('page')}
               total={pages}
@@ -352,4 +538,19 @@ export const ClinicalProcedureList = () => {
       </Card>
     </>
   )
+}
+
+function procedureStatusBadge(status: string, procedureDate: string) {
+  const isPending = status === 'agendado' && new Date(procedureDate) < new Date()
+  if (isPending) return <Badge variant="warning">Pendente</Badge>
+
+  const map: Record<string, { label: string; variant: 'outline' | 'success' | 'danger' }> = {
+    agendado: { label: 'Agendado', variant: 'outline' },
+    realizado: { label: 'Realizado', variant: 'success' },
+    cancelado: { label: 'Cancelado', variant: 'danger' },
+  }
+
+  const config = map[status]
+  if (!config) return <Badge variant="outline">{status}</Badge>
+  return <Badge variant={config.variant}>{config.label}</Badge>
 }

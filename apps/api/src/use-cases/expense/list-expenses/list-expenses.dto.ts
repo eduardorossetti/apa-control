@@ -10,6 +10,12 @@ export interface ListExpensesData {
   status?: string
   createdAtStart?: string
   createdAtEnd?: string
+  dueDateStart?: string
+  dueDateEnd?: string
+  paymentDateStart?: string
+  paymentDateEnd?: string
+  reversalDateStart?: string
+  reversalDateEnd?: string
   page?: number
   perPage?: number
   sort?: Array<{ name: string; order: string }>

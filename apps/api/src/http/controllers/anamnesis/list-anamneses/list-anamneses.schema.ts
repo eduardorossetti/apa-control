@@ -4,6 +4,7 @@ import { z } from 'zod'
 export const listAnamnesesSchema = apiQueryStringSchema
   .extend({
     animalName: z.string().optional(),
+    appointmentTypeId: z.coerce.number().int().positive().optional(),
     employeeId: z.coerce.number().int().positive().optional(),
     createdDateStart: z.string().min(1, 'Data inicial é obrigatória.'),
     createdDateEnd: z.string().min(1, 'Data final é obrigatória.'),
