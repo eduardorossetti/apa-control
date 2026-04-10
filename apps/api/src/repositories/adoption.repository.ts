@@ -29,7 +29,16 @@ export class AdoptionRepository {
   }
 
   async list(data: ListAdoptionsData): Promise<[number, AdoptionWithDetails[]]> {
-    const { animalName, adopterName, status, employeeId, adoptionDateStart, adoptionDateEnd } = data
+    const {
+      animalName,
+      adopterName,
+      status,
+      employeeId,
+      adoptionDateStart,
+      adoptionDateEnd,
+      animalDepartureDateStart,
+      animalDepartureDateEnd,
+    } = data
     const whereList: SQL[] = []
 
     if (animalName) whereList.push(ilike(animal.name, `%${animalName}%`))
@@ -38,6 +47,8 @@ export class AdoptionRepository {
     if (employeeId) whereList.push(eq(adoption.employeeId, employeeId))
     if (adoptionDateStart) whereList.push(gte(adoption.adoptionDate, adoptionDateStart))
     if (adoptionDateEnd) whereList.push(lte(adoption.adoptionDate, adoptionDateEnd))
+    if (animalDepartureDateStart) whereList.push(gte(adoption.animalDepartureDate, animalDepartureDateStart))
+    if (animalDepartureDateEnd) whereList.push(lte(adoption.animalDepartureDate, animalDepartureDateEnd))
 
     const [sqlQuery, countQuery] = querifyString<AdoptionWithDetails>(data, whereList, querifyStringSettings)
     const items = await sqlQuery
@@ -67,7 +78,7 @@ export class AdoptionRepository {
         adopterId: adoption.adopterId,
         employeeId: adoption.employeeId,
         adoptionDate: adoption.adoptionDate,
-        adaptationPeriod: adoption.adaptationPeriod,
+        animalDepartureDate: adoption.animalDepartureDate,
         status: adoption.status,
         observations: adoption.observations,
         proof: adoption.proof,
@@ -110,11 +121,19 @@ export class AdoptionRepository {
     return db.select().from(adoption).where(inArray(adoption.id, ids))
   }
 
-  async cancelByIds(ids: number[]) {
-    await db.update(adoption).set({ status: 'cancelada', updatedAt: new Date() }).where(inArray(adoption.id, ids))
+  async confirmByIds(ids: number[], dbTransaction: DrizzleTransaction | null = null) {
+    const connection = dbTransaction ?? db
+    await connection
+      .update(adoption)
+      .set({ status: 'concluida', animalDepartureDate: new Date().toISOString().slice(0, 10), updatedAt: new Date() })
+      .where(inArray(adoption.id, ids))
   }
 
-  async confirmByIds(ids: number[]) {
-    await db.update(adoption).set({ status: 'concluida', updatedAt: new Date() }).where(inArray(adoption.id, ids))
+  async cancelByIds(ids: number[], dbTransaction: DrizzleTransaction | null = null) {
+    const connection = dbTransaction ?? db
+    await connection
+      .update(adoption)
+      .set({ status: 'cancelada', animalDepartureDate: null, updatedAt: new Date() })
+      .where(inArray(adoption.id, ids))
   }
 }

@@ -1,6 +1,7 @@
 import { db } from '@/database/client'
 import { AnimalHistoryType } from '@/database/schema/enums/animal-history-type'
 import { AnimalHistory } from '@/entities'
+import type { AdoptionRepository } from '@/repositories/adoption.repository'
 import type { AnimalHistoryRepository } from '@/repositories/animal-history.repository'
 import type { AnimalRepository } from '@/repositories/animal.repository'
 import type { FinalDestinationRepository } from '@/repositories/final-destination.repository'
@@ -13,6 +14,7 @@ export class RemoveRescueUseCase {
     private rescueRepository: RescueRepository,
     private animalRepository: AnimalRepository,
     private finalDestinationRepository: FinalDestinationRepository,
+    private adoptionRepository: AdoptionRepository,
     private animalHistoryRepository: AnimalHistoryRepository,
   ) {}
 
@@ -26,6 +28,11 @@ export class RemoveRescueUseCase {
     const hasFinalDestination = await this.finalDestinationRepository.findByAnimalId(rescue.animalId)
     if (hasFinalDestination) {
       throw new ApiError('Não é possível remover o resgate, pois o animal possui destino final vinculado.', 409)
+    }
+
+    const hasAdoption = await this.adoptionRepository.findByAnimalId(rescue.animalId)
+    if (hasAdoption) {
+      throw new ApiError('Não é possível remover o resgate, pois o animal possui adoção vinculada.', 409)
     }
 
     await db.transaction(async (tx) => {

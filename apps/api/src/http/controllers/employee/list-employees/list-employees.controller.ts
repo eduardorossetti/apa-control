@@ -9,7 +9,7 @@ export async function listEmployeesController(request: FastifyRequest, reply: Fa
   const [count, items] = await listEmployeesUseCase.execute(data)
 
   if (data.exportType) {
-    return exportListData(reply, data.exportType, 'Funcionarios', 'funcionarios', items)
+    return exportListData(reply, data.exportType, 'Funcionários', 'funcionarios', items)
   }
 
   reply.header('X-Total-Count', count)

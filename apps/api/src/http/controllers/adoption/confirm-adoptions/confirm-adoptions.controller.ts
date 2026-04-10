@@ -4,7 +4,8 @@ import { confirmAdoptionsSchema } from './confirm-adoptions.schema'
 
 export async function confirmAdoptionsController(request: FastifyRequest, reply: FastifyReply) {
   const data = confirmAdoptionsSchema.parse(request.body)
+  const employeeId = request.user.id
   const confirmAdoptionsUseCase = makeConfirmAdoptionsUseCase()
-  await confirmAdoptionsUseCase.execute(data)
+  await confirmAdoptionsUseCase.execute(data, employeeId)
   reply.status(204).send()
 }

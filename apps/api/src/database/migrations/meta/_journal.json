@@ -155,6 +155,20 @@
       "when": 1775781288390,
       "tag": "0021_add-proof-clinical-procedures",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1775783331301,
+      "tag": "0022_add-animal-departure-date",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1775784397784,
+      "tag": "0023_remove-adaptation-period",
+      "breakpoints": true
     }
   ]
 }

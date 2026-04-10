@@ -58,46 +58,91 @@ const healthConditionOptions = [
   { value: 'estavel', label: 'Estável' },
   { value: 'critica', label: 'Crítica' },
 ]
-const adoptionStatusOptions = [
-  { value: 'processando', label: 'Processando' },
-  { value: 'concluida', label: 'Concluída' },
-  { value: 'cancelada', label: 'Cancelada' },
-]
+const adoptionSchema = z
+  .object({
+    id: z.number().nullish(),
+    animalId: z.number({ message: RequiredMessage }).int().positive(),
+    adopterId: z.union([z.number(), z.string()]).optional(),
+    adopterName: z.string().optional(),
+    adopterCpf: z.string().optional(),
+    adopterEmail: z.string().optional(),
+    adopterPhone: z.string().optional(),
+    adopterAddress: z.string().optional(),
+    adopterFamilyIncome: z.number().optional(),
+    adopterAnimalExperience: z.boolean().optional(),
+    adoptionDate: z.string({ message: RequiredMessage }),
+    status: z.enum(['processando', 'concluida', 'cancelada']),
+    observations: z.string().nullish(),
+    proof: z.string().nullish(),
+    proofFile: z.any().nullish(),
+    animalNamePreview: z.string().nullish(),
+    speciesPreview: z.string().nullish(),
+    breedPreview: z.string().nullish(),
+    sizePreview: z.string().nullish(),
+    sexPreview: z.string().nullish(),
+    agePreview: z.string().nullish(),
+    healthConditionPreview: z.string().nullish(),
+    entryDatePreview: z.string().nullish(),
+    animalObservationsPreview: z.string().nullish(),
+  })
+  .superRefine((data, context) => {
+    const parsedAdopterId = Number(data.adopterId)
+    const isExistingAdopter = Number.isFinite(parsedAdopterId) && parsedAdopterId > 0
+    if (isExistingAdopter) return
 
-const adoptionSchema = z.object({
-  id: z.number().nullish(),
-  animalId: z.number().nullish(),
-  adopterId: z.union([z.number(), z.string()]).optional(),
-  adopterName: z.string().optional(),
-  adopterCpf: z.string().optional(),
-  adopterEmail: z.string().optional(),
-  adopterPhone: z.string().optional(),
-  adopterAddress: z.string().optional(),
-  adopterFamilyIncome: z.number().optional(),
-  adopterAnimalExperience: z.boolean().optional(),
-  adoptionDate: z.string().min(1, RequiredMessage),
-  adaptationPeriod: z.any().transform((v): number | null => {
-    if (v === '' || v === null || v === undefined) return null
-    const n = typeof v === 'number' ? v : Number(v)
-    if (!Number.isFinite(n) || n < 0) return null
-    return Math.floor(n)
-  }),
-  status: z.enum(['processando', 'concluida', 'cancelada']),
-  observations: z.string().nullish(),
-  proof: z.string().nullish(),
-  proofFile: z.any().nullish(),
-  animalNamePreview: z.string().nullish(),
-  speciesPreview: z.string().nullish(),
-  breedPreview: z.string().nullish(),
-  sizePreview: z.string().nullish(),
-  sexPreview: z.string().nullish(),
-  agePreview: z.string().nullish(),
-  healthConditionPreview: z.string().nullish(),
-  entryDatePreview: z.string().nullish(),
-  animalObservationsPreview: z.string().nullish(),
-})
+    if (!data.adopterName || data.adopterName.trim().length < 8) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['adopterName'],
+        message: 'O nome deve ter pelo menos 8 caracteres.',
+      })
+    }
 
-type AdoptionFormData = z.infer<typeof adoptionSchema>
+    const cpf = (data.adopterCpf ?? '').replace(/\D/g, '')
+    if (!isCpf(cpf)) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['adopterCpf'],
+        message: 'Informe um número de CPF válido.',
+      })
+    }
+
+    const email = (data.adopterEmail ?? '').trim()
+    if (!email || !z.string().email().safeParse(email).success) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['adopterEmail'],
+        message: 'Digite um endereço de e-mail válido.',
+      })
+    }
+
+    const phone = (data.adopterPhone ?? '').replace(/\D/g, '')
+    if (![10, 11].includes(phone.length)) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['adopterPhone'],
+        message: 'Informe um número de telefone válido.',
+      })
+    }
+
+    if (!data.adopterAddress || data.adopterAddress.trim().length === 0) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['adopterAddress'],
+        message: RequiredMessage,
+      })
+    }
+
+    if (data.adopterFamilyIncome == null || data.adopterFamilyIncome < 1) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['adopterFamilyIncome'],
+        message: 'A renda familiar não pode ser zero.',
+      })
+    }
+  })
+
+type AdoptionFormData = z.input<typeof adoptionSchema>
 
 export const AdoptionForm = () => {
   const { token } = useApp()
@@ -136,16 +181,14 @@ export const AdoptionForm = () => {
       observations: '',
       proof: '',
       proofFile: null,
-      animalId: null,
+      animalId: undefined,
       adopterId: '',
       adopterName: '',
       adopterCpf: '',
       adopterEmail: '',
       adopterPhone: '',
       adopterAddress: '',
-      adopterFamilyIncome: 0,
       adopterAnimalExperience: false,
-      adaptationPeriod: null,
     },
   })
 
@@ -163,37 +206,12 @@ export const AdoptionForm = () => {
   const isExistingAdopter = Number.isFinite(parsedAdopterId) && parsedAdopterId > 0
 
   async function saveAdoption(values: AdoptionFormData) {
-    if (!params.id) {
-      if (values.animalId == null) {
-        toast.error('Selecione o animal.')
-        return
-      }
-    }
-
     try {
       let finalAdopterId: number | null = Number(values.adopterId)
       if (!Number.isFinite(finalAdopterId) || finalAdopterId <= 0) {
         finalAdopterId = null
         const cpf = (values.adopterCpf ?? '').replace(/\D/g, '')
         const phone = (values.adopterPhone ?? '').replace(/\D/g, '')
-        const inlineSchema = z.object({
-          name: z.string().min(8),
-          cpf: z.string().refine((v) => isCpf(v)),
-          email: z.string().email(),
-          phone: z.string().refine((v) => [10, 11].includes(v.length)),
-          address: z.string().min(1),
-          familyIncome: z.number().min(1),
-          animalExperience: z.boolean(),
-        })
-        inlineSchema.parse({
-          name: values.adopterName ?? '',
-          cpf,
-          email: values.adopterEmail ?? '',
-          phone,
-          address: values.adopterAddress ?? '',
-          familyIncome: values.adopterFamilyIncome ?? 0,
-          animalExperience: values.adopterAnimalExperience ?? false,
-        })
         const { data } = await api.post(
           'adopter.add',
           {
@@ -215,7 +233,6 @@ export const AdoptionForm = () => {
         formData.append('id', String(values.id))
         formData.append('adopterId', String(finalAdopterId))
         formData.append('adoptionDate', values.adoptionDate)
-        if (values.adaptationPeriod != null) formData.append('adaptationPeriod', String(values.adaptationPeriod))
         formData.append('status', values.status)
         if (values.observations) formData.append('observations', values.observations)
         if (currentProof) formData.append('proof', currentProof)
@@ -226,8 +243,6 @@ export const AdoptionForm = () => {
         formData.append('animalId', String(values.animalId))
         formData.append('adopterId', String(finalAdopterId))
         formData.append('adoptionDate', values.adoptionDate)
-        if (values.adaptationPeriod != null) formData.append('adaptationPeriod', String(values.adaptationPeriod))
-        formData.append('status', values.status)
         if (values.observations) formData.append('observations', values.observations)
         if (values.proofFile?.length) formData.append('proofFile', values.proofFile[0])
 
@@ -263,7 +278,6 @@ export const AdoptionForm = () => {
             adopterId: key.adopterId,
             adopterName: key.adopterName ?? '',
             adoptionDate,
-            adaptationPeriod: key.adaptationPeriod ?? null,
             status: key.status,
             observations: key.observations ?? '',
             proof: key.proof ?? '',
@@ -344,7 +358,7 @@ export const AdoptionForm = () => {
     'adopterFamilyIncome',
     'adopterAnimalExperience',
   ]
-  const adocaoTabFields: Array<keyof AdoptionFormData> = ['adoptionDate', 'adaptationPeriod', 'status', 'observations']
+  const adocaoTabFields: Array<keyof AdoptionFormData> = ['adoptionDate', 'observations']
 
   const onSubmitError: Parameters<typeof handleSubmit>[1] = (errors) => {
     if (!errors) return
@@ -536,23 +550,13 @@ export const AdoptionForm = () => {
                       <Form.ErrorMessage field="adoptionDate" />
                     </div>
                     <div>
-                      <Form.Label htmlFor="status">Status</Form.Label>
-                      <Form.Select name="status" options={adoptionStatusOptions} disabled />
-                      <Form.ErrorMessage field="status" />
+                      <Form.Label htmlFor="proofFile">Arquivo</Form.Label>
+                      <Form.FileInput name="proofFile" />
+                      <Form.ErrorMessage field="proofFile" />
+                      {currentProof ? (
+                        <span className="mt-2 block text-muted-foreground text-xs">Arquivo atual: {currentProof}</span>
+                      ) : null}
                     </div>
-                  </div>
-                  <div className="mb-6">
-                    <Form.Label htmlFor="adaptationPeriod">Período de adaptação (dias)</Form.Label>
-                    <Form.Input name="adaptationPeriod" type="number" min={0} step={1} placeholder="Opcional" />
-                    <Form.ErrorMessage field="adaptationPeriod" />
-                  </div>
-                  <div className="mb-6">
-                    <Form.Label htmlFor="proofFile">Comprovante</Form.Label>
-                    <Form.FileInput name="proofFile" />
-                    <Form.ErrorMessage field="proofFile" />
-                    {currentProof ? (
-                      <span className="mt-2 block text-muted-foreground text-xs">Arquivo atual: {currentProof}</span>
-                    ) : null}
                   </div>
                   <div className="mb-6">
                     <Form.Label htmlFor="observations">Observações</Form.Label>

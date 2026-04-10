@@ -9,7 +9,7 @@ export async function listTransactionTypesController(request: FastifyRequest, re
   const [count, items] = await listTransactionTypesUseCase.execute(data)
 
   if (data.exportType) {
-    return exportListData(reply, data.exportType, 'Tipos de Lancamento', 'tipos-lancamento', items)
+    return exportListData(reply, data.exportType, 'Tipos de Lançamento', 'tipos-lancamento', items)
   }
 
   reply.header('X-Total-Count', count)

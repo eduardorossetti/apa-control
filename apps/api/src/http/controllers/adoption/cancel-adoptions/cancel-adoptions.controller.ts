@@ -4,7 +4,8 @@ import { cancelAdoptionsSchema } from './cancel-adoptions.schema'
 
 export async function cancelAdoptionsController(request: FastifyRequest, reply: FastifyReply) {
   const data = cancelAdoptionsSchema.parse(request.body)
+  const employeeId = request.user.id
   const cancelAdoptionsUseCase = makeCancelAdoptionsUseCase()
-  await cancelAdoptionsUseCase.execute(data)
+  await cancelAdoptionsUseCase.execute(data, employeeId)
   reply.status(204).send()
 }

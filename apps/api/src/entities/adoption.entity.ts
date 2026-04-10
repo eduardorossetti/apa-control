@@ -4,7 +4,7 @@ export class Adoption {
   adopterId: number
   employeeId: number
   adoptionDate: string
-  adaptationPeriod?: number | null
+  animalDepartureDate?: string | null
   status: string
   observations?: string | null
   proof?: string | null
@@ -17,7 +17,7 @@ export class Adoption {
     this.adopterId = props.adopterId
     this.employeeId = props.employeeId
     this.adoptionDate = props.adoptionDate
-    this.adaptationPeriod = props.adaptationPeriod
+    this.animalDepartureDate = props.animalDepartureDate
     this.status = props.status
     this.observations = props.observations
     this.proof = props.proof

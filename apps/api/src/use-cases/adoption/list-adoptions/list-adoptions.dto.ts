@@ -5,6 +5,8 @@ export interface ListAdoptionsData {
   employeeId?: number
   adoptionDateStart?: string
   adoptionDateEnd?: string
+  animalDepartureDateStart?: string
+  animalDepartureDateEnd?: string
   page?: number
   perPage?: number
   sort?: Array<{ name: string; order: string }>
@@ -17,7 +19,7 @@ export type AdoptionWithDetails = {
   adopterId: number
   employeeId: number
   adoptionDate: string
-  adaptationPeriod: number | null
+  animalDepartureDate: string | null
   status: string
   observations: string | null
   proof: string | null

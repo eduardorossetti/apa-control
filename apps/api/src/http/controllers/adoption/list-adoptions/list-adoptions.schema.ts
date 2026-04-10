@@ -10,6 +10,8 @@ export const listAdoptionsSchema = apiQueryStringSchema
     employeeId: z.coerce.number().int().positive().optional(),
     adoptionDateStart: z.string().min(1, 'Data inicial é obrigatória.'),
     adoptionDateEnd: z.string().min(1, 'Data final é obrigatória.'),
+    animalDepartureDateStart: z.string().optional(),
+    animalDepartureDateEnd: z.string().optional(),
   })
   .refine(
     (data) => {
@@ -19,5 +21,15 @@ export const listAdoptionsSchema = apiQueryStringSchema
     {
       message: 'A data inicial deve ser menor ou igual à data final.',
       path: ['adoptionDateEnd'],
+    },
+  )
+  .refine(
+    (data) => {
+      if (!data.animalDepartureDateStart || !data.animalDepartureDateEnd) return true
+      return new Date(data.animalDepartureDateStart) <= new Date(data.animalDepartureDateEnd)
+    },
+    {
+      message: 'A data inicial de saída deve ser menor ou igual à data final de saída.',
+      path: ['animalDepartureDateEnd'],
     },
   )

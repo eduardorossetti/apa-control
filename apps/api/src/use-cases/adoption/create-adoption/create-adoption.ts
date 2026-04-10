@@ -1,9 +1,11 @@
 import { db } from '@/database/client'
 import { AdoptionStatus } from '@/database/schema/enums/adoption-status'
+import { AnimalHistoryType } from '@/database/schema/enums/animal-history-type'
 import { AnimalStatus } from '@/database/schema/enums/animal-status'
-import { Adoption } from '@/entities'
+import { Adoption, AnimalHistory } from '@/entities'
 import type { AdopterRepository } from '@/repositories/adopter.repository'
 import type { AdoptionRepository } from '@/repositories/adoption.repository'
+import type { AnimalHistoryRepository } from '@/repositories/animal-history.repository'
 import type { AnimalRepository } from '@/repositories/animal.repository'
 import { ApiError } from '@/utils/api-error'
 import type { CreateAdoptionData } from './create-adoption.dto'
@@ -13,9 +15,12 @@ export class CreateAdoptionUseCase {
     private adoptionRepository: AdoptionRepository,
     private animalRepository: AnimalRepository,
     private adopterRepository: AdopterRepository,
+    private animalHistoryRepository: AnimalHistoryRepository,
   ) {}
 
   async execute(data: CreateAdoptionData, employeeId: number): Promise<number> {
+    const status = data.status ?? AdoptionStatus.PROCESSING
+    const animalDepartureDate = null
     const existingAdoption = await this.adoptionRepository.findByAnimalId(data.animalId)
     if (existingAdoption) {
       throw new ApiError('Este animal já possui adoção registrada.', 409)
@@ -37,8 +42,8 @@ export class CreateAdoptionUseCase {
           adopterId: data.adopterId,
           employeeId,
           adoptionDate: data.adoptionDate,
-          adaptationPeriod: data.adaptationPeriod ?? null,
-          status: data.status,
+          animalDepartureDate,
+          status,
           observations: data.observations ?? null,
           proof: data.proof ?? null,
           createdAt: new Date(),
@@ -47,9 +52,20 @@ export class CreateAdoptionUseCase {
         tx,
       )
 
-      if (data.status === AdoptionStatus.COMPLETED) {
-        await this.animalRepository.update(data.animalId, { status: AnimalStatus.INACTIVE }, tx)
-      }
+      await this.animalHistoryRepository.create(
+        new AnimalHistory({
+          animalId: data.animalId,
+          rescueId: null,
+          employeeId,
+          type: AnimalHistoryType.ADOPTION,
+          action: 'adoption.created',
+          description: 'Adoção registrada',
+          oldValue: null,
+          newValue: null,
+          createdAt: new Date(),
+        }),
+        tx,
+      )
 
       return row!.id
     })

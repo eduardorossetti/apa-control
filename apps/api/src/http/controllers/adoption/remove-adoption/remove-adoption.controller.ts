@@ -4,9 +4,10 @@ import { removeAdoptionSchema } from './remove-adoption.schema'
 
 export async function removeAdoptionController(request: FastifyRequest) {
   const { id } = removeAdoptionSchema.parse(request.params)
+  const employeeId = request.user.id
 
   const removeAdoptionUseCase = makeRemoveAdoptionUseCase()
-  await removeAdoptionUseCase.execute({ id })
+  await removeAdoptionUseCase.execute({ id }, employeeId)
 
   return { message: 'Adoção removida com sucesso' }
 }

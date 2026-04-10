@@ -3,13 +3,14 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { endOfMonth, format, startOfMonth } from 'date-fns'
 import {
   CheckCircle2Icon,
   DownloadIcon,
+  EyeIcon,
   FileSpreadsheetIcon,
   FileTextIcon,
   HeartHandshakeIcon,
-  PencilIcon,
   PlusIcon,
   SearchIcon,
   XCircleIcon,
@@ -20,6 +21,7 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { useApp } from '../../App'
+import { Badge } from '../../components/badge'
 import { Button } from '../../components/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardToolbar } from '../../components/card'
 import { Form } from '../../components/form-hook'
@@ -51,7 +53,7 @@ interface AdoptionListValues {
   animalId: number
   adopterId: number
   adoptionDate: string
-  adaptationPeriod: number | null
+  animalDepartureDate: string | null
   status: string
   observations: string | null
   proof?: string | null
@@ -77,6 +79,8 @@ const adoptionFilterSchema = z
     status: z.string().nullish(),
     adoptionDateStart: z.string().min(1, 'Data inicial é obrigatória.'),
     adoptionDateEnd: z.string().min(1, 'Data final é obrigatória.'),
+    animalDepartureDateStart: z.string().nullish(),
+    animalDepartureDateEnd: z.string().nullish(),
   })
   .refine(
     (data) => {
@@ -86,6 +90,16 @@ const adoptionFilterSchema = z
     {
       message: 'A data inicial deve ser menor ou igual à data final.',
       path: ['adoptionDateEnd'],
+    },
+  )
+  .refine(
+    (data) => {
+      if (!data.animalDepartureDateStart || !data.animalDepartureDateEnd) return true
+      return new Date(data.animalDepartureDateStart) <= new Date(data.animalDepartureDateEnd)
+    },
+    {
+      message: 'A data inicial de saída deve ser menor ou igual à data final.',
+      path: ['animalDepartureDateEnd'],
     },
   )
 
@@ -99,15 +113,13 @@ export const AdoptionList = () => {
   const [items, setItems] = useState<AdoptionListValues[]>([])
   const [total, setTotal] = useState(0)
   const [selectedIds, setSelectedIds] = useState<number[]>([])
-  const [batchLoading, setBatchLoading] = useState(false)
+  const [batchLoading, setBatchLoading] = useState<'confirm' | 'cancel' | null>(null)
 
   const selectableItems = items.filter((item) => item.status === 'processando')
   const allSelected = selectableItems.length > 0 && selectableItems.every((item) => selectedIds.includes(item.id))
 
-  const today = new Date()
-  const monthAgo = new Date()
-  monthAgo.setMonth(monthAgo.getMonth() - 1)
-  const toDateInput = (date: Date) => date.toISOString().split('T')[0]
+  const currentDate = new Date()
+  const toDateInput = (date: Date) => format(date, 'yyyy-MM-dd')
 
   const adoptionFilterForm = useForm<AdoptionFilterData>({
     resolver: zodResolver(adoptionFilterSchema),
@@ -115,13 +127,15 @@ export const AdoptionList = () => {
       page: 1,
       perPage: 10,
       fields:
-        'id,animalId,adopterId,adoptionDate,adaptationPeriod,status,observations,proof,animalName,adopterName,employeeName',
+        'id,animalId,adopterId,adoptionDate,animalDepartureDate,status,observations,proof,animalName,adopterName,employeeName',
       sort: '-adoptionDate',
       animalName: '',
       adopterName: '',
       status: null,
-      adoptionDateStart: toDateInput(monthAgo),
-      adoptionDateEnd: toDateInput(today),
+      adoptionDateStart: toDateInput(startOfMonth(currentDate)),
+      adoptionDateEnd: toDateInput(endOfMonth(currentDate)),
+      animalDepartureDateStart: '',
+      animalDepartureDateEnd: '',
     },
   })
 
@@ -154,63 +168,6 @@ export const AdoptionList = () => {
     [token, modal, refresh],
   )
 
-  const confirmAdoption = useCallback(
-    (values: AdoptionListValues) => {
-      modal.confirm({
-        title: 'Confirmar adoção',
-        message: `Deseja confirmar a adoção do animal ${values.animalName ?? `#${values.animalId}`}?`,
-        confirmText: 'Confirmar',
-        callback: (confirmed) => {
-          if (!confirmed) return
-          api
-            .put(
-              'adoption.confirm',
-              { id: values.id },
-              {
-                headers: { Authorization: `Bearer ${token}` },
-              },
-            )
-            .then(() => {
-              toast.success('Adoção confirmada com sucesso!')
-              refresh.force()
-            })
-            .catch((err) => toast.error(errorMessageHandler(err)))
-        },
-      })
-    },
-    [token, modal, refresh],
-  )
-
-  const cancelAdoption = useCallback(
-    (values: AdoptionListValues) => {
-      modal.prompt({
-        title: 'Cancelar adoção',
-        message: 'Informe o motivo do cancelamento:',
-        callback: (reason) => {
-          const value = String(reason ?? '').trim()
-          if (!value) {
-            toast.error('Motivo é obrigatório para cancelar a adoção.')
-            return
-          }
-          api
-            .put(
-              'adoption.cancel',
-              { id: values.id, reason: value },
-              {
-                headers: { Authorization: `Bearer ${token}` },
-              },
-            )
-            .then(() => {
-              toast.success('Adoção cancelada com sucesso!')
-              refresh.force()
-            })
-            .catch((err) => toast.error(errorMessageHandler(err)))
-        },
-      })
-    },
-    [token, modal, refresh],
-  )
-
   function handleSelectAll(checked: boolean) {
     setSelectedIds(checked ? selectableItems.map((i) => i.id) : [])
   }
@@ -226,7 +183,7 @@ export const AdoptionList = () => {
       confirmText: 'Cancelar adoções',
       callback: async (confirmed) => {
         if (!confirmed) return
-        setBatchLoading(true)
+        setBatchLoading('cancel')
         try {
           await api.post(
             'adoption.cancelBatch',
@@ -239,7 +196,7 @@ export const AdoptionList = () => {
         } catch (error) {
           toast.error(errorMessageHandler(error))
         } finally {
-          setBatchLoading(false)
+          setBatchLoading(null)
         }
       },
     })
@@ -252,7 +209,7 @@ export const AdoptionList = () => {
       confirmText: 'Confirmar adoções',
       callback: async (confirmed) => {
         if (!confirmed) return
-        setBatchLoading(true)
+        setBatchLoading('confirm')
         try {
           await api.post(
             'adoption.confirmBatch',
@@ -265,7 +222,7 @@ export const AdoptionList = () => {
         } catch (error) {
           toast.error(errorMessageHandler(error))
         } finally {
-          setBatchLoading(false)
+          setBatchLoading(null)
         }
       },
     })
@@ -405,7 +362,7 @@ export const AdoptionList = () => {
                 </div>
               </div>
 
-              <div className="mb-6 grid gap-4 lg:grid-cols-2 2xl:grid-cols-2">
+              <div className="mb-6 grid gap-4 lg:grid-cols-4 2xl:grid-cols-4">
                 <div>
                   <Form.Label htmlFor="adoptionDateStart">Data inicial</Form.Label>
                   <Form.DateInput name="adoptionDateStart" />
@@ -416,24 +373,48 @@ export const AdoptionList = () => {
                   <Form.DateInput name="adoptionDateEnd" />
                   <Form.ErrorMessage field="adoptionDateEnd" />
                 </div>
+                <div>
+                  <Form.Label htmlFor="animalDepartureDateStart">Data inicial saída do animal</Form.Label>
+                  <Form.DateInput name="animalDepartureDateStart" />
+                  <Form.ErrorMessage field="animalDepartureDateStart" />
+                </div>
+                <div>
+                  <Form.Label htmlFor="animalDepartureDateEnd">Data final saída do animal</Form.Label>
+                  <Form.DateInput name="animalDepartureDateEnd" />
+                  <Form.ErrorMessage field="animalDepartureDateEnd" />
+                </div>
               </div>
 
               <CardFooter className="mt-6 flex flex-wrap items-center gap-3 p-0">
                 <Button
                   type="button"
                   variant="danger"
-                  disabled={selectedIds.length === 0 || batchLoading}
+                  disabled={selectedIds.length === 0 || batchLoading !== null}
                   onClick={cancelBatch}
                 >
-                  {batchLoading ? <Spinner /> : <span>Cancelar</span>}
+                  {batchLoading === 'cancel' ? (
+                    <Spinner />
+                  ) : (
+                    <>
+                      <XCircleIcon className="mr-2 h-5 w-5" />
+                      Confirmar cancelamento
+                    </>
+                  )}
                 </Button>
                 <Button
                   type="button"
                   variant="success"
-                  disabled={selectedIds.length === 0 || batchLoading}
+                  disabled={selectedIds.length === 0 || batchLoading !== null}
                   onClick={confirmBatch}
                 >
-                  {batchLoading ? <Spinner /> : <span>Confirmar</span>}
+                  {batchLoading === 'confirm' ? (
+                    <Spinner />
+                  ) : (
+                    <>
+                      <CheckCircle2Icon className="mr-2 h-5 w-5" />
+                      Confirmar concluídas
+                    </>
+                  )}
                 </Button>
                 <Button type="submit">
                   <SearchIcon className="mr-2 h-5 w-5 shrink-0" />
@@ -462,7 +443,7 @@ export const AdoptionList = () => {
                   <TableHead>Animal</TableHead>
                   <TableHead>Adotante</TableHead>
                   <TableHead>Data</TableHead>
-                  <TableHead>Período adapt.</TableHead>
+                  <TableHead>Saída do animal</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Responsável</TableHead>
                   <TableHead aria-label="Ações" />
@@ -489,38 +470,34 @@ export const AdoptionList = () => {
                       {item.adopterName ?? `#${item.adopterId}`}
                     </TableCell>
                     <TableCell>{formatDate(item.adoptionDate)}</TableCell>
-                    <TableCell>{item.adaptationPeriod != null ? `${item.adaptationPeriod} dias` : '—'}</TableCell>
+                    <TableCell>{item.animalDepartureDate ? formatDate(item.animalDepartureDate) : ''}</TableCell>
                     <TableCell>{formatAdoptionStatus(item.status)}</TableCell>
                     <TableCell>{item.employeeName ?? '—'}</TableCell>
                     <TableCell className="w-[1%] whitespace-nowrap">
-                      <div className="flex items-center gap-2">
-                        {item.status === 'processando' && (
-                          <>
-                            <Button type="button" variant="success" onClick={() => confirmAdoption(item)}>
-                              <CheckCircle2Icon className="mr-2 h-4 w-4 shrink-0" />
-                              <span>Confirmar</span>
-                            </Button>
-                            <Button type="button" variant="danger" onClick={() => cancelAdoption(item)}>
-                              <XCircleIcon className="mr-2 h-4 w-4 shrink-0" />
-                              <span>Cancelar</span>
-                            </Button>
-                          </>
-                        )}
-                        <ActionsList
-                          primaryKey="id"
-                          values={item}
-                          actions={[
-                            { icon: PencilIcon, title: 'Editar', action: ':id' },
-                            {
-                              icon: DownloadIcon,
-                              title: 'Baixar comprovante',
-                              action: (i) => window.open(`${appConfig.API_URL}${i.proof}`, '_blank'),
-                              hideWhen: (i) => !i.proof,
-                            },
-                            { icon: XIcon, title: 'Remover', action: removeAdoption },
-                          ]}
-                        />
-                      </div>
+                      <ActionsList
+                        primaryKey="id"
+                        values={item}
+                        actions={[
+                          {
+                            icon: EyeIcon,
+                            title: 'Visualizar',
+                            action: ':id',
+                            hideWhen: (currentItem) => currentItem.status !== 'processando',
+                          },
+                          {
+                            icon: DownloadIcon,
+                            title: 'Baixar arquivo',
+                            action: (i) => window.open(`${appConfig.API_URL}${i.proof}`, '_blank'),
+                            hideWhen: (i) => !i.proof,
+                          },
+                          {
+                            icon: XIcon,
+                            title: 'Remover',
+                            action: removeAdoption,
+                            hideWhen: (currentItem) => currentItem.status !== 'processando',
+                          },
+                        ]}
+                      />
                     </TableCell>
                   </TableRow>
                 ))}
@@ -548,10 +525,13 @@ export const AdoptionList = () => {
 }
 
 function formatAdoptionStatus(status: string) {
-  const map: Record<string, string> = {
-    processando: 'Processando',
-    concluida: 'Concluída',
-    cancelada: 'Cancelada',
+  const map: Record<string, { label: string; variant: 'outline' | 'success' | 'danger' }> = {
+    processando: { label: 'Processando', variant: 'outline' },
+    concluida: { label: 'Concluída', variant: 'success' },
+    cancelada: { label: 'Cancelada', variant: 'danger' },
   }
-  return map[status] ?? status
+
+  const config = map[status]
+  if (!config) return <Badge variant="outline">{status}</Badge>
+  return <Badge variant={config.variant}>{config.label}</Badge>
 }

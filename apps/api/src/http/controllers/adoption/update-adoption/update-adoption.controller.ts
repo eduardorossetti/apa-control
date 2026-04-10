@@ -23,12 +23,16 @@ export async function updateAdoptionController(request: FastifyRequest, reply: F
   }
 
   const body = updateAdoptionSchema.parse(payload)
+  const employeeId = request.user.id
 
   const updateAdoptionUseCase = makeUpdateAdoptionUseCase()
-  await updateAdoptionUseCase.execute({
-    ...body,
-    proof: uploadedProofPath ?? body.proof ?? null,
-  })
+  await updateAdoptionUseCase.execute(
+    {
+      ...body,
+      proof: uploadedProofPath ?? body.proof ?? null,
+    },
+    employeeId,
+  )
 
   return reply.status(204).send()
 }

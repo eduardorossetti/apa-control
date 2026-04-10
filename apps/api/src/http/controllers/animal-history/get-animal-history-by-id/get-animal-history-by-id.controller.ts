@@ -25,6 +25,7 @@ function formatHistoryType(type: string) {
     cadastro: 'Cadastro',
     consulta: 'Consulta',
     procedimento: 'Procedimento',
+    adocao: 'Adoção',
     ocorrencia: 'Ocorrência',
     destino_final: 'Destino Final',
     despesa: 'Despesa',

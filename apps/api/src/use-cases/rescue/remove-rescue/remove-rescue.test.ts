@@ -1,6 +1,8 @@
 import { beforeAll, describe, expect, it } from 'vitest'
 
 import { AccessProfileFactory } from '@/tests/factories/access-profile'
+import { AdopterFactory } from '@/tests/factories/adopter'
+import { AdoptionFactory } from '@/tests/factories/adoption'
 import { AnimalFactory } from '@/tests/factories/animal'
 import { EmployeeFactory } from '@/tests/factories/employee'
 import { FinalDestinationFactory } from '@/tests/factories/final-destination'
@@ -9,6 +11,7 @@ import { RescueFactory } from '@/tests/factories/rescue'
 import { getAuthToken } from '@/tests/utils'
 import { createBaseApp } from '@/utils/fastify/create-base-app'
 
+import { adoptionRoutes } from '@/http/controllers/adoption/routes'
 import { rescueRoutes } from '@/http/controllers/rescue/routes'
 
 describe('Remove rescue', () => {
@@ -17,6 +20,7 @@ describe('Remove rescue', () => {
   let destinationTypeId: number
 
   beforeAll(async () => {
+    await app.register(adoptionRoutes)
     await app.register(rescueRoutes)
     const profile = await AccessProfileFactory.create()
     const employee = await EmployeeFactory.create({ profileId: profile.id })
@@ -80,6 +84,35 @@ describe('Remove rescue', () => {
       animalId: animal.id,
       destinationTypeId,
       employeeId,
+    })
+
+    const response = await app.inject({
+      method: 'DELETE',
+      url: `/rescue.delete/${id}`,
+      headers: { authorization: `Bearer ${token}` },
+    })
+
+    expect(response.statusCode).toBe(409)
+  })
+
+  it('should return 409 when animal has linked adoption', async () => {
+    const animal = await AnimalFactory.create()
+    const adopter = await AdopterFactory.create()
+    const token = getAuthToken({ id: employeeId, roles: ['AdminPanel', 'Rescues', 'Adoptions'] })
+    const createPayload = RescueFactory.buildCreateWithAnimalId({ animalId: animal.id })
+    const createRes = await app.inject({
+      method: 'POST',
+      url: '/rescue.add',
+      headers: { authorization: `Bearer ${token}` },
+      payload: createPayload,
+    })
+    const { id } = createRes.json() as { id: number }
+
+    await app.inject({
+      method: 'POST',
+      url: '/adoption.add',
+      headers: { authorization: `Bearer ${token}` },
+      payload: AdoptionFactory.buildCreate({ animalId: animal.id, adopterId: adopter.id }),
     })
 
     const response = await app.inject({

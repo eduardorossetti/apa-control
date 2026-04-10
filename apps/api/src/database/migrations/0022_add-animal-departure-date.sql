@@ -1,0 +1,1 @@
+ALTER TABLE "adoption" ADD COLUMN "animal_departure_date" date;

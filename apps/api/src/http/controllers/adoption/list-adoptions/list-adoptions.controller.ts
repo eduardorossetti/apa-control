@@ -9,7 +9,18 @@ export async function listAdoptionsController(request: FastifyRequest, reply: Fa
   const [count, items] = await listAdoptionsUseCase.execute(data)
 
   if (data.exportType) {
-    return exportListData(reply, data.exportType, 'Adocoes', 'adocoes', items)
+    const reportItems = items.map(
+      ({ animalName, adopterName, adoptionDate, animalDepartureDate, status, observations, employeeName }) => ({
+        animalName,
+        adopterName,
+        adoptionDate,
+        animalDepartureDate,
+        status,
+        observations,
+        employeeName,
+      }),
+    )
+    return exportListData(reply, data.exportType, 'Adoções', 'adocoes', reportItems)
   }
 
   reply.header('X-Total-Count', count)

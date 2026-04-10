@@ -9,7 +9,7 @@ export async function listVeterinaryClinicsController(request: FastifyRequest, r
   const [count, items] = await listVeterinaryClinicsUseCase.execute(data)
 
   if (data.exportType) {
-    return exportListData(reply, data.exportType, 'Clinicas Veterinarias', 'clinicas-veterinarias', items)
+    return exportListData(reply, data.exportType, 'Clínicas Veterinárias', 'clinicas-veterinarias', items)
   }
 
   reply.header('X-Total-Count', count)

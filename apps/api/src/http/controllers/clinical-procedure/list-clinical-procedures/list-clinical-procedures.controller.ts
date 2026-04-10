@@ -10,7 +10,7 @@ export async function listClinicalProceduresController(request: FastifyRequest, 
 
   if (data.exportType) {
     const reportItems = items.map(({ proof: _proof, ...item }) => item)
-    return exportListData(reply, data.exportType, 'Procedimentos Clinicos', 'procedimentos-clinicos', reportItems, {
+    return exportListData(reply, data.exportType, 'Procedimentos Clínicos', 'procedimentos-clinicos', reportItems, {
       pdfLandscape: true,
     })
   }

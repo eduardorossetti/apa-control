@@ -1,3 +1,4 @@
+import { AdoptionRepository } from '@/repositories/adoption.repository'
 import { AnimalHistoryRepository } from '@/repositories/animal-history.repository'
 import { AnimalRepository } from '@/repositories/animal.repository'
 import { FinalDestinationRepository } from '@/repositories/final-destination.repository'
@@ -8,11 +9,13 @@ export function makeRemoveRescueUseCase() {
   const rescueRepository = new RescueRepository()
   const animalRepository = new AnimalRepository()
   const finalDestinationRepository = new FinalDestinationRepository()
+  const adoptionRepository = new AdoptionRepository()
   const animalHistoryRepository = new AnimalHistoryRepository()
   return new RemoveRescueUseCase(
     rescueRepository,
     animalRepository,
     finalDestinationRepository,
+    adoptionRepository,
     animalHistoryRepository,
   )
 }

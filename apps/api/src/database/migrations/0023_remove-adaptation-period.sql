@@ -1,0 +1,1 @@
+ALTER TABLE "adoption" DROP COLUMN "adaptation_period";

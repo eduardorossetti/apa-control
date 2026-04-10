@@ -102,7 +102,7 @@ function normalizeHeader(rawKey: string): string {
     type: 'Tipo',
     reason: 'Motivo',
     adopterName: 'Adotante',
-    adaptationPeriod: 'Período de adaptação',
+    animalDepartureDate: 'Data de saída do animal',
     proof: 'Comprovante',
   }
 
@@ -132,6 +132,7 @@ const enumLabels: Record<string, string> = {
   receita: 'Receita',
   despesa: 'Despesa',
   pendente: 'Pendente',
+  processando: 'Processando',
   confirmado: 'Confirmado',
   estornado: 'Estornado',
   ativa: 'Ativa',

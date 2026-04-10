@@ -9,7 +9,6 @@ const AdoptionFactory = {
     animalId: 1,
     adopterId: 1,
     adoptionDate: faker.date.past({ years: 1 }).toISOString().split('T')[0],
-    adaptationPeriod: faker.helpers.maybe(() => faker.number.int({ min: 7, max: 90 }), { probability: 0.5 }) ?? null,
     status: AdoptionStatus.PROCESSING,
     observations: faker.helpers.maybe(() => faker.lorem.sentence(), { probability: 0.5 }) ?? null,
     proof: null,

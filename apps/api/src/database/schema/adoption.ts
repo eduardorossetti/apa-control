@@ -17,7 +17,7 @@ export const adoption = pgTable('adoption', {
     .notNull()
     .references(() => employee.id),
   adoptionDate: date().notNull(),
-  adaptationPeriod: integer(),
+  animalDepartureDate: date(),
   status: adoptionStatusEnum().notNull(),
   observations: text(),
   proof: varchar({ length: 255 }),
