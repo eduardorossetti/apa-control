@@ -7,6 +7,7 @@ export const createAnimalSchema = z.object({
   size: z.string().min(1, 'Porte é obrigatório'),
   sex: z.string().min(1, 'Sexo é obrigatório'),
   birthYear: z.number().int().min(1900, 'Ano de nascimento inválido').nullish(),
+  birthMonth: z.number().int().min(1, 'Mês de nascimento inválido').max(12, 'Mês de nascimento inválido').nullish(),
   healthCondition: z.string().min(1, 'Condição de saúde é obrigatória'),
   entryDate: z.string().min(1, 'Data de entrada é obrigatória'),
   observations: z.string().nullish(),

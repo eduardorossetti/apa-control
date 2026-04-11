@@ -10,6 +10,7 @@ export type GetAnimalByIdDTO = {
   size: string
   sex: string
   birthYear: number | null
+  birthMonth: number | null
   healthCondition: string
   entryDate: string
   observations: string | null

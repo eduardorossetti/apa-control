@@ -1,0 +1,1 @@
+ALTER TABLE "veterinary_clinic" ADD COLUMN "email" varchar(255);

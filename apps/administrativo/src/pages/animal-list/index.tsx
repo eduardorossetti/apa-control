@@ -52,6 +52,7 @@ interface AnimalListValues {
   size: string
   sex: string
   birthYear: number | null
+  birthMonth: number | null
   healthCondition: string
   entryDate: string
   observations: string | null
@@ -94,7 +95,7 @@ export const AnimalList = () => {
     resolver: zodResolver(animalFilterSchema),
     defaultValues: {
       page: 1,
-      fields: 'id,name,species,breed,size,sex,birthYear,healthCondition,entryDate,status',
+      fields: 'id,name,species,breed,size,sex,birthYear,birthMonth,healthCondition,entryDate,status',
       sort: 'name',
     },
   })
@@ -341,7 +342,34 @@ export const AnimalList = () => {
                     <TableCell>{formatName(item.name)}</TableCell>
                     <TableCell>{formatSpecies(item.species)}</TableCell>
                     <TableCell>{item.breed}</TableCell>
-                    <TableCell>{item.birthYear ? `${new Date().getFullYear() - item.birthYear} anos` : ''}</TableCell>
+                    <TableCell>
+                      {(() => {
+                        if (!item.birthYear) return ''
+
+                        const currentYear = new Date().getFullYear()
+                        let ageYears = currentYear - item.birthYear
+
+                        if (!item.birthMonth) {
+                          return `${ageYears} ${ageYears === 1 ? 'ano' : 'anos'}`
+                        }
+
+                        const currentMonth = new Date().getMonth() + 1
+                        let ageMonths = currentMonth - item.birthMonth
+
+                        if (ageMonths < 0) {
+                          ageYears -= 1
+                          ageMonths += 12
+                        }
+
+                        if (ageYears === 0) {
+                          return `${ageMonths} ${ageMonths === 1 ? 'mês' : 'meses'}`
+                        }
+
+                        return ageMonths === 0
+                          ? `${ageYears} ${ageYears === 1 ? 'ano' : 'anos'}`
+                          : `${ageYears} ${ageYears === 1 ? 'ano' : 'anos'} e ${ageMonths} ${ageMonths === 1 ? 'mês' : 'meses'}`
+                      })()}
+                    </TableCell>
                     <TableCell>{formatHealthCondition(item.healthCondition)}</TableCell>
                     <TableCell>{animalStatusBadge(item.status)}</TableCell>
                     <TableCell className="w-[1%] whitespace-nowrap">

@@ -4,6 +4,7 @@ export const updateVeterinaryClinicSchema = z.object({
   id: z.number({ error: 'O código da clínica veterinária é obrigatório.' }),
   name: z.string({ error: 'O nome é obrigatório.' }).trim().max(100, 'O nome deve ter no máximo 100 caracteres.'),
   cnpj: z.string({ error: 'O CNPJ é obrigatório.' }).trim().length(14, 'O CNPJ deve ter 14 caracteres.'),
+  email: z.string().email('Email inválido.').nullable().optional(),
   phone: z
     .string({ error: 'O telefone é obrigatório.' })
     .trim()

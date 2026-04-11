@@ -7,6 +7,7 @@ export type ListVeterinaryClinicsDTO = {
   id: number
   name: string
   cnpj: string
+  email: string | null
   phone: string
   responsible: string
   active: boolean

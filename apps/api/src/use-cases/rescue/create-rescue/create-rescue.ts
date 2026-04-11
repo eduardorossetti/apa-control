@@ -46,6 +46,7 @@ export class CreateRescueUseCase {
           new Animal({
             ...data.animal!,
             birthYear: data.animal!.birthYear ?? null,
+            birthMonth: data.animal!.birthMonth ?? null,
             status: 'ativo',
             rescueAt: new Date(),
             createdAt: new Date(),

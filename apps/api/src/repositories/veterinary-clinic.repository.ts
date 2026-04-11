@@ -110,6 +110,7 @@ export class VeterinaryClinicRepository {
         id: veterinaryClinic.id,
         name: veterinaryClinic.name,
         cnpj: veterinaryClinic.cnpj,
+        email: veterinaryClinic.email,
         phone: veterinaryClinic.phone,
         address: veterinaryClinic.address,
         responsible: veterinaryClinic.responsible,

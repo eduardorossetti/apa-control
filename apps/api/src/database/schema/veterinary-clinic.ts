@@ -4,6 +4,7 @@ export const veterinaryClinic = pgTable('veterinary_clinic', {
   id: serial().primaryKey(),
   name: varchar({ length: 100 }).notNull(),
   cnpj: varchar({ length: 14 }).notNull().unique(),
+  email: varchar({ length: 255 }),
   phone: varchar({ length: 20 }).notNull(),
   address: text().notNull(),
   responsible: varchar({ length: 100 }).notNull(),

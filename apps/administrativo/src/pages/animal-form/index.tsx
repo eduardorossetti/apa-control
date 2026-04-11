@@ -37,6 +37,7 @@ const animalSchema = z.object({
     .min(1900, 'Ano inválido.')
     .max(new Date().getFullYear(), 'Ano não pode ser no futuro.')
     .nullish(),
+  birthMonth: z.number().int().min(1, 'Mês inválido.').max(12, 'Mês inválido.').nullish(),
   healthCondition: z.string({ error: RequiredMessage }),
   entryDate: z.string({ error: RequiredMessage }),
   observations: z.string().nullish(),
@@ -59,6 +60,21 @@ const sizeOptions = [
 const sexOptions = [
   { value: 'macho', label: 'Macho' },
   { value: 'femea', label: 'Fêmea' },
+]
+
+const monthOptions = [
+  { value: 1, label: 'Janeiro' },
+  { value: 2, label: 'Fevereiro' },
+  { value: 3, label: 'Março' },
+  { value: 4, label: 'Abril' },
+  { value: 5, label: 'Maio' },
+  { value: 6, label: 'Junho' },
+  { value: 7, label: 'Julho' },
+  { value: 8, label: 'Agosto' },
+  { value: 9, label: 'Setembro' },
+  { value: 10, label: 'Outubro' },
+  { value: 11, label: 'Novembro' },
+  { value: 12, label: 'Dezembro' },
 ]
 
 const healthConditionOptions = [
@@ -314,16 +330,29 @@ export const AnimalForm = () => {
                       <Form.ErrorMessage field="sex" />
                     </div>
 
-                    <div>
-                      <Form.Label htmlFor="birthYear">Nascimento</Form.Label>
-                      <Form.Input
-                        name="birthYear"
-                        type="number"
-                        min="1900"
-                        max={new Date().getFullYear()}
-                        placeholder="Ex: 2021"
-                      />
-                      <Form.ErrorMessage field="birthYear" />
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <Form.Label htmlFor="birthMonth">Mês de Nasc.</Form.Label>
+                        <Form.Select
+                          name="birthMonth"
+                          type="number"
+                          options={monthOptions}
+                          isClearable
+                          placeholder="Mês"
+                        />
+                        <Form.ErrorMessage field="birthMonth" />
+                      </div>
+                      <div>
+                        <Form.Label htmlFor="birthYear">Ano de Nasc.</Form.Label>
+                        <Form.Input
+                          name="birthYear"
+                          type="number"
+                          min="1900"
+                          max={new Date().getFullYear()}
+                          placeholder="Ex: 2021"
+                        />
+                        <Form.ErrorMessage field="birthYear" />
+                      </div>
                     </div>
 
                     <div>

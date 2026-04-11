@@ -169,6 +169,20 @@
       "when": 1775784397784,
       "tag": "0023_remove-adaptation-period",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1775933947042,
+      "tag": "0024_add_email_to_veterinary_clinic",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1775936344172,
+      "tag": "0025_add_birth_month_to_animal",
+      "breakpoints": true
     }
   ]
 }

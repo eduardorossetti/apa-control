@@ -6,6 +6,7 @@ export class Animal {
   size: string
   sex: string
   birthYear: number | null
+  birthMonth: number | null
   healthCondition: string
   entryDate: string
   observations?: string | null
@@ -22,6 +23,7 @@ export class Animal {
     this.size = props.size
     this.sex = props.sex
     this.birthYear = props.birthYear
+    this.birthMonth = props.birthMonth
     this.healthCondition = props.healthCondition
     this.entryDate = props.entryDate
     this.observations = props.observations

@@ -271,8 +271,25 @@ export const AdopterList = () => {
                   <TableRow key={item.id}>
                     <TableCell>{item.name}</TableCell>
                     <TableCell>{maskCpfCnpj(item.cpf)}</TableCell>
-                    <TableCell>{item.email}</TableCell>
-                    <TableCell>{maskPhone(item.phone)}</TableCell>
+                    <TableCell>
+                      {item.email ? (
+                        <a href={`mailto:${item.email}`} className="text-blue-600 hover:underline">
+                          {item.email}
+                        </a>
+                      ) : null}
+                    </TableCell>
+                    <TableCell>
+                      {item.phone ? (
+                        <a
+                          href={`https://wa.me/55${item.phone.replace(/\\D/g, '')}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-blue-600 hover:underline"
+                        >
+                          {maskPhone(item.phone)}
+                        </a>
+                      ) : null}
+                    </TableCell>
                     <TableCell className="w-[1%] whitespace-nowrap">
                       <ActionsList
                         primaryKey="id"
