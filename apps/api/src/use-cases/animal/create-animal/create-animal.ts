@@ -18,6 +18,7 @@ export class CreateAnimalUseCase {
           ...data,
           status: 'pendente',
           birthYear: data.birthYear ?? null,
+          birthMonth: data.birthMonth ?? null,
           createdAt: new Date(),
         }),
         tx,

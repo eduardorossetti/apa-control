@@ -2,6 +2,7 @@ export class VeterinaryClinic {
   id?: number
   name: string
   cnpj: string
+  email?: string | null
   phone: string
   address: string
   responsible: string
@@ -13,6 +14,7 @@ export class VeterinaryClinic {
     this.id = id
     this.name = props.name
     this.cnpj = props.cnpj
+    this.email = props.email
     this.phone = props.phone
     this.address = props.address
     this.responsible = props.responsible

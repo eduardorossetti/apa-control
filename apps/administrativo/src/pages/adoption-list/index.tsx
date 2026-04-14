@@ -5,7 +5,6 @@ import { Link } from 'react-router-dom'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { endOfMonth, format, startOfMonth } from 'date-fns'
 import {
-  CheckCircle2Icon,
   DownloadIcon,
   EyeIcon,
   FileSpreadsheetIcon,
@@ -13,7 +12,6 @@ import {
   HeartHandshakeIcon,
   PlusIcon,
   SearchIcon,
-  XCircleIcon,
   XIcon,
 } from 'lucide-react'
 import { Helmet } from 'react-helmet-async'
@@ -386,37 +384,25 @@ export const AdoptionList = () => {
                 </div>
               </div>
 
-              <CardFooter className="mt-6 flex flex-wrap items-center gap-3 p-0">
+              <CardFooter className="mt-6 flex flex-wrap gap-3 p-0">
                 <Button
                   type="button"
                   variant="danger"
                   disabled={selectedIds.length === 0 || batchLoading !== null}
                   onClick={cancelBatch}
                 >
-                  {batchLoading === 'cancel' ? (
-                    <Spinner />
-                  ) : (
-                    <>
-                      <XCircleIcon className="mr-2 h-5 w-5" />
-                      Confirmar cancelamento
-                    </>
-                  )}
+                  {batchLoading === 'cancel' ? <Spinner /> : <span>Cancelar Adoções</span>}
                 </Button>
+
                 <Button
                   type="button"
                   variant="success"
                   disabled={selectedIds.length === 0 || batchLoading !== null}
                   onClick={confirmBatch}
                 >
-                  {batchLoading === 'confirm' ? (
-                    <Spinner />
-                  ) : (
-                    <>
-                      <CheckCircle2Icon className="mr-2 h-5 w-5" />
-                      Confirmar concluídas
-                    </>
-                  )}
+                  {batchLoading === 'confirm' ? <Spinner /> : <span>Confirmar Adoções</span>}
                 </Button>
+
                 <Button type="submit">
                   <SearchIcon className="mr-2 h-5 w-5 shrink-0" />
                   <span>Consultar</span>

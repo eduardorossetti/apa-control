@@ -50,6 +50,7 @@ interface VeterinaryClinicListValues {
   id: number
   name: string
   cnpj: string
+  email: string | null
   phone: string
   responsible: string
   active: boolean
@@ -341,6 +342,7 @@ export const VeterinaryClinicList = () => {
                 <TableRow>
                   <TableHead>Nome</TableHead>
                   <TableHead>CNPJ</TableHead>
+                  <TableHead>Email</TableHead>
                   <TableHead>Telefone</TableHead>
                   <TableHead>Responsável</TableHead>
                   <TableHead>Ativo</TableHead>
@@ -353,7 +355,25 @@ export const VeterinaryClinicList = () => {
                   <TableRow key={item.id}>
                     <TableCell>{item.name}</TableCell>
                     <TableCell>{maskCpfCnpj(item.cnpj)}</TableCell>
-                    <TableCell>{maskPhone(item.phone)}</TableCell>
+                    <TableCell>
+                      {item.email ? (
+                        <a href={`mailto:${item.email}`} className="text-blue-600 hover:underline">
+                          {item.email}
+                        </a>
+                      ) : null}
+                    </TableCell>
+                    <TableCell>
+                      {item.phone ? (
+                        <a
+                          href={`https://wa.me/55${item.phone.replace(/\\D/g, '')}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-blue-600 hover:underline"
+                        >
+                          {maskPhone(item.phone)}
+                        </a>
+                      ) : null}
+                    </TableCell>
                     <TableCell>{item.responsible}</TableCell>
                     <TableCell>
                       {item.active ? (

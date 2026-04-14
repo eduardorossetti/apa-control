@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 
-import { Building2Icon, ChevronLeftIcon, PhoneIcon, SaveIcon } from 'lucide-react'
+import { Building2Icon, ChevronLeftIcon, MailIcon, PhoneIcon, SaveIcon } from 'lucide-react'
 import { Helmet } from 'react-helmet-async'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -118,7 +118,16 @@ export const VeterinaryClinicForm = () => {
                 </div>
               </div>
 
-              <div className="mb-6 grid gap-4 lg:grid-cols-2">
+              <div className="mb-6 grid gap-4 lg:grid-cols-3">
+                <div>
+                  <Form.Label htmlFor="email">Email</Form.Label>
+                  <Form.IconContainer>
+                    <Form.Input name="email" type="email" className="pl-9" />
+                    <Form.Icon icon={MailIcon} />
+                  </Form.IconContainer>
+                  <Form.ErrorMessage field="email" />
+                </div>
+
                 <div>
                   <Form.Label htmlFor="phone">Telefone</Form.Label>
                   <Form.IconContainer>
