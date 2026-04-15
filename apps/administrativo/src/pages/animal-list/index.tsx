@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
+import { ReactivateAnimalForm } from '../reactivate-animal-form'
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
@@ -87,6 +88,7 @@ export const AnimalList = () => {
   const { modal, token } = useApp()
   const refresh = useRefresh()
   const [fetching, setFetching] = useState(false)
+  const [reactivatingAnimal, setReactivatingAnimal] = useState<AnimalListValues | null>(null)
   const [downloading, setDownloading] = useState<ReportExportType | null>(null)
   const [items, setItems] = useState<AnimalListValues[]>([])
   const [total, setTotal] = useState(0)
@@ -128,33 +130,9 @@ export const AnimalList = () => {
     [modal, refresh, token],
   )
 
-  const reactivateAnimal = useCallback(
-    (values: AnimalListValues) => {
-      modal.confirm({
-        title: 'Reativar animal',
-        message: `Deseja reativar o animal ${values.name}? O destino final será removido e o animal voltará ao status ativo.`,
-        confirmText: 'Reativar',
-        callback: (confirmed) => {
-          if (confirmed) {
-            api
-              .post(
-                `animal.reactivate/${values.id}`,
-                {},
-                {
-                  headers: { Authorization: `Bearer ${token}` },
-                },
-              )
-              .then(() => {
-                toast.success(`Animal ${values.name} reativado com sucesso!`)
-                refresh.force()
-              })
-              .catch((err) => toast.error(errorMessageHandler(err)))
-          }
-        },
-      })
-    },
-    [modal, refresh, token],
-  )
+  const reactivateAnimal = useCallback((values: AnimalListValues) => {
+    setReactivatingAnimal(values)
+  }, [])
 
   async function listAnimals(values: AnimalFilterData) {
     setFetching(true)
@@ -406,6 +384,12 @@ export const AnimalList = () => {
           </div>
         </div>
       </Card>
+      <ReactivateAnimalForm
+        animal={reactivatingAnimal}
+        show={!!reactivatingAnimal}
+        onClose={() => setReactivatingAnimal(null)}
+        onSuccess={refresh.force}
+      />
     </>
   )
 }
