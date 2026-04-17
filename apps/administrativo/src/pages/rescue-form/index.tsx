@@ -39,6 +39,21 @@ const speciesOptions = [
   { value: 'outros', label: 'Outros' },
 ]
 
+const monthOptions = [
+  { value: 1, label: 'Janeiro' },
+  { value: 2, label: 'Fevereiro' },
+  { value: 3, label: 'Março' },
+  { value: 4, label: 'Abril' },
+  { value: 5, label: 'Maio' },
+  { value: 6, label: 'Junho' },
+  { value: 7, label: 'Julho' },
+  { value: 8, label: 'Agosto' },
+  { value: 9, label: 'Setembro' },
+  { value: 10, label: 'Outubro' },
+  { value: 11, label: 'Novembro' },
+  { value: 12, label: 'Dezembro' },
+]
+
 const sizeOptions = [
   { value: 'pequeno', label: 'Pequeno' },
   { value: 'medio', label: 'Médio' },
@@ -64,6 +79,7 @@ const rescueFormSchema = z.object({
   breed: z.string().nullish(),
   size: z.string({ error: RequiredMessage }),
   sex: z.string({ error: RequiredMessage }),
+  birthMonth: z.number().int().min(1, 'Mês inválido.').max(12, 'Mês inválido.').nullish(),
   birthYear: z
     .number()
     .int()
@@ -161,6 +177,7 @@ export const RescueForm = () => {
           setValue('breed', data.breed ?? '')
           setValue('size', data.size)
           setValue('sex', data.sex)
+          setValue('birthMonth', data.birthMonth ?? null)
           setValue('birthYear', data.birthYear ?? null)
           setValue('healthCondition', data.healthCondition)
           setValue('entryDate', data.entryDate?.split('T')[0] ?? '')
@@ -224,6 +241,7 @@ export const RescueForm = () => {
         breed: 'Raça',
         size: 'Porte',
         sex: 'Sexo',
+        birthMonth: 'Mês de Nascimento',
         birthYear: 'Ano de Nascimento',
         healthCondition: 'Condição de Saúde',
         entryDate: 'Data de Entrada',
@@ -366,6 +384,7 @@ export const RescueForm = () => {
                 breed: values.breed || null,
                 size: values.size,
                 sex: values.sex,
+                birthMonth: values.birthMonth ?? null,
                 birthYear: values.birthYear ?? null,
                 healthCondition: values.healthCondition,
                 entryDate: values.entryDate,
@@ -391,6 +410,7 @@ export const RescueForm = () => {
     'breed',
     'size',
     'sex',
+    'birthMonth',
     'birthYear',
     'healthCondition',
     'entryDate',
@@ -491,17 +511,31 @@ export const RescueForm = () => {
                       <Form.Select name="sex" options={sexOptions} disabled={disableAnimalFields} />
                       <Form.ErrorMessage field="sex" />
                     </div>
-                    <div>
-                      <Form.Label htmlFor="birthYear">Nascimento</Form.Label>
-                      <Form.Input
-                        name="birthYear"
-                        type="number"
-                        min="1900"
-                        max={new Date().getFullYear()}
-                        placeholder="Ex: 2021"
-                        disabled={disableAnimalFields}
-                      />
-                      <Form.ErrorMessage field="birthYear" />
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <Form.Label htmlFor="birthMonth">Mês de Nasc.</Form.Label>
+                        <Form.Select
+                          name="birthMonth"
+                          type="number"
+                          options={monthOptions}
+                          isClearable
+                          placeholder="Mês"
+                          disabled={disableAnimalFields}
+                        />
+                        <Form.ErrorMessage field="birthMonth" />
+                      </div>
+                      <div>
+                        <Form.Label htmlFor="birthYear">Ano de Nasc.</Form.Label>
+                        <Form.Input
+                          name="birthYear"
+                          type="number"
+                          min="1900"
+                          max={new Date().getFullYear()}
+                          placeholder="Ex: 2021"
+                          disabled={disableAnimalFields}
+                        />
+                        <Form.ErrorMessage field="birthYear" />
+                      </div>
                     </div>
                     <div>
                       <Form.Label htmlFor="healthCondition">Condição de saúde</Form.Label>

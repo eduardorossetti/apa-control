@@ -70,6 +70,7 @@ const schema = z.object({
   breedPreview: z.string().nullish(),
   sizePreview: z.string().nullish(),
   sexPreview: z.string().nullish(),
+  birthMonthPreview: z.string().nullish(),
   agePreview: z.string().nullish(),
   healthConditionPreview: z.string().nullish(),
   entryDatePreview: z.string().nullish(),
@@ -200,6 +201,7 @@ export const ClinicalProcedureForm = () => {
       setValue('breedPreview', '')
       setValue('sizePreview', '')
       setValue('sexPreview', '')
+      setValue('birthMonthPreview', '')
       setValue('agePreview', '')
       setValue('healthConditionPreview', '')
       setValue('entryDatePreview', '')
@@ -210,11 +212,26 @@ export const ClinicalProcedureForm = () => {
     api
       .get(`animal.key/${animalId}`, { headers: { Authorization: `Bearer ${token}` } })
       .then(({ data }) => {
+        const monthNames = [
+          'Janeiro',
+          'Fevereiro',
+          'Março',
+          'Abril',
+          'Maio',
+          'Junho',
+          'Julho',
+          'Agosto',
+          'Setembro',
+          'Outubro',
+          'Novembro',
+          'Dezembro',
+        ]
         setValue('animalNamePreview', data.name ?? '')
         setValue('speciesPreview', data.species ?? '')
         setValue('breedPreview', data.breed ?? '')
         setValue('sizePreview', data.size ?? '')
         setValue('sexPreview', data.sex ?? '')
+        setValue('birthMonthPreview', data.birthMonth ? (monthNames[data.birthMonth - 1] ?? '') : '')
         setValue('agePreview', data.birthYear ? `${new Date().getFullYear() - data.birthYear} anos` : '')
         setValue('healthConditionPreview', data.healthCondition ?? '')
         setValue('entryDatePreview', data.entryDate?.split('T')[0] ?? '')
@@ -227,6 +244,7 @@ export const ClinicalProcedureForm = () => {
         setValue('breedPreview', '')
         setValue('sizePreview', '')
         setValue('sexPreview', '')
+        setValue('birthMonthPreview', '')
         setValue('agePreview', '')
         setValue('healthConditionPreview', '')
         setValue('entryDatePreview', '')
@@ -295,6 +313,10 @@ export const ClinicalProcedureForm = () => {
                     <div>
                       <Form.Label htmlFor="sexPreview">Sexo</Form.Label>
                       <Form.Select name="sexPreview" options={sexOptions} disabled />
+                    </div>
+                    <div>
+                      <Form.Label htmlFor="birthMonthPreview">Mês de Nasc.</Form.Label>
+                      <Form.Input name="birthMonthPreview" disabled />
                     </div>
                     <div>
                       <Form.Label htmlFor="agePreview">Idade</Form.Label>
