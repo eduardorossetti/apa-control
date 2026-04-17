@@ -3,6 +3,7 @@ import { AnimalHistoryType } from '@/database/schema/enums/animal-history-type'
 import { ProcedureStatus } from '@/database/schema/enums/procedure-status'
 import { AnimalHistory } from '@/entities'
 import type { AnimalHistoryRepository } from '@/repositories/animal-history.repository'
+import type { AppointmentReminderRepository } from '@/repositories/appointment-reminder.repository'
 import type { ClinicalProcedureRepository } from '@/repositories/clinical-procedure.repository'
 import type { ProcedureTypeRepository } from '@/repositories/procedure-type.repository'
 import { ApiError } from '@/utils/api-error'
@@ -11,6 +12,7 @@ import type { ConfirmClinicalProceduresData } from './confirm-clinical-procedure
 export class ConfirmClinicalProceduresUseCase {
   constructor(
     private clinicalProcedureRepository: ClinicalProcedureRepository,
+    private appointmentReminderRepository: AppointmentReminderRepository,
     private procedureTypeRepository: ProcedureTypeRepository,
     private animalHistoryRepository: AnimalHistoryRepository,
   ) {}
@@ -36,6 +38,7 @@ export class ConfirmClinicalProceduresUseCase {
 
     await db.transaction(async (tx) => {
       await this.clinicalProcedureRepository.updateStatusByIds(data.ids, ProcedureStatus.COMPLETED, tx)
+      await this.appointmentReminderRepository.deleteByProcedureIds(data.ids, tx)
 
       for (const procedure of procedures) {
         await this.animalHistoryRepository.create(

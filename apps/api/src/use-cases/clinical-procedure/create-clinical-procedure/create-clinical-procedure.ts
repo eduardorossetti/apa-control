@@ -1,9 +1,10 @@
 import { db } from '@/database/client'
 import { AnimalHistoryType } from '@/database/schema/enums/animal-history-type'
 import { ProcedureStatus } from '@/database/schema/enums/procedure-status'
-import { AnimalHistory, ClinicalProcedure } from '@/entities'
+import { AnimalHistory, AppointmentReminder, ClinicalProcedure } from '@/entities'
 import type { AnimalHistoryRepository } from '@/repositories/animal-history.repository'
 import type { AnimalRepository } from '@/repositories/animal.repository'
+import type { AppointmentReminderRepository } from '@/repositories/appointment-reminder.repository'
 import type { AppointmentRepository } from '@/repositories/appointment.repository'
 import type { ClinicalProcedureRepository } from '@/repositories/clinical-procedure.repository'
 import type { ProcedureTypeRepository } from '@/repositories/procedure-type.repository'
@@ -12,11 +13,13 @@ import { timeZoneName } from '@/utils/time-zone'
 import { tz } from '@date-fns/tz'
 import { parseISO } from 'date-fns'
 import Decimal from 'decimal.js'
+import { buildProcedureReminderMessage } from '../reminder-message'
 import type { CreateClinicalProcedureData } from './create-clinical-procedure.dto'
 
 export class CreateClinicalProcedureUseCase {
   constructor(
     private clinicalProcedureRepository: ClinicalProcedureRepository,
+    private appointmentReminderRepository: AppointmentReminderRepository,
     private procedureTypeRepository: ProcedureTypeRepository,
     private animalRepository: AnimalRepository,
     private appointmentRepository: AppointmentRepository,
@@ -44,6 +47,12 @@ export class CreateClinicalProcedureUseCase {
     const procedureDate = parseISO(data.procedureDate, { in: tz(timeZoneName.SP) })
     if (Number.isNaN(procedureDate.getTime())) throw new ApiError('Data/hora do procedimento inválida.', 400)
 
+    const reminder = buildProcedureReminderMessage({
+      procedureTypeName: procedureType.name,
+      animalName: animal.name,
+      procedureDate,
+    })
+
     return await db.transaction(async (tx) => {
       const [result] = await this.clinicalProcedureRepository.create(
         new ClinicalProcedure({
@@ -57,6 +66,19 @@ export class CreateClinicalProcedureUseCase {
           actualCost: data.actualCost === null ? null : new Decimal(data.actualCost),
           observations: data.observations ?? null,
           status: ProcedureStatus.SCHEDULED,
+          createdAt: new Date(),
+        }),
+        tx,
+      )
+
+      await this.appointmentReminderRepository.create(
+        new AppointmentReminder({
+          appointmentId: null,
+          procedureId: result!.id,
+          employeeId,
+          title: reminder.title,
+          message: reminder.message,
+          readAt: null,
           createdAt: new Date(),
         }),
         tx,

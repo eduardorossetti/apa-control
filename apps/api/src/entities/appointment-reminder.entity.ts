@@ -1,6 +1,7 @@
 export class AppointmentReminder {
   id?: number
   appointmentId?: number | null
+  procedureId?: number | null
   employeeId: number
   title: string
   message: string
@@ -10,6 +11,7 @@ export class AppointmentReminder {
   constructor(props: Omit<AppointmentReminder, 'id'>, id?: number) {
     this.id = id
     this.appointmentId = props.appointmentId ?? null
+    this.procedureId = props.procedureId ?? null
     this.employeeId = props.employeeId
     this.title = props.title
     this.message = props.message

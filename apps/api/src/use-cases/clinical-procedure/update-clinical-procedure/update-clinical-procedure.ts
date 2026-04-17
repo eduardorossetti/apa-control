@@ -1,9 +1,10 @@
 import { db } from '@/database/client'
 import { AnimalHistoryType } from '@/database/schema/enums/animal-history-type'
 import { ProcedureStatus } from '@/database/schema/enums/procedure-status'
-import { AnimalHistory } from '@/entities'
+import { AnimalHistory, AppointmentReminder } from '@/entities'
 import type { AnimalHistoryRepository } from '@/repositories/animal-history.repository'
 import type { AnimalRepository } from '@/repositories/animal.repository'
+import type { AppointmentReminderRepository } from '@/repositories/appointment-reminder.repository'
 import type { AppointmentRepository } from '@/repositories/appointment.repository'
 import type { ClinicalProcedureRepository } from '@/repositories/clinical-procedure.repository'
 import type { ProcedureTypeRepository } from '@/repositories/procedure-type.repository'
@@ -12,11 +13,13 @@ import { timeZoneName } from '@/utils/time-zone'
 import { tz } from '@date-fns/tz'
 import { parseISO } from 'date-fns'
 import Decimal from 'decimal.js'
+import { buildProcedureReminderMessage } from '../reminder-message'
 import type { UpdateClinicalProcedureData } from './update-clinical-procedure.dto'
 
 export class UpdateClinicalProcedureUseCase {
   constructor(
     private clinicalProcedureRepository: ClinicalProcedureRepository,
+    private appointmentReminderRepository: AppointmentReminderRepository,
     private procedureTypeRepository: ProcedureTypeRepository,
     private animalRepository: AnimalRepository,
     private appointmentRepository: AppointmentRepository,
@@ -48,6 +51,12 @@ export class UpdateClinicalProcedureUseCase {
 
     const procedureDate = parseISO(data.procedureDate, { in: tz(timeZoneName.SP) })
     if (Number.isNaN(procedureDate.getTime())) throw new ApiError('Data/hora do procedimento inválida.', 400)
+
+    const reminder = buildProcedureReminderMessage({
+      procedureTypeName: procedureType.name,
+      animalName: animal.name,
+      procedureDate,
+    })
 
     const normalizedData = {
       animalId: data.animalId,
@@ -124,6 +133,31 @@ export class UpdateClinicalProcedureUseCase {
         },
         tx,
       )
+
+      const updatedReminderCount = await this.appointmentReminderRepository.updateByProcedureId(
+        data.id,
+        existing.employeeId,
+        {
+          title: reminder.title,
+          message: reminder.message,
+        },
+        tx,
+      )
+
+      if (updatedReminderCount === 0) {
+        await this.appointmentReminderRepository.create(
+          new AppointmentReminder({
+            appointmentId: null,
+            procedureId: data.id,
+            employeeId: existing.employeeId,
+            title: reminder.title,
+            message: reminder.message,
+            readAt: null,
+            createdAt: new Date(),
+          }),
+          tx,
+        )
+      }
 
       await this.animalHistoryRepository.create(
         new AnimalHistory({

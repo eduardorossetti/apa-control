@@ -1,5 +1,6 @@
 import { index, integer, pgTable, serial, text, timestamp, varchar } from 'drizzle-orm/pg-core'
 import { appointment } from './appointment'
+import { clinicalProcedure } from './clinical-procedure'
 import { employee } from './employee'
 
 export const appointmentReminder = pgTable(
@@ -7,6 +8,7 @@ export const appointmentReminder = pgTable(
   {
     id: serial().primaryKey(),
     appointmentId: integer().references(() => appointment.id, { onDelete: 'set null' }),
+    procedureId: integer().references(() => clinicalProcedure.id, { onDelete: 'set null' }),
     employeeId: integer()
       .notNull()
       .references(() => employee.id),

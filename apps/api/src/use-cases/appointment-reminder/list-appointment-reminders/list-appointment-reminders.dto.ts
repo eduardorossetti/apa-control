@@ -8,6 +8,7 @@ export interface ListAppointmentRemindersData {
 export interface AppointmentReminderWithDetails {
   id: number
   appointmentId: number | null
+  procedureId: number | null
   employeeId: number
   title: string
   message: string

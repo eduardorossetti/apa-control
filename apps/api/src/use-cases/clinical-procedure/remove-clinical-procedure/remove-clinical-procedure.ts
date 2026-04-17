@@ -3,6 +3,7 @@ import { AnimalHistoryType } from '@/database/schema/enums/animal-history-type'
 import { ProcedureStatus } from '@/database/schema/enums/procedure-status'
 import { AnimalHistory } from '@/entities'
 import type { AnimalHistoryRepository } from '@/repositories/animal-history.repository'
+import type { AppointmentReminderRepository } from '@/repositories/appointment-reminder.repository'
 import type { ClinicalProcedureRepository } from '@/repositories/clinical-procedure.repository'
 import type { ProcedureTypeRepository } from '@/repositories/procedure-type.repository'
 import { ApiError } from '@/utils/api-error'
@@ -11,6 +12,7 @@ import type { RemoveClinicalProcedureData } from './remove-clinical-procedure.dt
 export class RemoveClinicalProcedureUseCase {
   constructor(
     private clinicalProcedureRepository: ClinicalProcedureRepository,
+    private appointmentReminderRepository: AppointmentReminderRepository,
     private procedureTypeRepository: ProcedureTypeRepository,
     private animalHistoryRepository: AnimalHistoryRepository,
   ) {}
@@ -24,6 +26,7 @@ export class RemoveClinicalProcedureUseCase {
     const procedureType = await this.procedureTypeRepository.findById(existing.procedureTypeId)
 
     await db.transaction(async (tx) => {
+      await this.appointmentReminderRepository.deleteByProcedureIds([data.id], tx)
       await this.clinicalProcedureRepository.delete(data.id, tx)
 
       await this.animalHistoryRepository.create(
