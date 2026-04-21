@@ -274,7 +274,9 @@ Cada perfil de acesso define quais módulos o funcionário pode acessar:
 | `Adopters` | Adotantes |
 | `FinalDestinations` | Destinos finais |
 | `FinalDestinationTypes` | Tipos de destino final |
-| `Registrations` | Ocorrências |
+| `Occurrences` | Ocorrências |
+| `OccurrenceTypes` | Tipos de ocorrência |
+| `Registrations` | Cadastros (geral) |
 | `Financial` | Financeiro (geral) |
 | `Expenses` | Despesas |
 | `Revenues` | Receitas |
