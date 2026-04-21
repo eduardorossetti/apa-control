@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 
+import { addDays, isSameDay, parseISO } from 'date-fns'
 import { BellIcon, BellRingIcon, CheckCheckIcon, CheckCircleIcon } from 'lucide-react'
 import { Helmet } from 'react-helmet-async'
 import { toast } from 'sonner'
@@ -20,9 +21,27 @@ type Reminder = {
   message: string
   readAt: string | null
   createdAt: string
+  appointmentDate: string | null
 }
 
 type ReminderFilter = 'unread' | 'read' | 'all'
+
+function formatReminderMessage(reminder: Reminder): string {
+  if (!reminder.appointmentDate) return reminder.message
+
+  const date = parseISO(reminder.appointmentDate)
+  const now = new Date()
+
+  if (isSameDay(date, now)) {
+    return reminder.message.replace(/dia \d{2}\/\d{2}\/\d{4}/, 'hoje')
+  }
+
+  if (isSameDay(date, addDays(now, 1))) {
+    return reminder.message.replace(/dia \d{2}\/\d{2}\/\d{4}/, 'amanhã')
+  }
+
+  return reminder.message
+}
 
 export function ReminderList() {
   const { token } = useApp()
@@ -179,7 +198,7 @@ export function ReminderList() {
                   <div className="text-gray-500 text-xs dark:text-gray-400">{formatDateTime(item.createdAt)}</div>
                 </div>
 
-                <p className="mt-2 text-sm dark:text-gray-300">{item.message}</p>
+                <p className="mt-2 text-sm dark:text-gray-300">{formatReminderMessage(item)}</p>
 
                 {!item.readAt && (
                   <button
