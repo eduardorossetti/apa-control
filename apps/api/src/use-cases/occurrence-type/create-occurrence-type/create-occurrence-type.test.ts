@@ -19,7 +19,7 @@ describe('Create occurrence-type', () => {
   })
 
   it('should create occurrence-type successfully', async () => {
-    const token = getAuthToken({ id: employeeId, roles: ['AdminPanel', 'Registrations'] })
+    const token = getAuthToken({ id: employeeId, roles: ['AdminPanel', 'Registrations', 'OccurrenceTypes'] })
 
     const response = await app.inject({
       method: 'POST',
@@ -35,7 +35,7 @@ describe('Create occurrence-type', () => {
   })
 
   it('should return 409 when name already exists', async () => {
-    const token = getAuthToken({ id: employeeId, roles: ['AdminPanel', 'Registrations'] })
+    const token = getAuthToken({ id: employeeId, roles: ['AdminPanel', 'Registrations', 'OccurrenceTypes'] })
     const existing = await OccurrenceTypeFactory.create()
 
     const response = await app.inject({

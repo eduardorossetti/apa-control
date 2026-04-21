@@ -19,7 +19,7 @@ describe('List occurrences', () => {
     const profile = await AccessProfileFactory.create()
     const employee = await EmployeeFactory.create({ profileId: profile.id })
     employeeId = employee.id
-    token = getAuthToken({ id: employeeId, roles: ['AdminPanel', 'Animals'] })
+    token = getAuthToken({ id: employeeId, roles: ['AdminPanel', 'Occurrences'] })
 
     const animal = await AnimalFactory.create()
     const occurrenceType = await OccurrenceTypeFactory.create({ active: true })

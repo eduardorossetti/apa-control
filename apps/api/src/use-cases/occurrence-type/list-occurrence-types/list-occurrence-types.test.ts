@@ -17,7 +17,7 @@ describe('List occurrence-types', () => {
     const profile = await AccessProfileFactory.create()
     const employee = await EmployeeFactory.create({ profileId: profile.id })
     employeeId = employee.id
-    token = getAuthToken({ id: employeeId, roles: ['AdminPanel', 'Registrations'] })
+    token = getAuthToken({ id: employeeId, roles: ['AdminPanel', 'Registrations', 'OccurrenceTypes'] })
     await OccurrenceTypeFactory.create()
   })
 

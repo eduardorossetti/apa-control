@@ -21,7 +21,7 @@ describe('Update occurrence', () => {
   })
 
   it('should update occurrence successfully', async () => {
-    const token = getAuthToken({ id: employeeId, roles: ['AdminPanel', 'Animals'] })
+    const token = getAuthToken({ id: employeeId, roles: ['AdminPanel', 'Occurrences'] })
     const animal = await AnimalFactory.create()
     const occurrenceType = await OccurrenceTypeFactory.create({ active: true })
     const created = await OccurrenceFactory.create({
@@ -47,7 +47,7 @@ describe('Update occurrence', () => {
   })
 
   it('should return 404 when occurrence does not exist', async () => {
-    const token = getAuthToken({ id: employeeId, roles: ['AdminPanel', 'Animals'] })
+    const token = getAuthToken({ id: employeeId, roles: ['AdminPanel', 'Occurrences'] })
     const animal = await AnimalFactory.create()
     const occurrenceType = await OccurrenceTypeFactory.create({ active: true })
 
@@ -68,7 +68,7 @@ describe('Update occurrence', () => {
   })
 
   it('should return 409 when occurrence-type is inactive', async () => {
-    const token = getAuthToken({ id: employeeId, roles: ['AdminPanel', 'Animals'] })
+    const token = getAuthToken({ id: employeeId, roles: ['AdminPanel', 'Occurrences'] })
     const animal = await AnimalFactory.create()
     const activeType = await OccurrenceTypeFactory.create({ active: true })
     const inactiveType = await OccurrenceTypeFactory.create({ active: false })

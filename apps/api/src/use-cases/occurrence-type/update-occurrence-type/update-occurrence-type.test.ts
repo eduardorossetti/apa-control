@@ -19,7 +19,7 @@ describe('Update occurrence-type', () => {
   })
 
   it('should update occurrence-type successfully', async () => {
-    const token = getAuthToken({ id: employeeId, roles: ['AdminPanel', 'Registrations'] })
+    const token = getAuthToken({ id: employeeId, roles: ['AdminPanel', 'Registrations', 'OccurrenceTypes'] })
     const created = await OccurrenceTypeFactory.create()
 
     const response = await app.inject({
@@ -33,7 +33,7 @@ describe('Update occurrence-type', () => {
   })
 
   it('should return 404 when occurrence-type does not exist', async () => {
-    const token = getAuthToken({ id: employeeId, roles: ['AdminPanel', 'Registrations'] })
+    const token = getAuthToken({ id: employeeId, roles: ['AdminPanel', 'Registrations', 'OccurrenceTypes'] })
 
     const response = await app.inject({
       method: 'PUT',
@@ -46,7 +46,7 @@ describe('Update occurrence-type', () => {
   })
 
   it('should return 409 when name conflicts with another occurrence-type', async () => {
-    const token = getAuthToken({ id: employeeId, roles: ['AdminPanel', 'Registrations'] })
+    const token = getAuthToken({ id: employeeId, roles: ['AdminPanel', 'Registrations', 'OccurrenceTypes'] })
     const other = await OccurrenceTypeFactory.create()
     const target = await OccurrenceTypeFactory.create()
 

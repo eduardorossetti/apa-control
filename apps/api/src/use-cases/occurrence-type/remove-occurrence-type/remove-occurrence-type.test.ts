@@ -21,7 +21,7 @@ describe('Remove occurrence-type', () => {
   })
 
   it('should remove occurrence-type successfully', async () => {
-    const token = getAuthToken({ id: employeeId, roles: ['AdminPanel', 'Registrations'] })
+    const token = getAuthToken({ id: employeeId, roles: ['AdminPanel', 'Registrations', 'OccurrenceTypes'] })
     const created = await OccurrenceTypeFactory.create()
 
     const response = await app.inject({
@@ -34,7 +34,7 @@ describe('Remove occurrence-type', () => {
   })
 
   it('should return 404 when occurrence-type does not exist', async () => {
-    const token = getAuthToken({ id: employeeId, roles: ['AdminPanel', 'Registrations'] })
+    const token = getAuthToken({ id: employeeId, roles: ['AdminPanel', 'Registrations', 'OccurrenceTypes'] })
 
     const response = await app.inject({
       method: 'DELETE',
@@ -46,7 +46,7 @@ describe('Remove occurrence-type', () => {
   })
 
   it('should return 409 when occurrence-type is in use', async () => {
-    const token = getAuthToken({ id: employeeId, roles: ['AdminPanel', 'Registrations'] })
+    const token = getAuthToken({ id: employeeId, roles: ['AdminPanel', 'Registrations', 'OccurrenceTypes'] })
     const occurrenceTypeRecord = await OccurrenceTypeFactory.create()
     const animal = await AnimalFactory.create()
     await OccurrenceFactory.create({
