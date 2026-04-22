@@ -1,15 +1,19 @@
-export class AppointmentReminder {
+import type { ReminderEntityTypeValue } from '@/database/schema/enums/reminder-entity-type'
+
+export class Reminder {
   id?: number
-  appointmentId?: number | null
+  entityType: ReminderEntityTypeValue
+  entityId: number
   employeeId: number
   title: string
   message: string
   readAt?: Date | null
   createdAt: Date
 
-  constructor(props: Omit<AppointmentReminder, 'id'>, id?: number) {
+  constructor(props: Omit<Reminder, 'id'>, id?: number) {
     this.id = id
-    this.appointmentId = props.appointmentId ?? null
+    this.entityType = props.entityType
+    this.entityId = props.entityId
     this.employeeId = props.employeeId
     this.title = props.title
     this.message = props.message

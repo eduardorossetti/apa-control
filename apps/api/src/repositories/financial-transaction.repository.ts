@@ -162,8 +162,9 @@ export class FinancialTransactionRepository {
     await connection.delete(financialTransaction).where(eq(financialTransaction.id, id))
   }
 
-  async findByIds(ids: number[]) {
-    return db
+  async findByIds(ids: number[], dbTransaction: DrizzleTransaction | null = null) {
+    const connection = dbTransaction ?? db
+    return connection
       .select({
         id: financialTransaction.id,
         animalId: financialTransaction.animalId,
@@ -174,22 +175,25 @@ export class FinancialTransactionRepository {
       .where(inArray(financialTransaction.id, ids))
   }
 
-  async cancelByIds(ids: number[]) {
-    await db
+  async cancelByIds(ids: number[], dbTransaction: DrizzleTransaction | null = null) {
+    const connection = dbTransaction ?? db
+    await connection
       .update(financialTransaction)
       .set({ status: 'estornado', paymentDate: null, reversalDate: sql`now()` })
       .where(inArray(financialTransaction.id, ids))
   }
 
-  async reverseById(id: number) {
-    await db
+  async reverseById(id: number, dbTransaction: DrizzleTransaction | null = null) {
+    const connection = dbTransaction ?? db
+    await connection
       .update(financialTransaction)
       .set({ status: 'estornado', paymentDate: null, reversalDate: sql`now()` })
       .where(eq(financialTransaction.id, id))
   }
 
-  async confirmTransactionByIds(ids: number[]) {
-    await db
+  async confirmTransactionByIds(ids: number[], dbTransaction: DrizzleTransaction | null = null) {
+    const connection = dbTransaction ?? db
+    await connection
       .update(financialTransaction)
       .set({ status: 'confirmado', paymentDate: sql`now()`, reversalDate: null })
       .where(inArray(financialTransaction.id, ids))

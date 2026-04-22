@@ -1,12 +1,13 @@
 import { index, integer, pgTable, serial, text, timestamp, varchar } from 'drizzle-orm/pg-core'
-import { appointment } from './appointment'
 import { employee } from './employee'
+import { reminderEntityTypeEnum } from './enums/pg-enums'
 
-export const appointmentReminder = pgTable(
-  'appointment_reminder',
+export const reminder = pgTable(
+  'reminder',
   {
     id: serial().primaryKey(),
-    appointmentId: integer().references(() => appointment.id, { onDelete: 'set null' }),
+    entityType: reminderEntityTypeEnum().notNull(),
+    entityId: integer().notNull(),
     employeeId: integer()
       .notNull()
       .references(() => employee.id),
@@ -15,5 +16,5 @@ export const appointmentReminder = pgTable(
     readAt: timestamp({ withTimezone: true }),
     createdAt: timestamp({ withTimezone: true }).notNull(),
   },
-  (table) => [index().on(table.employeeId, table.createdAt)],
+  (table) => [index().on(table.employeeId, table.createdAt), index().on(table.entityType, table.entityId)],
 )

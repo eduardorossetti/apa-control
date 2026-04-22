@@ -44,6 +44,7 @@ export class CampaignRepository {
       .select({
         id: campaign.id,
         campaignTypeId: campaign.campaignTypeId,
+        employeeId: campaign.employeeId,
         title: campaign.title,
         description: campaign.description,
         startDate: campaign.startDate,

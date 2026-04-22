@@ -19,7 +19,7 @@ describe('Get occurrence-type by id', () => {
   })
 
   it('should return occurrence-type by id', async () => {
-    const token = getAuthToken({ id: employeeId, roles: ['AdminPanel', 'Registrations'] })
+    const token = getAuthToken({ id: employeeId, roles: ['AdminPanel', 'Registrations', 'OccurrenceTypes'] })
     const created = await OccurrenceTypeFactory.create()
 
     const response = await app.inject({
@@ -34,7 +34,7 @@ describe('Get occurrence-type by id', () => {
   })
 
   it('should return 404 when occurrence-type does not exist', async () => {
-    const token = getAuthToken({ id: employeeId, roles: ['AdminPanel', 'Registrations'] })
+    const token = getAuthToken({ id: employeeId, roles: ['AdminPanel', 'Registrations', 'OccurrenceTypes'] })
 
     const response = await app.inject({
       method: 'GET',

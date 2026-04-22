@@ -7,9 +7,9 @@ import { removeOccurrenceController } from './remove-occurrence/remove-occurrenc
 import { updateOccurrenceController } from './update-occurrence/update-occurrence.controller'
 
 export async function occurrenceRoutes(app: FastifyInstance) {
-  app.post('/occurrence.add', authorize('AdminPanel', 'Animals'), createOccurrenceController)
-  app.put('/occurrence.update', authorize('AdminPanel', 'Animals'), updateOccurrenceController)
-  app.get('/occurrence.list', authorize('AdminPanel', 'Animals'), listOccurrencesController)
-  app.get('/occurrence.key/:id', authorize('AdminPanel', 'Animals'), getOccurrenceByIdController)
-  app.delete('/occurrence.delete/:id', authorize('AdminPanel', 'Animals'), removeOccurrenceController)
+  app.post('/occurrence.add', authorize('AdminPanel', 'Occurrences'), createOccurrenceController)
+  app.put('/occurrence.update', authorize('AdminPanel', 'Occurrences'), updateOccurrenceController)
+  app.get('/occurrence.list', authorize('AdminPanel', 'Occurrences'), listOccurrencesController)
+  app.get('/occurrence.key/:id', authorize('AdminPanel', 'Occurrences'), getOccurrenceByIdController)
+  app.delete('/occurrence.delete/:id', authorize('AdminPanel', 'Occurrences'), removeOccurrenceController)
 }

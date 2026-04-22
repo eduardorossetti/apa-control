@@ -37,7 +37,7 @@ export const pages: PageProps[] = [
       {
         title: 'Tipos de Ocorrência',
         path: '/tipos-ocorrencia',
-        roles: ['AdminPanel', 'Registrations'],
+        roles: ['AdminPanel', 'Registrations', 'OccurrenceTypes'],
       },
       { title: 'Tipos de Campanha', path: '/tipos-campanhas', roles: ['AdminPanel', 'Registrations', 'CampaignTypes'] },
       {
@@ -56,6 +56,7 @@ export const pages: PageProps[] = [
       'Registrations',
       'ProcedureTypes',
       'AppointmentTypes',
+      'OccurrenceTypes',
       'CampaignTypes',
       'TransactionTypes',
       'FinalDestinationTypes',
@@ -72,7 +73,7 @@ export const pages: PageProps[] = [
   { title: 'Adoções', path: '/adocoes', icon: HeartHandshakeIcon, roles: ['AdminPanel', 'Adoptions'] },
   { title: 'Adotantes', path: '/adotantes', icon: HeartIcon, roles: ['AdminPanel', 'Adopters'] },
   { title: 'Consultas', path: '/consultas', icon: CalendarHeartIcon, roles: ['AdminPanel', 'Appointments'] },
-  { title: 'Ocorrências', path: '/ocorrencias', icon: AlertTriangleIcon, roles: ['AdminPanel', 'Animals'] },
+  { title: 'Ocorrências', path: '/ocorrencias', icon: AlertTriangleIcon, roles: ['AdminPanel', 'Occurrences'] },
   { title: 'Anamnese', path: '/anamnese', icon: ClipboardListIcon, roles: ['AdminPanel', 'Anamnesis'] },
   {
     title: 'Procedimentos Clínicos',

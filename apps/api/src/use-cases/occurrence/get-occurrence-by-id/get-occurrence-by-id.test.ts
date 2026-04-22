@@ -21,7 +21,7 @@ describe('Get occurrence by id', () => {
   })
 
   it('should return occurrence by id', async () => {
-    const token = getAuthToken({ id: employeeId, roles: ['AdminPanel', 'Animals'] })
+    const token = getAuthToken({ id: employeeId, roles: ['AdminPanel', 'Occurrences'] })
     const animal = await AnimalFactory.create()
     const occurrenceType = await OccurrenceTypeFactory.create({ active: true })
     const created = await OccurrenceFactory.create({
@@ -42,7 +42,7 @@ describe('Get occurrence by id', () => {
   })
 
   it('should return 404 when occurrence does not exist', async () => {
-    const token = getAuthToken({ id: employeeId, roles: ['AdminPanel', 'Animals'] })
+    const token = getAuthToken({ id: employeeId, roles: ['AdminPanel', 'Occurrences'] })
 
     const response = await app.inject({
       method: 'GET',

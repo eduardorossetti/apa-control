@@ -4,6 +4,7 @@ import type { Decimal } from 'decimal.js'
 export class Campaign {
   id?: number
   campaignTypeId: number
+  employeeId: number
   title: string
   description: string
   startDate: string
@@ -18,6 +19,7 @@ export class Campaign {
   constructor(props: Omit<Campaign, 'id'>, id?: number) {
     this.id = id
     this.campaignTypeId = props.campaignTypeId
+    this.employeeId = props.employeeId
     this.title = props.title
     this.description = props.description
     this.startDate = props.startDate

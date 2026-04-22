@@ -1,9 +1,9 @@
 import { ConsultationType } from '@/database/schema/enums/consultation-type'
 import { timeZoneName } from '@/utils/time-zone'
 import { tz } from '@date-fns/tz'
-import { addDays, format, isSameDay } from 'date-fns'
+import { format } from 'date-fns'
 
-type ReminderMessageInput = {
+export type AppointmentReminderInput = {
   appointmentTypeName: string
   animalName: string
   appointmentDate: Date
@@ -11,13 +11,8 @@ type ReminderMessageInput = {
   clinicName?: string | null
 }
 
-export function buildAppointmentReminderMessage(data: ReminderMessageInput) {
-  const now = new Date()
-  const dayText = isSameDay(data.appointmentDate, now)
-    ? 'hoje'
-    : isSameDay(data.appointmentDate, addDays(now, 1))
-      ? 'amanhã'
-      : `dia ${format(data.appointmentDate, 'dd/MM/yyyy', { in: tz(timeZoneName.SP) })}`
+export function buildAppointmentReminderMessage(data: AppointmentReminderInput) {
+  const dayText = `dia ${format(data.appointmentDate, 'dd/MM/yyyy', { in: tz(timeZoneName.SP) })}`
   const hourText = format(data.appointmentDate, "HH'h'mm", { in: tz(timeZoneName.SP) })
   const locationText =
     data.consultationType === ConsultationType.CLINICAL && data.clinicName

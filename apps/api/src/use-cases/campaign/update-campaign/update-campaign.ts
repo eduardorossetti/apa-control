@@ -1,15 +1,21 @@
 import Decimal from 'decimal.js'
 
+import { db } from '@/database/client'
+import { ReminderEntityType } from '@/database/schema/enums/reminder-entity-type'
+import { Reminder } from '@/entities'
 import type { CampaignTypeRepository } from '@/repositories/campaign-type.repository'
 import type { CampaignRepository } from '@/repositories/campaign.repository'
+import type { ReminderRepository } from '@/repositories/reminder.repository'
 import { ApiError } from '@/utils/api-error'
 import { removeUploadFile } from '@/utils/files/remove-upload-file'
+import { buildCampaignReminderMessage } from '../../reminder/builders'
 import type { UpdateCampaignData } from './update-campaign.dto'
 
 export class UpdateCampaignUseCase {
   constructor(
     private campaignRepository: CampaignRepository,
     private campaignTypeRepository: CampaignTypeRepository,
+    private reminderRepository: ReminderRepository,
   ) {}
 
   async execute(data: UpdateCampaignData): Promise<void> {
@@ -26,16 +32,35 @@ export class UpdateCampaignUseCase {
     }
     const proof = data.proof ?? null
 
-    await this.campaignRepository.update(data.id, {
-      campaignTypeId: data.campaignTypeId,
-      title: data.title,
-      description: data.description,
-      startDate: data.startDate,
-      endDate: data.endDate,
-      fundraisingGoal: data.fundraisingGoal != null ? new Decimal(data.fundraisingGoal) : null,
-      proof,
-      observations: data.observations ?? null,
-      updatedAt: new Date(),
+    await db.transaction(async (tx) => {
+      await this.campaignRepository.update(
+        data.id,
+        {
+          campaignTypeId: data.campaignTypeId,
+          title: data.title,
+          description: data.description,
+          startDate: data.startDate,
+          endDate: data.endDate,
+          fundraisingGoal: data.fundraisingGoal != null ? new Decimal(data.fundraisingGoal) : null,
+          proof,
+          observations: data.observations ?? null,
+          updatedAt: new Date(),
+        },
+        tx,
+      )
+
+      if (new Date(data.endDate) >= new Date()) {
+        const reminderMsg = buildCampaignReminderMessage({ title: data.title, endDate: data.endDate })
+        await this.reminderRepository.upsertByEntity(
+          ReminderEntityType.CAMPAIGN,
+          data.id,
+          campaign.employeeId,
+          { title: reminderMsg.title, message: reminderMsg.message },
+          tx,
+        )
+      } else {
+        await this.reminderRepository.deleteByEntity(ReminderEntityType.CAMPAIGN, [data.id], tx)
+      }
     })
 
     if (campaign.proof && campaign.proof !== proof) {

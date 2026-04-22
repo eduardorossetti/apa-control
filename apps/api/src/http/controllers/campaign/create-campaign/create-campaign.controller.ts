@@ -24,17 +24,22 @@ export async function createCampaignController(request: FastifyRequest, reply: F
 
   const body = createCampaignSchema.parse(payload)
 
+  const employeeId = request.user.id
+
   const createCampaignUseCase = makeCreateCampaignUseCase()
-  const id = await createCampaignUseCase.execute({
-    campaignTypeId: body.campaignTypeId,
-    title: body.title,
-    description: body.description,
-    startDate: body.startDate,
-    endDate: body.endDate,
-    fundraisingGoal: body.fundraisingGoal,
-    proof: uploadedProofPath ?? body.proof ?? null,
-    observations: body.observations ?? null,
-  })
+  const id = await createCampaignUseCase.execute(
+    {
+      campaignTypeId: body.campaignTypeId,
+      title: body.title,
+      description: body.description,
+      startDate: body.startDate,
+      endDate: body.endDate,
+      fundraisingGoal: body.fundraisingGoal,
+      proof: uploadedProofPath ?? body.proof ?? null,
+      observations: body.observations ?? null,
+    },
+    employeeId,
+  )
 
   return reply.status(201).send({ id })
 }

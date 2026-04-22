@@ -60,6 +60,9 @@ export class ClinicalProcedureRepository {
     if (status === 'pendente') {
       whereList.push(eq(clinicalProcedure.status, ProcedureStatus.SCHEDULED))
       whereList.push(sql`${clinicalProcedure.procedureDate} < NOW()`)
+    } else if (status === ProcedureStatus.SCHEDULED) {
+      whereList.push(eq(clinicalProcedure.status, ProcedureStatus.SCHEDULED))
+      whereList.push(sql`${clinicalProcedure.procedureDate} >= NOW()`)
     } else if (status) {
       whereList.push(eq(clinicalProcedure.status, status))
     }

@@ -57,6 +57,9 @@ export class AppointmentRepository {
     if (status === 'pendente') {
       whereList.push(eq(appointment.status, AppointmentStatus.SCHEDULED))
       whereList.push(sql`${appointment.appointmentDate} < NOW()`)
+    } else if (status === AppointmentStatus.SCHEDULED) {
+      whereList.push(eq(appointment.status, AppointmentStatus.SCHEDULED))
+      whereList.push(sql`${appointment.appointmentDate} >= NOW()`)
     } else if (status) {
       whereList.push(eq(appointment.status, status))
     }

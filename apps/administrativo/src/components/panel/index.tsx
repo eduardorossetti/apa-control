@@ -102,7 +102,7 @@ export const Panel = ({ pages, signOut, basename = '' }: PanelProps) => {
 
   return (
     <div id="panel" className="flex w-full flex-col overflow-x-hidden lg:h-screen lg:overflow-hidden">
-      <header className="glass-card relative top-7.5 right-4 left-4 z-97 flex min-h-[calc(128px+env(safe-area-inset-top))] w-[calc(100%-2rem)] items-center justify-between overflow-visible rounded-t-xl rounded-b-xl border-gray-200/50 border-b bg-white/90 pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)] backdrop-blur-xl transition-all duration-300 ease-in-out lg:fixed lg:top-7.5 lg:right-20 lg:left-20 lg:w-[calc(100%-10rem)] dark:border-gray-700/50 dark:bg-gray-900/90">
+      <header className="glass-card relative top-7.5 right-4 left-4 z-97 flex min-h-[calc(128px+env(safe-area-inset-top))] w-[calc(100%-2rem)] items-center justify-between overflow-visible rounded-t-xl rounded-b-xl border-gray-200/50 border-b bg-white/90 pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)] backdrop-blur-xl transition-colors duration-300 ease-in-out lg:fixed lg:top-7.5 lg:right-20 lg:left-20 lg:w-[calc(100%-10rem)] dark:border-gray-700/50 dark:bg-gray-900/90">
         <div className="mx-auto flex w-full max-w-full items-center justify-between gap-4 px-4 lg:px-20">
           <div className="flex items-center gap-3 lg:flex-1">
             <button
@@ -148,7 +148,7 @@ export const Panel = ({ pages, signOut, basename = '' }: PanelProps) => {
               <DropdownMenu.Trigger asChild>
                 <button
                   type="button"
-                  className="group inline-flex items-center gap-2 rounded-lg px-2 py-1.5 outline-hidden transition-all duration-200 hover:bg-gray-100 active:scale-95 dark:hover:bg-gray-800"
+                  className="group inline-flex items-center gap-2 rounded-lg px-2 py-1.5 outline-hidden transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-800"
                   aria-label={`Menu do usuário ${operator.name || ''}`}
                   aria-haspopup="menu"
                 >
@@ -159,79 +159,77 @@ export const Panel = ({ pages, signOut, basename = '' }: PanelProps) => {
                 </button>
               </DropdownMenu.Trigger>
 
-              <DropdownMenu.Portal>
-                <DropdownMenu.Content
-                  align="end"
-                  sideOffset={8}
-                  collisionPadding={16}
-                  className="glass-card data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 z-100 min-w-50 overflow-hidden rounded-xl border border-gray-200/50 p-1"
-                >
-                  <div className="px-3 py-2.5">
-                    <p className="font-semibold text-gray-900 text-sm leading-tight dark:text-gray-100">
-                      {operator.name || 'Usuário'}
+              <DropdownMenu.Content
+                align="end"
+                sideOffset={8}
+                collisionPadding={16}
+                className="glass-card data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 z-100 min-w-50 overflow-hidden rounded-xl border border-gray-200/50 p-1"
+              >
+                <div className="px-3 py-2.5">
+                  <p className="font-semibold text-gray-900 text-sm leading-tight dark:text-gray-100">
+                    {operator.name || 'Usuário'}
+                  </p>
+                  {operator.profileName && (
+                    <p className="mt-1 text-gray-500 text-xs leading-tight dark:text-gray-400">
+                      {operator.profileName}
                     </p>
-                    {operator.profileName && (
-                      <p className="mt-1 text-gray-500 text-xs leading-tight dark:text-gray-400">
-                        {operator.profileName}
-                      </p>
-                    )}
-                  </div>
+                  )}
+                </div>
 
-                  <DropdownMenu.Separator className="my-1 h-px bg-gray-200 dark:bg-gray-700" />
+                <DropdownMenu.Separator className="my-1 h-px bg-gray-200 dark:bg-gray-700" />
 
-                  <DropdownMenu.Item
-                    className="flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2.5 text-sm outline-hidden transition-colors hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-hidden sm:hidden dark:focus:bg-gray-800 dark:focus:text-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-100"
-                    onSelect={(e) => {
-                      e.preventDefault()
-                      navigate(`${basename}/lembretes`)
-                    }}
-                  >
-                    <BellIcon className="h-4 w-4" />
-                    <span>Lembretes</span>
-                    {unreadRemindersCount > 0 && (
-                      <span className="ml-auto inline-flex min-h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 font-semibold text-white text-xs">
-                        {unreadRemindersCount}
-                      </span>
-                    )}
-                  </DropdownMenu.Item>
+                <DropdownMenu.Item
+                  className="flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2.5 text-sm outline-hidden transition-colors hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-hidden sm:hidden dark:focus:bg-gray-800 dark:focus:text-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-100"
+                  onSelect={(e) => {
+                    e.preventDefault()
+                    navigate(`${basename}/lembretes`)
+                  }}
+                >
+                  <BellIcon className="h-4 w-4" />
+                  <span>Lembretes</span>
+                  {unreadRemindersCount > 0 && (
+                    <span className="ml-auto inline-flex min-h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 font-semibold text-white text-xs">
+                      {unreadRemindersCount}
+                    </span>
+                  )}
+                </DropdownMenu.Item>
 
-                  <DropdownMenu.Separator className="my-1 h-px bg-gray-200 sm:hidden dark:bg-gray-700" />
+                <DropdownMenu.Separator className="my-1 h-px bg-gray-200 sm:hidden dark:bg-gray-700" />
 
-                  <DropdownMenu.Item
-                    className="flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2.5 text-sm outline-hidden transition-colors hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-hidden dark:focus:bg-gray-800 dark:focus:text-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-100"
-                    onSelect={(e) => {
-                      e.preventDefault()
-                      toggleTheme()
-                    }}
-                  >
-                    {(theme || 'light') === 'light' ? (
-                      <>
-                        <MoonIcon className="h-4 w-4" />
-                        <span>Modo Escuro</span>
-                      </>
-                    ) : (
-                      <>
-                        <SunIcon className="h-4 w-4" />
-                        <span>Modo Claro</span>
-                      </>
-                    )}
-                  </DropdownMenu.Item>
+                <DropdownMenu.Item
+                  className="flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2.5 text-sm outline-hidden transition-colors hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-hidden dark:focus:bg-gray-800 dark:focus:text-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-100"
+                  onSelect={(e) => {
+                    e.preventDefault()
+                    toggleTheme()
+                  }}
+                >
+                  {(theme || 'light') === 'light' ? (
+                    <>
+                      <MoonIcon className="h-4 w-4" />
+                      <span>Modo Escuro</span>
+                    </>
+                  ) : (
+                    <>
+                      <SunIcon className="h-4 w-4" />
+                      <span>Modo Claro</span>
+                    </>
+                  )}
+                </DropdownMenu.Item>
 
-                  <DropdownMenu.Separator className="my-1 h-px bg-gray-200 dark:bg-gray-700" />
+                <DropdownMenu.Separator className="my-1 h-px bg-gray-200 dark:bg-gray-700" />
 
-                  <DropdownMenu.Item
-                    className="flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2.5 text-sm outline-hidden transition-colors hover:bg-red-50 hover:text-red-600 focus:bg-red-50 focus:text-red-600 focus:outline-hidden dark:focus:bg-red-950/30 dark:focus:text-red-400 dark:hover:bg-red-950/30 dark:hover:text-red-400"
-                    onClick={signOut}
-                    onSelect={(e) => {
-                      e.preventDefault()
-                      signOut()
-                    }}
-                  >
-                    <LogOutIcon className="h-4 w-4" />
-                    <span>Sair</span>
-                  </DropdownMenu.Item>
-                </DropdownMenu.Content>
-              </DropdownMenu.Portal>
+                <DropdownMenu.Item
+                  className="flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2.5 text-sm outline-hidden transition-colors hover:bg-red-50 hover:text-red-600 focus:bg-red-50 focus:text-red-600 focus:outline-hidden dark:focus:bg-red-950/30 dark:focus:text-red-400 dark:hover:bg-red-950/30 dark:hover:text-red-400"
+                  onClick={signOut}
+                  onSelect={(e) => {
+                    e.preventDefault()
+                    signOut()
+                  }}
+                >
+                  <LogOutIcon className="h-4 w-4" />
+                  <span>Sair</span>
+                </DropdownMenu.Item>
+              </DropdownMenu.Content>
             </DropdownMenu.Root>
           </div>
         </div>

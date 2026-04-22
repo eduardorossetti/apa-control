@@ -1,14 +1,19 @@
 import { db } from '@/database/client'
 import { financialTransaction, transactionType } from '@/database/schema'
+import { ReminderEntityType } from '@/database/schema/enums/reminder-entity-type'
 import { TransactionCategory } from '@/database/schema/enums/transaction-category'
 import type { CampaignRepository } from '@/repositories/campaign.repository'
+import type { ReminderRepository } from '@/repositories/reminder.repository'
 import { ApiError } from '@/utils/api-error'
 import { removeUploadFile } from '@/utils/files/remove-upload-file'
 import { and, eq } from 'drizzle-orm'
 import type { RemoveCampaignData } from './remove-campaign.dto'
 
 export class RemoveCampaignUseCase {
-  constructor(private campaignRepository: CampaignRepository) {}
+  constructor(
+    private campaignRepository: CampaignRepository,
+    private reminderRepository: ReminderRepository,
+  ) {}
 
   async execute(data: RemoveCampaignData): Promise<void> {
     const campaign = await this.campaignRepository.findById(data.id)
@@ -40,7 +45,10 @@ export class RemoveCampaignUseCase {
       throw new ApiError('Não é possível remover a campanha, pois ela possui receitas vinculadas.', 409)
     }
 
-    await this.campaignRepository.delete(data.id)
+    await db.transaction(async (tx) => {
+      await this.reminderRepository.deleteByEntity(ReminderEntityType.CAMPAIGN, [data.id], tx)
+      await this.campaignRepository.delete(data.id, tx)
+    })
     await removeUploadFile(campaign.proof)
   }
 }

@@ -7,9 +7,29 @@ import { removeOccurrenceTypeController } from './remove-occurrence-type/remove-
 import { updateOccurrenceTypeController } from './update-occurrence-type/update-occurrence-type.controller'
 
 export async function occurrenceTypeRoutes(app: FastifyInstance) {
-  app.post('/occurrence-type.add', authorize('AdminPanel', 'Registrations'), createOccurrenceTypeController)
-  app.put('/occurrence-type.update', authorize('AdminPanel', 'Registrations'), updateOccurrenceTypeController)
-  app.get('/occurrence-type.list', authorize('AdminPanel', 'Registrations'), listOccurrenceTypesController)
-  app.get('/occurrence-type.key/:id', authorize('AdminPanel', 'Registrations'), getOccurrenceTypeByIdController)
-  app.delete('/occurrence-type.delete/:id', authorize('AdminPanel', 'Registrations'), removeOccurrenceTypeController)
+  app.post(
+    '/occurrence-type.add',
+    authorize('AdminPanel', 'Registrations', 'OccurrenceTypes'),
+    createOccurrenceTypeController,
+  )
+  app.put(
+    '/occurrence-type.update',
+    authorize('AdminPanel', 'Registrations', 'OccurrenceTypes'),
+    updateOccurrenceTypeController,
+  )
+  app.get(
+    '/occurrence-type.list',
+    authorize('AdminPanel', 'Registrations', 'OccurrenceTypes'),
+    listOccurrenceTypesController,
+  )
+  app.get(
+    '/occurrence-type.key/:id',
+    authorize('AdminPanel', 'Registrations', 'OccurrenceTypes'),
+    getOccurrenceTypeByIdController,
+  )
+  app.delete(
+    '/occurrence-type.delete/:id',
+    authorize('AdminPanel', 'Registrations', 'OccurrenceTypes'),
+    removeOccurrenceTypeController,
+  )
 }
