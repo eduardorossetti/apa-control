@@ -8,7 +8,7 @@ import { TransactionStatus } from '@/database/schema/enums/transaction-status'
 import type { DrizzleTransaction } from '@/database/types'
 import type { Reminder } from '@/entities'
 import type { ListRemindersData, ReminderWithDetails } from '@/use-cases/reminder/list-reminders/list-reminders.dto'
-import { and, asc, desc, eq, gte, inArray, isNotNull, isNull, lte, or, sql } from 'drizzle-orm'
+import { and, desc, eq, gte, inArray, isNotNull, isNull, lte, or, sql } from 'drizzle-orm'
 
 export class ReminderRepository {
   async purgeInvalidReminders() {
@@ -162,7 +162,7 @@ export class ReminderRepository {
     )
       .leftJoin(animal, eq(animal.id, animalId))
       .where(and(...whereList))
-      .orderBy(asc(eventDate), desc(reminder.createdAt))
+      .orderBy(desc(reminder.createdAt))
       .limit(perPage)
       .offset((page - 1) * perPage)
 
