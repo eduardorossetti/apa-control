@@ -1,6 +1,7 @@
 import { date, integer, pgTable, serial, text, timestamp, varchar } from 'drizzle-orm/pg-core'
 import { decimalJs } from '../decimal-type'
 import { campaignType } from './campaign-type'
+import { employee } from './employee'
 import { campaignStatusEnum } from './enums'
 
 export const campaign = pgTable('campaign', {
@@ -8,6 +9,9 @@ export const campaign = pgTable('campaign', {
   campaignTypeId: integer()
     .notNull()
     .references(() => campaignType.id),
+  employeeId: integer()
+    .notNull()
+    .references(() => employee.id),
   title: varchar({ length: 200 }).notNull(),
   description: text().notNull(),
   startDate: date().notNull(),

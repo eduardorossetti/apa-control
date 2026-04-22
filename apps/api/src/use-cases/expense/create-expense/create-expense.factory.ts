@@ -2,6 +2,7 @@ import { AnimalHistoryRepository } from '@/repositories/animal-history.repositor
 import { AnimalRepository } from '@/repositories/animal.repository'
 import { CampaignRepository } from '@/repositories/campaign.repository'
 import { FinancialTransactionRepository } from '@/repositories/financial-transaction.repository'
+import { ReminderRepository } from '@/repositories/reminder.repository'
 import { TransactionTypeRepository } from '@/repositories/transaction-type.repository'
 import { CreateExpenseUseCase } from './create-expense'
 
@@ -12,5 +13,6 @@ export function makeCreateExpenseUseCase() {
     new CampaignRepository(),
     new AnimalRepository(),
     new AnimalHistoryRepository(),
+    new ReminderRepository(),
   )
 }

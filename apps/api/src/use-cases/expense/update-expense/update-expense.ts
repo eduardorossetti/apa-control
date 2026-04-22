@@ -1,15 +1,19 @@
 import Decimal from 'decimal.js'
 
+import { db } from '@/database/client'
 import { AnimalHistoryType } from '@/database/schema/enums/animal-history-type'
+import { ReminderEntityType } from '@/database/schema/enums/reminder-entity-type'
 import { TransactionCategory } from '@/database/schema/enums/transaction-category'
-import { AnimalHistory } from '@/entities'
+import { AnimalHistory, Reminder } from '@/entities'
 import type { AnimalHistoryRepository } from '@/repositories/animal-history.repository'
 import type { AnimalRepository } from '@/repositories/animal.repository'
 import type { CampaignRepository } from '@/repositories/campaign.repository'
 import type { FinancialTransactionRepository } from '@/repositories/financial-transaction.repository'
+import type { ReminderRepository } from '@/repositories/reminder.repository'
 import type { TransactionTypeRepository } from '@/repositories/transaction-type.repository'
 import { ApiError } from '@/utils/api-error'
 import { removeUploadFile } from '@/utils/files/remove-upload-file'
+import { buildFinancialTransactionReminderMessage } from '../../reminder/builders'
 import type { UpdateExpenseData } from './update-expense.dto'
 
 export class UpdateExpenseUseCase {
@@ -19,6 +23,7 @@ export class UpdateExpenseUseCase {
     private campaignRepository: CampaignRepository,
     private animalRepository: AnimalRepository,
     private animalHistoryRepository: AnimalHistoryRepository,
+    private reminderRepository: ReminderRepository,
   ) {}
 
   async execute(data: UpdateExpenseData, employeeId: number): Promise<void> {
@@ -65,37 +70,59 @@ export class UpdateExpenseUseCase {
       }
     }
 
-    await this.financialTransactionRepository.update(data.id, {
-      transactionTypeId: data.transactionTypeId,
-      campaignId: data.campaignId ?? null,
-      animalId: data.animalId ?? null,
-      description: data.description,
-      value: new Decimal(data.value),
-      proof,
-      observations: data.observations ?? null,
-      dueDate: data.dueDate ?? null,
+    await db.transaction(async (tx) => {
+      await this.financialTransactionRepository.update(
+        data.id,
+        {
+          transactionTypeId: data.transactionTypeId,
+          campaignId: data.campaignId ?? null,
+          animalId: data.animalId ?? null,
+          description: data.description,
+          value: new Decimal(data.value),
+          proof,
+          observations: data.observations ?? null,
+          dueDate: data.dueDate ?? null,
+        },
+        tx,
+      )
+
+      if (data.dueDate) {
+        const reminderMsg = buildFinancialTransactionReminderMessage({
+          description: data.description,
+          dueDate: data.dueDate,
+        })
+        await this.reminderRepository.upsertByEntity(
+          ReminderEntityType.FINANCIAL_TRANSACTION,
+          data.id,
+          existing.employeeId,
+          { title: reminderMsg.title, message: reminderMsg.message },
+          tx,
+        )
+      } else {
+        await this.reminderRepository.deleteByEntity(ReminderEntityType.FINANCIAL_TRANSACTION, [data.id], tx)
+      }
+
+      const animalId = data.animalId ?? existing.animalId
+      if (animalId && Object.keys(newValues).length > 0) {
+        await this.animalHistoryRepository.create(
+          new AnimalHistory({
+            animalId,
+            rescueId: null,
+            employeeId,
+            type: AnimalHistoryType.EXPENSE,
+            action: 'expense.updated',
+            description: `Despesa ${data.description} atualizada`,
+            oldValue: JSON.stringify(oldValues),
+            newValue: JSON.stringify(newValues),
+            createdAt: new Date(),
+          }),
+          tx,
+        )
+      }
     })
 
     if (existing.proof && existing.proof !== proof) {
       await removeUploadFile(existing.proof)
-    }
-
-    const animalId = data.animalId ?? existing.animalId
-    if (animalId && Object.keys(newValues).length > 0) {
-      await this.animalHistoryRepository.create(
-        new AnimalHistory({
-          animalId,
-          rescueId: null,
-          employeeId,
-          type: AnimalHistoryType.EXPENSE,
-          action: 'expense.updated',
-          description: `Despesa ${data.description} atualizada`,
-          oldValue: JSON.stringify(oldValues),
-          newValue: JSON.stringify(newValues),
-          createdAt: new Date(),
-        }),
-        null,
-      )
     }
   }
 }

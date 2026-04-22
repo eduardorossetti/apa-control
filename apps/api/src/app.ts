@@ -7,7 +7,6 @@ import { adoptionRoutes } from './http/controllers/adoption/routes'
 import { anamnesisRoutes } from './http/controllers/anamnesis/routes'
 import { animalHistoryRoutes } from './http/controllers/animal-history/routes'
 import { animalRoutes } from './http/controllers/animal/routes'
-import { appointmentReminderRoutes } from './http/controllers/appointment-reminder/routes'
 import { appointmentTypeRoutes } from './http/controllers/appointment-type/routes'
 import { appointmentRoutes } from './http/controllers/appointment/routes'
 import { authRoutes } from './http/controllers/auth/routes'
@@ -23,6 +22,7 @@ import { healthRoutes } from './http/controllers/health/routes'
 import { occurrenceTypeRoutes } from './http/controllers/occurrence-type/routes'
 import { occurrenceRoutes } from './http/controllers/occurrence/routes'
 import { procedureTypeRoutes } from './http/controllers/procedure-type/routes'
+import { reminderRoutes } from './http/controllers/reminder/routes'
 import { rescueRoutes } from './http/controllers/rescue/routes'
 import { revenueRoutes } from './http/controllers/revenue/routes'
 import { transactionTypeRoutes } from './http/controllers/transaction-type/routes'
@@ -41,7 +41,6 @@ app.register(employeeRoutes)
 app.register(animalRoutes)
 app.register(anamnesisRoutes)
 app.register(appointmentRoutes)
-app.register(appointmentReminderRoutes)
 app.register(appointmentTypeRoutes)
 app.register(campaignTypeRoutes)
 app.register(campaignRoutes)
@@ -58,5 +57,6 @@ app.register(dashboardRoutes)
 app.register(animalHistoryRoutes)
 app.register(occurrenceTypeRoutes)
 app.register(occurrenceRoutes)
+app.register(reminderRoutes)
 
 export { app }

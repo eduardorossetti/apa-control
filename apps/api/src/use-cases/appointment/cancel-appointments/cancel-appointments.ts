@@ -1,18 +1,19 @@
 import { db } from '@/database/client'
 import { AnimalHistoryType } from '@/database/schema/enums/animal-history-type'
 import { AppointmentStatus } from '@/database/schema/enums/appointment-status'
+import { ReminderEntityType } from '@/database/schema/enums/reminder-entity-type'
 import { AnimalHistory } from '@/entities'
 import type { AnimalHistoryRepository } from '@/repositories/animal-history.repository'
-import type { AppointmentReminderRepository } from '@/repositories/appointment-reminder.repository'
 import type { AppointmentTypeRepository } from '@/repositories/appointment-type.repository'
 import type { AppointmentRepository } from '@/repositories/appointment.repository'
+import type { ReminderRepository } from '@/repositories/reminder.repository'
 import { ApiError } from '@/utils/api-error'
 import type { CancelAppointmentsData } from './cancel-appointments.dto'
 
 export class CancelAppointmentsUseCase {
   constructor(
     private appointmentRepository: AppointmentRepository,
-    private appointmentReminderRepository: AppointmentReminderRepository,
+    private reminderRepository: ReminderRepository,
     private appointmentTypeRepository: AppointmentTypeRepository,
     private animalHistoryRepository: AnimalHistoryRepository,
   ) {}
@@ -38,7 +39,7 @@ export class CancelAppointmentsUseCase {
 
     await db.transaction(async (tx) => {
       await this.appointmentRepository.updateStatusByIds(data.ids, AppointmentStatus.CANCELLED, tx)
-      await this.appointmentReminderRepository.deleteByAppointmentIds(data.ids, tx)
+      await this.reminderRepository.deleteByEntity(ReminderEntityType.APPOINTMENT, data.ids, tx)
 
       for (const appointment of appointments) {
         await this.animalHistoryRepository.create(

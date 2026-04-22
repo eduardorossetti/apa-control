@@ -9,6 +9,7 @@ import { HealthConditionValues } from './health-condition'
 import { ProcedureCategoryValues } from './procedure-category'
 import { ProcedureStatusValues } from './procedure-status'
 import { ProfileTypeValues } from './profile-type'
+import { ReminderEntityTypeValues } from './reminder-entity-type'
 import { SexValues } from './sex'
 import { SizeValues } from './size'
 import { SpeciesValues } from './species'
@@ -31,5 +32,6 @@ export const appointmentStatusEnum = pgEnum('appointment_status', AppointmentSta
 export const procedureStatusEnum = pgEnum('procedure_status', ProcedureStatusValues)
 export const adoptionStatusEnum = pgEnum('adoption_status', AdoptionStatusValues)
 export const transactionStatusEnum = pgEnum('transaction_status', TransactionStatusValues)
+export const reminderEntityTypeEnum = pgEnum('reminder_entity_type', ReminderEntityTypeValues)
 
 export const animalHistoryTypeEnum = pgEnum('animal_history_type', AnimalHistoryTypeValues)

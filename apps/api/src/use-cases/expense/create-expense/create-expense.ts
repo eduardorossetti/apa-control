@@ -2,15 +2,18 @@ import Decimal from 'decimal.js'
 
 import { db } from '@/database/client'
 import { AnimalHistoryType } from '@/database/schema/enums/animal-history-type'
+import { ReminderEntityType } from '@/database/schema/enums/reminder-entity-type'
 import { TransactionCategory } from '@/database/schema/enums/transaction-category'
 import { TransactionStatus } from '@/database/schema/enums/transaction-status'
-import { AnimalHistory, FinancialTransaction } from '@/entities'
+import { AnimalHistory, FinancialTransaction, Reminder } from '@/entities'
 import type { AnimalHistoryRepository } from '@/repositories/animal-history.repository'
 import type { AnimalRepository } from '@/repositories/animal.repository'
 import type { CampaignRepository } from '@/repositories/campaign.repository'
 import type { FinancialTransactionRepository } from '@/repositories/financial-transaction.repository'
+import type { ReminderRepository } from '@/repositories/reminder.repository'
 import type { TransactionTypeRepository } from '@/repositories/transaction-type.repository'
 import { ApiError } from '@/utils/api-error'
+import { buildFinancialTransactionReminderMessage } from '../../reminder/builders'
 import type { CreateExpenseData } from './create-expense.dto'
 
 export class CreateExpenseUseCase {
@@ -20,6 +23,7 @@ export class CreateExpenseUseCase {
     private campaignRepository: CampaignRepository,
     private animalRepository: AnimalRepository,
     private animalHistoryRepository: AnimalHistoryRepository,
+    private reminderRepository: ReminderRepository,
   ) {}
 
   async execute(data: CreateExpenseData, employeeId: number): Promise<number> {
@@ -57,6 +61,25 @@ export class CreateExpenseUseCase {
         }),
         tx,
       )
+
+      if (data.dueDate) {
+        const reminderMsg = buildFinancialTransactionReminderMessage({
+          description: data.description,
+          dueDate: data.dueDate,
+        })
+        await this.reminderRepository.create(
+          new Reminder({
+            entityType: ReminderEntityType.FINANCIAL_TRANSACTION,
+            entityId: result!.id,
+            employeeId,
+            title: reminderMsg.title,
+            message: reminderMsg.message,
+            readAt: null,
+            createdAt: new Date(),
+          }),
+          tx,
+        )
+      }
 
       if (data.animalId) {
         await this.animalHistoryRepository.create(

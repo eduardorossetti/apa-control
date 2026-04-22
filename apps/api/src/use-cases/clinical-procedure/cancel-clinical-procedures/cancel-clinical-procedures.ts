@@ -1,18 +1,19 @@
 import { db } from '@/database/client'
 import { AnimalHistoryType } from '@/database/schema/enums/animal-history-type'
 import { ProcedureStatus } from '@/database/schema/enums/procedure-status'
+import { ReminderEntityType } from '@/database/schema/enums/reminder-entity-type'
 import { AnimalHistory } from '@/entities'
 import type { AnimalHistoryRepository } from '@/repositories/animal-history.repository'
-import type { AppointmentReminderRepository } from '@/repositories/appointment-reminder.repository'
 import type { ClinicalProcedureRepository } from '@/repositories/clinical-procedure.repository'
 import type { ProcedureTypeRepository } from '@/repositories/procedure-type.repository'
+import type { ReminderRepository } from '@/repositories/reminder.repository'
 import { ApiError } from '@/utils/api-error'
 import type { CancelClinicalProceduresData } from './cancel-clinical-procedures.dto'
 
 export class CancelClinicalProceduresUseCase {
   constructor(
     private clinicalProcedureRepository: ClinicalProcedureRepository,
-    private appointmentReminderRepository: AppointmentReminderRepository,
+    private reminderRepository: ReminderRepository,
     private procedureTypeRepository: ProcedureTypeRepository,
     private animalHistoryRepository: AnimalHistoryRepository,
   ) {}
@@ -38,7 +39,7 @@ export class CancelClinicalProceduresUseCase {
 
     await db.transaction(async (tx) => {
       await this.clinicalProcedureRepository.updateStatusByIds(data.ids, ProcedureStatus.CANCELLED, tx)
-      await this.appointmentReminderRepository.deleteByProcedureIds(data.ids, tx)
+      await this.reminderRepository.deleteByEntity(ReminderEntityType.PROCEDURE, data.ids, tx)
 
       for (const procedure of procedures) {
         await this.animalHistoryRepository.create(

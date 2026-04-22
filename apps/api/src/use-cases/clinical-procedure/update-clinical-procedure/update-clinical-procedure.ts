@@ -1,25 +1,26 @@
 import { db } from '@/database/client'
 import { AnimalHistoryType } from '@/database/schema/enums/animal-history-type'
 import { ProcedureStatus } from '@/database/schema/enums/procedure-status'
-import { AnimalHistory, AppointmentReminder } from '@/entities'
+import { ReminderEntityType } from '@/database/schema/enums/reminder-entity-type'
+import { AnimalHistory, Reminder } from '@/entities'
 import type { AnimalHistoryRepository } from '@/repositories/animal-history.repository'
 import type { AnimalRepository } from '@/repositories/animal.repository'
-import type { AppointmentReminderRepository } from '@/repositories/appointment-reminder.repository'
 import type { AppointmentRepository } from '@/repositories/appointment.repository'
 import type { ClinicalProcedureRepository } from '@/repositories/clinical-procedure.repository'
 import type { ProcedureTypeRepository } from '@/repositories/procedure-type.repository'
+import type { ReminderRepository } from '@/repositories/reminder.repository'
 import { ApiError } from '@/utils/api-error'
 import { timeZoneName } from '@/utils/time-zone'
 import { tz } from '@date-fns/tz'
 import { parseISO } from 'date-fns'
 import Decimal from 'decimal.js'
-import { buildProcedureReminderMessage } from '../reminder-message'
+import { buildProcedureReminderMessage } from '../../reminder/builders'
 import type { UpdateClinicalProcedureData } from './update-clinical-procedure.dto'
 
 export class UpdateClinicalProcedureUseCase {
   constructor(
     private clinicalProcedureRepository: ClinicalProcedureRepository,
-    private appointmentReminderRepository: AppointmentReminderRepository,
+    private reminderRepository: ReminderRepository,
     private procedureTypeRepository: ProcedureTypeRepository,
     private animalRepository: AnimalRepository,
     private appointmentRepository: AppointmentRepository,
@@ -134,30 +135,13 @@ export class UpdateClinicalProcedureUseCase {
         tx,
       )
 
-      const updatedReminderCount = await this.appointmentReminderRepository.updateByProcedureId(
+      await this.reminderRepository.upsertByEntity(
+        ReminderEntityType.PROCEDURE,
         data.id,
         existing.employeeId,
-        {
-          title: reminder.title,
-          message: reminder.message,
-        },
+        { title: reminder.title, message: reminder.message },
         tx,
       )
-
-      if (updatedReminderCount === 0) {
-        await this.appointmentReminderRepository.create(
-          new AppointmentReminder({
-            appointmentId: null,
-            procedureId: data.id,
-            employeeId: existing.employeeId,
-            title: reminder.title,
-            message: reminder.message,
-            readAt: null,
-            createdAt: new Date(),
-          }),
-          tx,
-        )
-      }
 
       await this.animalHistoryRepository.create(
         new AnimalHistory({

@@ -2,26 +2,27 @@ import { db } from '@/database/client'
 import { AnimalHistoryType } from '@/database/schema/enums/animal-history-type'
 import { AppointmentStatus } from '@/database/schema/enums/appointment-status'
 import { ConsultationType } from '@/database/schema/enums/consultation-type'
-import { AnimalHistory, AppointmentReminder } from '@/entities'
+import { ReminderEntityType } from '@/database/schema/enums/reminder-entity-type'
+import { AnimalHistory, Reminder } from '@/entities'
 import type { AnamnesisRepository } from '@/repositories/anamnesis.repository'
 import type { AnimalHistoryRepository } from '@/repositories/animal-history.repository'
 import type { AnimalRepository } from '@/repositories/animal.repository'
-import type { AppointmentReminderRepository } from '@/repositories/appointment-reminder.repository'
 import type { AppointmentTypeRepository } from '@/repositories/appointment-type.repository'
 import type { AppointmentRepository } from '@/repositories/appointment.repository'
 import type { ClinicalProcedureRepository } from '@/repositories/clinical-procedure.repository'
+import type { ReminderRepository } from '@/repositories/reminder.repository'
 import type { VeterinaryClinicRepository } from '@/repositories/veterinary-clinic.repository'
 import { ApiError } from '@/utils/api-error'
 import { timeZoneName } from '@/utils/time-zone'
 import { tz } from '@date-fns/tz'
 import { parseISO } from 'date-fns'
-import { buildAppointmentReminderMessage } from '../reminder-message'
+import { buildAppointmentReminderMessage } from '../../reminder/builders'
 import type { UpdateAppointmentData } from './update-appointment.dto'
 
 export class UpdateAppointmentUseCase {
   constructor(
     private appointmentRepository: AppointmentRepository,
-    private appointmentReminderRepository: AppointmentReminderRepository,
+    private reminderRepository: ReminderRepository,
     private appointmentTypeRepository: AppointmentTypeRepository,
     private animalRepository: AnimalRepository,
     private veterinaryClinicRepository: VeterinaryClinicRepository,
@@ -146,29 +147,13 @@ export class UpdateAppointmentUseCase {
         tx,
       )
 
-      const updatedReminderCount = await this.appointmentReminderRepository.updateByAppointmentId(
+      await this.reminderRepository.upsertByEntity(
+        ReminderEntityType.APPOINTMENT,
         data.id,
         existing.employeeId,
-        {
-          title: reminder.title,
-          message: reminder.message,
-        },
+        { title: reminder.title, message: reminder.message },
         tx,
       )
-
-      if (updatedReminderCount === 0) {
-        await this.appointmentReminderRepository.create(
-          new AppointmentReminder({
-            appointmentId: data.id,
-            employeeId: existing.employeeId,
-            title: reminder.title,
-            message: reminder.message,
-            readAt: null,
-            createdAt: new Date(),
-          }),
-          tx,
-        )
-      }
 
       await this.animalHistoryRepository.create(
         new AnimalHistory({

@@ -1,25 +1,26 @@
 import { db } from '@/database/client'
 import { AnimalHistoryType } from '@/database/schema/enums/animal-history-type'
 import { ProcedureStatus } from '@/database/schema/enums/procedure-status'
-import { AnimalHistory, AppointmentReminder, ClinicalProcedure } from '@/entities'
+import { ReminderEntityType } from '@/database/schema/enums/reminder-entity-type'
+import { AnimalHistory, ClinicalProcedure, Reminder } from '@/entities'
 import type { AnimalHistoryRepository } from '@/repositories/animal-history.repository'
 import type { AnimalRepository } from '@/repositories/animal.repository'
-import type { AppointmentReminderRepository } from '@/repositories/appointment-reminder.repository'
 import type { AppointmentRepository } from '@/repositories/appointment.repository'
 import type { ClinicalProcedureRepository } from '@/repositories/clinical-procedure.repository'
 import type { ProcedureTypeRepository } from '@/repositories/procedure-type.repository'
+import type { ReminderRepository } from '@/repositories/reminder.repository'
 import { ApiError } from '@/utils/api-error'
 import { timeZoneName } from '@/utils/time-zone'
 import { tz } from '@date-fns/tz'
 import { parseISO } from 'date-fns'
 import Decimal from 'decimal.js'
-import { buildProcedureReminderMessage } from '../reminder-message'
+import { buildProcedureReminderMessage } from '../../reminder/builders'
 import type { CreateClinicalProcedureData } from './create-clinical-procedure.dto'
 
 export class CreateClinicalProcedureUseCase {
   constructor(
     private clinicalProcedureRepository: ClinicalProcedureRepository,
-    private appointmentReminderRepository: AppointmentReminderRepository,
+    private reminderRepository: ReminderRepository,
     private procedureTypeRepository: ProcedureTypeRepository,
     private animalRepository: AnimalRepository,
     private appointmentRepository: AppointmentRepository,
@@ -71,10 +72,10 @@ export class CreateClinicalProcedureUseCase {
         tx,
       )
 
-      await this.appointmentReminderRepository.create(
-        new AppointmentReminder({
-          appointmentId: null,
-          procedureId: result!.id,
+      await this.reminderRepository.create(
+        new Reminder({
+          entityType: ReminderEntityType.PROCEDURE,
+          entityId: result!.id,
           employeeId,
           title: reminder.title,
           message: reminder.message,

@@ -1,9 +1,8 @@
 import { CampaignTypeRepository } from '@/repositories/campaign-type.repository'
 import { CampaignRepository } from '@/repositories/campaign.repository'
+import { ReminderRepository } from '@/repositories/reminder.repository'
 import { UpdateCampaignUseCase } from './update-campaign'
 
 export function makeUpdateCampaignUseCase() {
-  const campaignRepository = new CampaignRepository()
-  const campaignTypeRepository = new CampaignTypeRepository()
-  return new UpdateCampaignUseCase(campaignRepository, campaignTypeRepository)
+  return new UpdateCampaignUseCase(new CampaignRepository(), new CampaignTypeRepository(), new ReminderRepository())
 }

@@ -16,20 +16,22 @@ import { api } from '../../service'
 
 type Reminder = {
   id: number
-  appointmentId: number | null
+  entityType: 'appointment' | 'procedure' | 'financial_transaction' | 'campaign'
+  entityId: number
   title: string
   message: string
   readAt: string | null
   createdAt: string
-  appointmentDate: string | null
+  eventDate: string | null
+  transactionCategory: 'despesa' | 'receita' | null
 }
 
 type ReminderFilter = 'unread' | 'read' | 'all'
 
 function formatReminderMessage(reminder: Reminder): string {
-  if (!reminder.appointmentDate) return reminder.message
+  if (!reminder.eventDate) return reminder.message
 
-  const date = parseISO(reminder.appointmentDate)
+  const date = parseISO(reminder.eventDate)
   const now = new Date()
 
   if (isSameDay(date, now)) {
@@ -108,10 +110,6 @@ export function ReminderList() {
     }
   }
 
-  function handleOpenReminder(reminder: Reminder) {
-    void handleMarkOneAsRead(reminder)
-  }
-
   const filteredItems = useMemo(() => {
     if (filter === 'read') return items.filter((item) => item.readAt)
     if (filter === 'unread') return items.filter((item) => !item.readAt)
@@ -171,20 +169,13 @@ export function ReminderList() {
 
           <div className="space-y-3">
             {filteredItems.map((item) => (
-              <button
+              <div
                 key={item.id}
-                type="button"
                 className={`w-full rounded-lg border p-4 text-left transition-colors ${
                   item.readAt
-                    ? 'border-gray-300 bg-white hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:hover:bg-gray-800'
-                    : 'border-brand/40 bg-brand/5 hover:bg-brand/10 dark:border-brand/50 dark:bg-brand/10 dark:hover:bg-brand/20'
+                    ? 'border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-900'
+                    : 'border-brand/40 bg-brand/5 dark:border-brand/50 dark:bg-brand/10'
                 }`}
-                onClick={() => handleOpenReminder(item)}
-                onKeyDown={(event) => {
-                  if (event.key !== 'Enter' && event.key !== ' ') return
-                  event.preventDefault()
-                  void handleOpenReminder(item)
-                }}
               >
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
@@ -204,16 +195,13 @@ export function ReminderList() {
                   <button
                     type="button"
                     className="mt-3 inline-flex cursor-pointer items-center gap-1 text-gray-600 text-xs dark:text-gray-400"
-                    onClick={(event) => {
-                      event.stopPropagation()
-                      void handleMarkOneAsRead(item)
-                    }}
+                    onClick={() => void handleMarkOneAsRead(item)}
                   >
                     <CheckCircleIcon className="h-4 w-4" />
                     Marcar como lido
                   </button>
                 )}
-              </button>
+              </div>
             ))}
 
             {!filteredItems.length && !fetching && (

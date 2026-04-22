@@ -1,20 +1,16 @@
 import { timeZoneName } from '@/utils/time-zone'
 import { tz } from '@date-fns/tz'
-import { addDays, format, isSameDay } from 'date-fns'
+import { format } from 'date-fns'
+import { formatRelativeDayText } from './utils'
 
-type ReminderMessageInput = {
+export type ProcedureReminderInput = {
   procedureTypeName: string
   animalName: string
   procedureDate: Date
 }
 
-export function buildProcedureReminderMessage(data: ReminderMessageInput) {
-  const now = new Date()
-  const dayText = isSameDay(data.procedureDate, now)
-    ? 'hoje'
-    : isSameDay(data.procedureDate, addDays(now, 1))
-      ? 'amanhã'
-      : `dia ${format(data.procedureDate, 'dd/MM/yyyy', { in: tz(timeZoneName.SP) })}`
+export function buildProcedureReminderMessage(data: ProcedureReminderInput) {
+  const dayText = formatRelativeDayText(data.procedureDate)
   const hourText = format(data.procedureDate, "HH'h'mm", { in: tz(timeZoneName.SP) })
 
   return {

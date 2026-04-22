@@ -1,7 +1,7 @@
 import { CampaignRepository } from '@/repositories/campaign.repository'
+import { ReminderRepository } from '@/repositories/reminder.repository'
 import { RemoveCampaignUseCase } from './remove-campaign'
 
 export function makeRemoveCampaignUseCase() {
-  const campaignRepository = new CampaignRepository()
-  return new RemoveCampaignUseCase(campaignRepository)
+  return new RemoveCampaignUseCase(new CampaignRepository(), new ReminderRepository())
 }
