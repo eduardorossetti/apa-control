@@ -29,14 +29,14 @@ const campaignSchema = z
     campaignTypeId: z.number({ error: RequiredMessage }),
     title: z.string().min(1, RequiredMessage).max(200),
     description: z.string().min(1, RequiredMessage),
-    startDate: z.string().min(1, RequiredMessage),
-    endDate: z.string().min(1, RequiredMessage),
+    startDate: z.string({ error: RequiredMessage }).min(1, RequiredMessage),
+    endDate: z.string({ error: RequiredMessage }).min(1, RequiredMessage),
     fundraisingGoal: z.number().nonnegative(RequiredMessage).nullish(),
     proof: z.string().nullish(),
     proofFile: z.any().nullish(),
     observations: z.string().nullish(),
   })
-  .refine((data) => new Date(data.startDate) <= new Date(data.endDate), {
+  .refine((data) => data.startDate <= data.endDate, {
     message: 'A data inicial deve ser menor ou igual à data final.',
     path: ['endDate'],
   })

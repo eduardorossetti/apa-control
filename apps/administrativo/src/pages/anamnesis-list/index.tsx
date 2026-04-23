@@ -38,7 +38,7 @@ import {
 } from '../../components/table'
 import { appConfig } from '../../config'
 import { errorMessageHandler } from '../../helpers/axios'
-import { formatDate, formatDateTime } from '../../helpers/date'
+import { formatDate, formatDateTimeEvent } from '../../helpers/date'
 import { resolveFileUrl } from '../../helpers/file-url'
 import { itemCountMessage } from '../../helpers/item-count'
 import { toQueryString } from '../../helpers/qs'
@@ -313,7 +313,7 @@ export const AnamnesisList = () => {
                     <TableCell>
                       {`${item.appointmentTypeName ?? 'Tipo não informado'} - ${item.animalName ?? 'Animal'} (${item.appointmentDate ? formatDate(item.appointmentDate) : ''})`}
                     </TableCell>
-                    <TableCell>{formatDateTime(item.createdAt)}</TableCell>
+                    <TableCell>{formatDateTimeEvent(item.createdAt)}</TableCell>
                     <TableCell className="max-w-[320px] truncate">{item.symptomsPresented}</TableCell>
                     <TableCell>
                       <ActionsList

@@ -176,7 +176,7 @@ function formatValueByKey(key: string, value: unknown): string {
   }
 
   if (value instanceof Date) {
-    return format(value, 'dd/MM/yyyy HH:mm:ss', { in: tz(timeZoneName.SP) })
+    return format(value, "dd/MM/yyyy, 'às' HH'h'mm", { in: tz(timeZoneName.SP) })
   }
 
   if (typeof value === 'string' && isDateLikeKey(keyLower)) {
@@ -184,7 +184,7 @@ function formatValueByKey(key: string, value: unknown): string {
     if (!Number.isNaN(parsed.getTime())) {
       const hasTime = value.includes('T') || value.includes(':')
       return hasTime
-        ? format(parsed, 'dd/MM/yyyy HH:mm:ss', { in: tz(timeZoneName.SP) })
+        ? format(parsed, "dd/MM/yyyy, 'às' HH'h'mm", { in: tz(timeZoneName.SP) })
         : format(parsed, 'dd/MM/yyyy', { in: tz(timeZoneName.SP) })
     }
   }

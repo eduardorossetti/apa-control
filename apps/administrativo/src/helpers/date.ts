@@ -13,6 +13,10 @@ export function formatDateTime(date: Date | string | undefined | null) {
   return date ? format(parseDate(date), 'dd/MM/yyyy HH:mm:ss') : ''
 }
 
+export function formatDateTimeEvent(date: Date | string | undefined | null) {
+  return date ? format(parseDate(date), "dd/MM/yyyy, 'às' HH'h'mm") : ''
+}
+
 export function formatTime(date: Date | string | undefined | null) {
   return date ? format(parseDate(date), 'HH:mm') : ''
 }

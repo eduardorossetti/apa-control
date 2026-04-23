@@ -33,7 +33,7 @@ import {
   TableRow,
 } from '../../components/table'
 import { errorMessageHandler } from '../../helpers/axios'
-import { formatDateTime } from '../../helpers/date'
+import { formatDateTimeEvent } from '../../helpers/date'
 import { itemCountMessage } from '../../helpers/item-count'
 import { toQueryString } from '../../helpers/qs'
 import { type ReportExportType, downloadReportBlob } from '../../helpers/report-download'
@@ -284,7 +284,7 @@ export const OccurrenceList = () => {
                   <TableRow key={item.id}>
                     <TableCell>{item.animalName ?? ''}</TableCell>
                     <TableCell>{item.occurrenceTypeName ?? ''}</TableCell>
-                    <TableCell>{formatDateTime(item.occurrenceDate)}</TableCell>
+                    <TableCell>{formatDateTimeEvent(item.occurrenceDate)}</TableCell>
                     <TableCell className="max-w-100 truncate" title={item.description}>
                       {item.description}
                     </TableCell>

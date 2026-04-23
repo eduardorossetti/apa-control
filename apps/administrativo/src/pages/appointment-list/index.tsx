@@ -40,7 +40,7 @@ import {
   TableRow,
 } from '../../components/table'
 import { errorMessageHandler } from '../../helpers/axios'
-import { formatDateTime } from '../../helpers/date'
+import { formatDateTimeEvent } from '../../helpers/date'
 import { itemCountMessage } from '../../helpers/item-count'
 import { toQueryString } from '../../helpers/qs'
 import { type ReportExportType, downloadReportBlob } from '../../helpers/report-download'
@@ -472,7 +472,7 @@ export const AppointmentList = () => {
                     </TableCell>
                     <TableCell>{item.animalName ?? ''}</TableCell>
                     <TableCell>{item.appointmentTypeName ?? ''}</TableCell>
-                    <TableCell>{formatDateTime(item.appointmentDate)}</TableCell>
+                    <TableCell>{formatDateTimeEvent(item.appointmentDate)}</TableCell>
                     <TableCell>{appointmentStatusBadge(item.status, item.appointmentDate)}</TableCell>
                     <TableCell>
                       <ActionsList

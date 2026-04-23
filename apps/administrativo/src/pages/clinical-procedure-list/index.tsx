@@ -41,7 +41,7 @@ import {
 } from '../../components/table'
 import { appConfig } from '../../config'
 import { errorMessageHandler } from '../../helpers/axios'
-import { formatDateTime } from '../../helpers/date'
+import { formatDateTimeEvent } from '../../helpers/date'
 import { resolveFileUrl } from '../../helpers/file-url'
 import { itemCountMessage } from '../../helpers/item-count'
 import { toQueryString } from '../../helpers/qs'
@@ -477,7 +477,7 @@ export const ClinicalProcedureList = () => {
                     <TableCell>{item.animalName ?? ''}</TableCell>
                     <TableCell>{item.procedureTypeName ?? ''}</TableCell>
                     <TableCell>{item.appointmentTypeName ?? ''}</TableCell>
-                    <TableCell>{formatDateTime(item.procedureDate)}</TableCell>
+                    <TableCell>{formatDateTimeEvent(item.procedureDate)}</TableCell>
                     <TableCell>{procedureStatusBadge(item.status, item.procedureDate)}</TableCell>
                     <TableCell>
                       {item.actualCost === null

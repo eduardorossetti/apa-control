@@ -289,6 +289,7 @@ function formatHistoryValue(value: string | null) {
       size: 'Porte',
       sex: 'Sexo',
       birthYear: 'Ano de Nascimento',
+      birthMonth: 'Mês de Nascimento',
       healthCondition: 'Condição de Saúde',
       entryDate: 'Data de Entrada',
       observations: 'Observações',
@@ -353,6 +354,23 @@ function formatHistoryValue(value: string | null) {
         }
 
         return valueLabelMapByField[fieldKey]?.[fieldValue] ?? fieldValue
+      }
+      if (typeof fieldValue === 'number' && fieldKey === 'birthMonth') {
+        const months = [
+          'Janeiro',
+          'Fevereiro',
+          'Março',
+          'Abril',
+          'Maio',
+          'Junho',
+          'Julho',
+          'Agosto',
+          'Setembro',
+          'Outubro',
+          'Novembro',
+          'Dezembro',
+        ]
+        return months[fieldValue - 1] ?? fieldValue
       }
       return fieldValue
     }

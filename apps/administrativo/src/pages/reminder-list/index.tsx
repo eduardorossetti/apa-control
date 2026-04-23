@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 
-import { addDays, isSameDay, parseISO } from 'date-fns'
+import { addDays, format, isSameDay, parseISO } from 'date-fns'
 import { BellIcon, BellRingIcon, CheckCheckIcon, CheckCircleIcon } from 'lucide-react'
 import { Helmet } from 'react-helmet-async'
 import { toast } from 'sonner'
@@ -27,6 +27,14 @@ type Reminder = {
 }
 
 type ReminderFilter = 'unread' | 'read' | 'all'
+
+function formatEventDate(reminder: Reminder): string {
+  if (!reminder.eventDate) return formatDateTime(reminder.createdAt)
+  const date = parseISO(reminder.eventDate)
+  const withTime = reminder.entityType === 'appointment' || reminder.entityType === 'procedure'
+  if (withTime) return `em ${format(date, 'dd/MM/yyyy')}, às ${format(date, "HH'h'mm")}`
+  return `em ${format(date, 'dd/MM/yyyy')}`
+}
 
 function formatReminderMessage(reminder: Reminder): string {
   if (!reminder.eventDate) return reminder.message
@@ -186,7 +194,7 @@ export function ReminderList() {
                     )}
                     <span className="font-semibold dark:text-gray-100">{item.title}</span>
                   </div>
-                  <div className="text-gray-500 text-xs dark:text-gray-400">{formatDateTime(item.createdAt)}</div>
+                  <div className="text-gray-500 text-xs dark:text-gray-400">{formatEventDate(item)}</div>
                 </div>
 
                 <p className="mt-2 text-sm dark:text-gray-300">{formatReminderMessage(item)}</p>

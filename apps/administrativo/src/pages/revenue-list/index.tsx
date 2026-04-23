@@ -566,7 +566,7 @@ export const RevenueList = () => {
                           },
                           {
                             icon: DownloadIcon,
-                            title: 'Baixar comprovante',
+                            title: 'Baixar arquivo',
                             action: (item) => window.open(resolveFileUrl(item.proof!, appConfig.API_URL), '_blank'),
                             hideWhen: (item) => !item.proof,
                           },
