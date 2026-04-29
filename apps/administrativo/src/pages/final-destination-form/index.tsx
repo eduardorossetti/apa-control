@@ -313,7 +313,7 @@ export const FinalDestinationForm = () => {
                     </div>
                   </div>
                   <div className="mb-6">
-                    <Form.Label htmlFor="proofFile">Documento</Form.Label>
+                    <Form.Label htmlFor="proofFile">Arquivo</Form.Label>
                     <Form.FileInput name="proofFile" />
                     <Form.ErrorMessage field="proofFile" />
                     {currentProof ? (

@@ -47,16 +47,18 @@ export const FormSelect = (props: FormSelectProps) => {
               <SelectValue placeholder={props.placeholder ?? 'Selecione...'} />
             </SelectTrigger>
 
-            {isClearable && !(field.value === '' || field.value === null || typeof field.value === 'undefined') && (
-              <button
-                type="button"
-                className="-translate-y-1/2 absolute top-1/2 right-8 text-danger dark:text-red-400"
-                aria-label="Limpar"
-                onClick={() => setValue(field.name, null)}
-              >
-                <XCircleIcon className="h-5 w-5" />
-              </button>
-            )}
+            {isClearable &&
+              !props.disabled &&
+              !(field.value === '' || field.value === null || typeof field.value === 'undefined') && (
+                <button
+                  type="button"
+                  className="-translate-y-1/2 absolute top-1/2 right-8 text-danger dark:text-red-400"
+                  aria-label="Limpar"
+                  onClick={() => setValue(field.name, null)}
+                >
+                  <XCircleIcon className="h-5 w-5" />
+                </button>
+              )}
           </div>
           <SelectContent>
             {options.map(({ value, label }) => {

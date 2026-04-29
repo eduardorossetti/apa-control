@@ -120,13 +120,40 @@ export class UpdateAppointmentUseCase {
       {} as Record<string, unknown>,
     )
 
+    let oldClinicName: string | null = null
+    let oldAppointmentTypeName: string | null = null
+    let oldAnimalName: string | null = null
+    await Promise.all([
+      'clinicId' in changedData && existing.clinicId
+        ? this.veterinaryClinicRepository.findById(existing.clinicId).then((c) => {
+            oldClinicName = c?.name ?? null
+          })
+        : Promise.resolve(),
+      'appointmentTypeId' in changedData
+        ? this.appointmentTypeRepository.findById(existing.appointmentTypeId).then((t) => {
+            oldAppointmentTypeName = t?.name ?? null
+          })
+        : Promise.resolve(),
+      'animalId' in changedData
+        ? this.animalRepository.findById(existing.animalId).then((a) => {
+            oldAnimalName = a?.name ?? null
+          })
+        : Promise.resolve(),
+    ])
+
     const oldValues = Object.keys(changedData).reduce<Record<string, unknown>>((acc, key) => {
-      acc[key] = (existing as Record<string, unknown>)[key] ?? null
+      if (key === 'clinicId') acc[key] = oldClinicName
+      else if (key === 'appointmentTypeId') acc[key] = oldAppointmentTypeName
+      else if (key === 'animalId') acc[key] = oldAnimalName
+      else acc[key] = (existing as Record<string, unknown>)[key] ?? null
       return acc
     }, {})
 
     const newValues = Object.keys(changedData).reduce<Record<string, unknown>>((acc, key) => {
-      acc[key] = changedData[key]
+      if (key === 'clinicId') acc[key] = clinicName
+      else if (key === 'appointmentTypeId') acc[key] = appointmentType.name
+      else if (key === 'animalId') acc[key] = animal.name
+      else acc[key] = changedData[key]
       return acc
     }, {})
 

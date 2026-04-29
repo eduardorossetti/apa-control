@@ -119,7 +119,7 @@ export const AnamnesisList = () => {
     (item: Item) => {
       modal.confirm({
         title: 'Remover anamnese',
-        message: `Deseja remover a anamnese #${item.id}?`,
+        message: `Deseja remover a anamnese "${item.appointmentTypeName ?? 'Tipo não informado'} - ${item.animalName ?? 'Animal'} (${item.appointmentDate ? formatDate(item.appointmentDate) : ''})"?`,
         confirmText: 'Remover',
         callback: (confirmed) => {
           if (confirmed) {

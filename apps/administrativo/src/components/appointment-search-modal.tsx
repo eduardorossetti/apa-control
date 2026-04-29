@@ -19,6 +19,7 @@ interface AppointmentSearchModalProps {
   open: boolean
   onClose: () => void
   onSelect: (appointment: { id: number; label: string }) => void
+  animalName?: string | null
 }
 
 interface AppointmentItem {
@@ -34,7 +35,12 @@ interface AppointmentTypeOption {
   active: boolean
 }
 
-export function AppointmentSearchModal({ open, onClose, onSelect }: AppointmentSearchModalProps) {
+export function AppointmentSearchModal({
+  open,
+  onClose,
+  onSelect,
+  animalName: animalNameProp,
+}: AppointmentSearchModalProps) {
   const { token } = useApp()
   const [fetching, setFetching] = useState(false)
   const [items, setItems] = useState<AppointmentItem[]>([])
@@ -53,7 +59,7 @@ export function AppointmentSearchModal({ open, onClose, onSelect }: AppointmentS
       `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
     setDateStart(toDateInput(monthStart))
     setDateEnd(toDateInput(monthEnd))
-    setAnimalName('')
+    setAnimalName(animalNameProp ?? '')
     setAppointmentTypeId('all')
 
     api

@@ -141,7 +141,7 @@ export const ClinicalProcedureList = () => {
     (item: Item) => {
       modal.confirm({
         title: 'Remover procedimento',
-        message: `Deseja remover o procedimento #${item.id}?`,
+        message: `Deseja remover o procedimento "${item.procedureTypeName ?? 'Tipo não informado'} - ${item.animalName ?? 'Animal'} (${formatDateTimeEvent(item.procedureDate)})"?`,
         confirmText: 'Remover',
         callback: (confirmed) => {
           if (confirmed) {

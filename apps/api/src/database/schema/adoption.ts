@@ -8,7 +8,6 @@ export const adoption = pgTable('adoption', {
   id: serial().primaryKey(),
   animalId: integer()
     .notNull()
-    .unique()
     .references(() => animal.id),
   adopterId: integer()
     .notNull()

@@ -62,7 +62,7 @@ export const Pagination = ({ current, total, changePage }: PaginationProps) => {
 
       <button
         type="button"
-        className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:bg-gray-50 disabled:opacity-60"
+        className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:bg-gray-50 disabled:opacity-60 dark:text-gray-500 dark:ring-gray-600 dark:disabled:bg-gray-800 dark:hover:bg-gray-700"
         disabled={current === total}
         onClick={() => changePage(total)}
       >

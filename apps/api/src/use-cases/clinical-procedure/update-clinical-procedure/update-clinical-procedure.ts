@@ -106,13 +106,32 @@ export class UpdateClinicalProcedureUseCase {
       {} as Record<string, unknown>,
     )
 
+    let oldProcedureTypeName: string | null = null
+    let oldAnimalName: string | null = null
+    await Promise.all([
+      'procedureTypeId' in changedData
+        ? this.procedureTypeRepository.findById(existing.procedureTypeId).then((t) => {
+            oldProcedureTypeName = t?.name ?? null
+          })
+        : Promise.resolve(),
+      'animalId' in changedData
+        ? this.animalRepository.findById(existing.animalId).then((a) => {
+            oldAnimalName = a?.name ?? null
+          })
+        : Promise.resolve(),
+    ])
+
     const oldValues = Object.keys(changedData).reduce<Record<string, unknown>>((acc, key) => {
-      acc[key] = (existing as Record<string, unknown>)[key] ?? null
+      if (key === 'procedureTypeId') acc[key] = oldProcedureTypeName
+      else if (key === 'animalId') acc[key] = oldAnimalName
+      else acc[key] = (existing as Record<string, unknown>)[key] ?? null
       return acc
     }, {})
 
     const newValues = Object.keys(changedData).reduce<Record<string, unknown>>((acc, key) => {
-      acc[key] = changedData[key]
+      if (key === 'procedureTypeId') acc[key] = procedureType.name
+      else if (key === 'animalId') acc[key] = animal.name
+      else acc[key] = changedData[key]
       return acc
     }, {})
 

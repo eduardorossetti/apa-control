@@ -1,5 +1,6 @@
 import { db } from '@/database/client'
 import { adopter, adoption, animal, employee } from '@/database/schema'
+import type { AdoptionStatusValue } from '@/database/schema/enums/adoption-status'
 import type { DrizzleTransaction } from '@/database/types'
 import type { Adoption } from '@/entities'
 import type { AdoptionWithDetails, ListAdoptionsData } from '@/use-cases/adoption/list-adoptions/list-adoptions.dto'
@@ -57,8 +58,21 @@ export class AdoptionRepository {
     return [total, items]
   }
 
-  async findByAnimalId(animalId: number) {
-    const [item] = await db.select({ id: adoption.id }).from(adoption).where(eq(adoption.animalId, animalId))
+  async findByAnimalId(animalId: number, status?: AdoptionStatusValue) {
+    const conditions: SQL[] = [eq(adoption.animalId, animalId)]
+    if (status) conditions.push(eq(adoption.status, status))
+    const [item] = await db
+      .select({ id: adoption.id })
+      .from(adoption)
+      .where(and(...conditions))
+    return item ?? null
+  }
+
+  async findActiveByAnimalId(animalId: number) {
+    const [item] = await db
+      .select({ id: adoption.id })
+      .from(adoption)
+      .where(and(eq(adoption.animalId, animalId), ne(adoption.status, 'cancelada')))
     return item ?? null
   }
 

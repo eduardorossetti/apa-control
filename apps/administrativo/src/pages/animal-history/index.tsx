@@ -320,6 +320,8 @@ function formatHistoryValue(value: string | null) {
       destinationTypeId: 'Tipo de Destino Final',
       destinationDate: 'Data do Destino Final',
       reason: 'Motivo',
+      adopterId: 'Adotante',
+      adoptionDate: 'Data da Adoção',
       proof: 'Comprovante',
       animal: 'Animal',
       description: 'Descrição',
@@ -344,7 +346,15 @@ function formatHistoryValue(value: string | null) {
     const translateValue = (fieldKey: string, fieldValue: unknown): unknown => {
       if (typeof fieldValue === 'string') {
         if (
-          ['entryDate', 'rescueDate', 'destinationDate', 'dueDate', 'paymentDate', 'reversalDate'].includes(fieldKey)
+          [
+            'entryDate',
+            'rescueDate',
+            'destinationDate',
+            'dueDate',
+            'paymentDate',
+            'reversalDate',
+            'adoptionDate',
+          ].includes(fieldKey)
         ) {
           return formatDate(fieldValue)
         }

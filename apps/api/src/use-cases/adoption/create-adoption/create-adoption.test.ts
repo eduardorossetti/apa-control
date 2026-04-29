@@ -8,6 +8,7 @@ import { EmployeeFactory } from '@/tests/factories/employee'
 import { getAuthToken } from '@/tests/utils'
 import { createBaseApp } from '@/utils/fastify/create-base-app'
 
+import { AdoptionStatus } from '@/database/schema/enums/adoption-status'
 import { AnimalStatus } from '@/database/schema/enums/animal-status'
 import { adoptionRoutes } from '@/http/controllers/adoption/routes'
 
@@ -72,7 +73,7 @@ describe('Create adoption', () => {
     expect(response.statusCode).toBe(404)
   })
 
-  it('should return 409 when animal already has an adoption', async () => {
+  it('should return 409 when animal already has a completed adoption', async () => {
     const animal = await AnimalFactory.create({ status: AnimalStatus.ACTIVE })
     const adopter1 = await AdopterFactory.create()
     const adopter2 = await AdopterFactory.create()
@@ -82,7 +83,11 @@ describe('Create adoption', () => {
       method: 'POST',
       url: '/adoption.add',
       headers: { authorization: `Bearer ${token}` },
-      payload: AdoptionFactory.buildCreate({ animalId: animal.id, adopterId: adopter1.id }),
+      payload: AdoptionFactory.buildCreate({
+        animalId: animal.id,
+        adopterId: adopter1.id,
+        status: AdoptionStatus.COMPLETED,
+      }),
     })
 
     const response = await app.inject({
@@ -93,6 +98,33 @@ describe('Create adoption', () => {
     })
 
     expect(response.statusCode).toBe(409)
+  })
+
+  it('should allow creating adoption when existing one is not completed', async () => {
+    const animal = await AnimalFactory.create({ status: AnimalStatus.ACTIVE })
+    const adopter1 = await AdopterFactory.create()
+    const adopter2 = await AdopterFactory.create()
+    const token = getAuthToken({ id: employeeId, roles: ['AdminPanel', 'Adoptions'] })
+
+    await app.inject({
+      method: 'POST',
+      url: '/adoption.add',
+      headers: { authorization: `Bearer ${token}` },
+      payload: AdoptionFactory.buildCreate({
+        animalId: animal.id,
+        adopterId: adopter1.id,
+        status: AdoptionStatus.PROCESSING,
+      }),
+    })
+
+    const response = await app.inject({
+      method: 'POST',
+      url: '/adoption.add',
+      headers: { authorization: `Bearer ${token}` },
+      payload: AdoptionFactory.buildCreate({ animalId: animal.id, adopterId: adopter2.id }),
+    })
+
+    expect(response.statusCode).toBe(201)
   })
 
   it('should return 409 when animal is inactive', async () => {

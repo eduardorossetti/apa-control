@@ -450,6 +450,7 @@ export const ClinicalProcedureForm = () => {
       </Card>
       <AppointmentSearchModal
         open={openAppointmentModal}
+        animalName={animalNamePreview}
         onClose={() => setOpenAppointmentModal(false)}
         onSelect={(appointment) => {
           setValue('appointmentId', appointment.id, { shouldValidate: true })
