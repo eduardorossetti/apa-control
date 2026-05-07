@@ -27,6 +27,14 @@
       <% if (locals.period) { %>
       <div class="meta">Período: <%= locals.period %></div>
       <% } %>
+      <% if (Array.isArray(locals.appliedFilters) && locals.appliedFilters.length > 0) { %>
+      <div class="meta">Filtros aplicados:</div>
+      <% locals.appliedFilters.forEach((item) => { %>
+      <div class="meta">- <%= item.label %>: <%= item.value %></div>
+      <% }) %>
+      <% } else { %>
+      <div class="meta">Filtros aplicados: Nenhum</div>
+      <% } %>
     </div>
 
     <table>
@@ -49,4 +57,3 @@
     </table>
   </body>
 </html>
-

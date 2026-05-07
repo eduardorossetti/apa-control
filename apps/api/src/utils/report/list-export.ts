@@ -13,7 +13,10 @@ type ExportType = 'csv' | 'xlsx' | 'pdf'
 
 type ExportListOptions = {
   pdfLandscape?: boolean
+  filters?: Record<string, unknown>
 }
+
+type ReportItem = Record<string, unknown>
 
 function getApaControlLogoDataUrl() {
   const logoPath = getRootFolder('assets/img/logo.png')
@@ -56,7 +59,11 @@ function normalizeHeader(rawKey: string): string {
     procedureDate: 'Data do procedimento',
     rescueDate: 'Data do resgate',
     destinationDate: 'Data do destino',
+    destinationDateStart: 'Data do destino (de)',
+    destinationDateEnd: 'Data do destino (até)',
     adoptionDate: 'Data da adoção',
+    adoptionDateStart: 'Data da adoção (de)',
+    adoptionDateEnd: 'Data da adoção (até)',
     dueDate: 'Vencimento',
     paymentDate: 'Pagamento',
     reversalDate: 'Estorno',
@@ -74,6 +81,7 @@ function normalizeHeader(rawKey: string): string {
     profileName: 'Perfil',
     disabledAt: 'Desativado em',
     active: 'Ativo',
+    available: 'Disponível',
     urgency: 'Urgência',
     consultationType: 'Modalidade',
     occurrenceTypeName: 'Tipo de ocorrência',
@@ -103,7 +111,49 @@ function normalizeHeader(rawKey: string): string {
     reason: 'Motivo',
     adopterName: 'Adotante',
     animalDepartureDate: 'Data de saída do animal',
+    animalDepartureDateStart: 'Data de saída do animal (de)',
+    animalDepartureDateEnd: 'Data de saída do animal (até)',
     proof: 'Comprovante',
+    animalId: 'Animal',
+    employeeId: 'Responsável',
+    clinicId: 'Clínica',
+    campaignId: 'Campanha',
+    campaignTypeId: 'Tipo de campanha',
+    transactionTypeId: 'Tipo de transação',
+    occurrenceTypeId: 'Tipo de ocorrência',
+    appointmentTypeId: 'Tipo de consulta',
+    procedureTypeId: 'Tipo de procedimento',
+    destinationTypeId: 'Tipo de destino',
+    finalDestinationTypeId: 'Tipo de destino',
+    adopterId: 'Adotante',
+    profileId: 'Perfil',
+    profileIds: 'Perfis',
+    categoryIds: 'Categorias',
+    appointmentId: 'Consulta',
+    readStatus: 'Leitura',
+    show: 'Exibição',
+    createdAtStart: 'Criado em (de)',
+    createdAtEnd: 'Criado em (até)',
+    createdDateStart: 'Data de criação (de)',
+    createdDateEnd: 'Data de criação (até)',
+    updatedAtStart: 'Atualizado em (de)',
+    updatedAtEnd: 'Atualizado em (até)',
+    occurrenceDateStart: 'Data da ocorrência (de)',
+    occurrenceDateEnd: 'Data da ocorrência (até)',
+    appointmentDateStart: 'Data da consulta (de)',
+    appointmentDateEnd: 'Data da consulta (até)',
+    procedureDateStart: 'Data do procedimento (de)',
+    procedureDateEnd: 'Data do procedimento (até)',
+    rescueDateStart: 'Data do resgate (de)',
+    rescueDateEnd: 'Data do resgate (até)',
+    dueDateStart: 'Vencimento (de)',
+    dueDateEnd: 'Vencimento (até)',
+    paymentDateStart: 'Pagamento (de)',
+    paymentDateEnd: 'Pagamento (até)',
+    reversalDateStart: 'Estorno (de)',
+    reversalDateEnd: 'Estorno (até)',
+    entryDateStart: 'Data de entrada (de)',
+    entryDateEnd: 'Data de entrada (até)',
   }
 
   if (dictionary[rawKey]) return dictionary[rawKey]
@@ -138,6 +188,24 @@ const enumLabels: Record<string, string> = {
   ativa: 'Ativa',
   concluida: 'Concluída',
   cancelada: 'Cancelada',
+  all: 'Todos',
+  enabled: 'Ativos',
+  disabled: 'Desativados',
+  read: 'Lidos',
+  unread: 'Não lidos',
+  canina: 'Canina',
+  felina: 'Felina',
+  outros: 'Outros',
+  pequeno: 'Pequeno',
+  medio: 'Médio',
+  grande: 'Grande',
+  macho: 'Macho',
+  femea: 'Fêmea',
+  saudavel: 'Saudável',
+  estavel: 'Estável',
+  critica: 'Crítica',
+  ativo: 'Ativo',
+  inativo: 'Inativo',
 }
 
 function toNumberIfPossible(value: unknown): number | null {
@@ -192,6 +260,91 @@ function formatValueByKey(key: string, value: unknown): string {
   return normalizeValue(value)
 }
 
+function isControlFilterKey(key: string): boolean {
+  return ['exportType', 'page', 'perPage', 'fields', 'sort', 'usePager', 'filters'].includes(key)
+}
+
+export type AppliedFilter = {
+  label: string
+  value: string
+}
+
+function getFilterValueFromItems(filterKey: string, value: unknown, items: ReportItem[]): string | null {
+  const isSingleIdFilter = filterKey.endsWith('Id')
+  const isMultiIdFilter = filterKey.endsWith('Ids')
+  if ((!isSingleIdFilter && !isMultiIdFilter) || items.length === 0) return null
+
+  const fieldBase = isMultiIdFilter ? filterKey.slice(0, -3) : filterKey.slice(0, -2)
+  const itemIdKey = isMultiIdFilter ? `${fieldBase}Id` : filterKey
+  const candidateNameKeys = [
+    `${fieldBase}Name`,
+    `${fieldBase}Title`,
+    `${fieldBase}Description`,
+    fieldBase === 'campaign' ? 'campaignTitle' : '',
+  ].filter(Boolean)
+
+  const resolveSingleValue = (singleValue: unknown): string | null => {
+    for (const nameKey of candidateNameKeys) {
+      const matchedNames = items
+        .filter((item) => item[itemIdKey] === singleValue && typeof item[nameKey] === 'string')
+        .map((item) => String(item[nameKey]).trim())
+        .filter(Boolean)
+
+      if (matchedNames.length > 0) {
+        return matchedNames[0]!
+      }
+
+      const uniqueNames = Array.from(
+        new Set(
+          items
+            .map((item) => item[nameKey])
+            .filter((item): item is string => typeof item === 'string' && item.trim() !== ''),
+        ),
+      )
+
+      if (uniqueNames.length === 1) return uniqueNames[0]!
+    }
+
+    return null
+  }
+
+  if (Array.isArray(value)) {
+    const resolvedValues = value.map(resolveSingleValue).filter((item): item is string => Boolean(item))
+    if (resolvedValues.length > 0) return resolvedValues.join(', ')
+    return null
+  }
+
+  return resolveSingleValue(value)
+}
+
+export function buildAppliedFilters(filters?: Record<string, unknown>, items: ReportItem[] = []): AppliedFilter[] {
+  if (!filters) return []
+
+  return Object.entries(filters)
+    .filter(([key, value]) => {
+      if (isControlFilterKey(key)) return false
+      if (value === null || value === undefined) return false
+      if (typeof value === 'string' && value.trim() === '') return false
+      if (Array.isArray(value) && value.length === 0) return false
+      return true
+    })
+    .map(([key, value]) => {
+      const valueFromItems = getFilterValueFromItems(key, value, items)
+      const resolvedValue = Array.isArray(value)
+        ? value
+            .map((item) => formatValueByKey(key, item))
+            .filter((item) => item.trim() !== '')
+            .join(', ')
+        : formatValueByKey(key, value)
+
+      return {
+        label: normalizeHeader(key),
+        value: valueFromItems ?? resolvedValue,
+      }
+    })
+    .filter((item) => item.value.trim() !== '')
+}
+
 export async function exportListData(
   reply: FastifyReply,
   exportType: ExportType,
@@ -229,6 +382,10 @@ export async function exportListData(
 
   const pdfTemplatePath = getRootFolder('layout/pdf/report-base.ejs')
   const pdfRows = rows.map((row) => headers.map((header) => row[header] ?? ''))
+  const appliedFilters = buildAppliedFilters(
+    options.filters ?? (reply.request.query as Record<string, unknown> | undefined) ?? {},
+    items as ReportItem[],
+  )
   const pdf = await generatePdfFromTemplate(
     pdfTemplatePath,
     {
@@ -236,6 +393,7 @@ export async function exportListData(
       logoDataUrl: getApaControlLogoDataUrl(),
       generatedAt: format(new Date(), 'dd/MM/yyyy HH:mm:ss', { in: tz(timeZoneName.SP) }),
       period: null,
+      appliedFilters,
       headers,
       rows: pdfRows,
     },

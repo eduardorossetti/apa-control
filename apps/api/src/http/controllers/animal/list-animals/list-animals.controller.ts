@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs'
 import { makeListAnimalsUseCase } from '@/use-cases/animal/list-animals/list-animals.factory'
 import { getRootFolder } from '@/utils/get-root-folder'
 import { createCsvFromJson2Csv } from '@/utils/report/csv-export'
+import { buildAppliedFilters } from '@/utils/report/list-export'
 import { generatePdfFromTemplate } from '@/utils/report/pdf-generator'
 import { createSimpleXlsxBuffer } from '@/utils/report/xlsx-export'
 import { timeZoneName } from '@/utils/time-zone'
@@ -82,6 +83,7 @@ export async function listAnimalsController(request: FastifyRequest, reply: Fast
       logoDataUrl: getApaControlLogoDataUrl(),
       generatedAt: format(new Date(), 'dd/MM/yyyy HH:mm:ss', { in: tz(timeZoneName.SP) }),
       period: null,
+      appliedFilters: buildAppliedFilters(filters),
       headers,
       rows: pdfRows,
     })
