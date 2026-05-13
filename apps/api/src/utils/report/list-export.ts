@@ -206,6 +206,7 @@ const enumLabels: Record<string, string> = {
   critica: 'Crítica',
   ativo: 'Ativo',
   inativo: 'Inativo',
+  vencido: 'Vencido',
 }
 
 function toNumberIfPossible(value: unknown): number | null {
@@ -218,7 +219,7 @@ function toNumberIfPossible(value: unknown): number | null {
 }
 
 function isDateLikeKey(key: string): boolean {
-  return /date|at$/i.test(key)
+  return /date|at(start|end)?$/i.test(key)
 }
 
 function formatValueByKey(key: string, value: unknown): string {
@@ -248,12 +249,17 @@ function formatValueByKey(key: string, value: unknown): string {
   }
 
   if (typeof value === 'string' && isDateLikeKey(keyLower)) {
-    const parsed = new Date(value)
-    if (!Number.isNaN(parsed.getTime())) {
-      const hasTime = value.includes('T') || value.includes(':')
-      return hasTime
-        ? format(parsed, "dd/MM/yyyy, 'às' HH'h'mm", { in: tz(timeZoneName.SP) })
-        : format(parsed, 'dd/MM/yyyy', { in: tz(timeZoneName.SP) })
+    const hasTime = value.includes('T') || value.includes(':')
+    if (hasTime) {
+      const parsed = new Date(value)
+      if (!Number.isNaN(parsed.getTime())) {
+        return format(parsed, "dd/MM/yyyy, 'às' HH'h'mm", { in: tz(timeZoneName.SP) })
+      }
+    } else {
+      const match = value.match(/^(\d{4})-(\d{2})-(\d{2})$/)
+      if (match) {
+        return `${match[3]}/${match[2]}/${match[1]}`
+      }
     }
   }
 
