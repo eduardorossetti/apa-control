@@ -125,7 +125,7 @@ const revenueFilterSchema = z
 type RevenueFilterData = z.infer<typeof revenueFilterSchema>
 
 export const RevenueList = () => {
-  const { modal, token } = useApp()
+  const { modal, token, operator } = useApp()
   const refresh = useRefresh()
   const [fetching, setFetching] = useState(false)
   const [downloading, setDownloading] = useState<ReportExportType | null>(null)
@@ -264,13 +264,26 @@ export const RevenueList = () => {
 
   useEffect(() => {
     const config = { headers: { Authorization: `Bearer ${token}` } }
+    const roles = operator.roles ?? []
+    const canListTransactionTypes = roles.some((role) =>
+      ['AdminPanel', 'Registrations', 'TransactionTypes'].includes(role),
+    )
+    const canListCampaigns = roles.some((role) => ['AdminPanel', 'Campaigns'].includes(role))
+    const canListEmployees = roles.some((role) => ['AdminPanel', 'Employees'].includes(role))
+
     Promise.all([
-      api.get(
-        `transaction-type.list?${toQueryString({ categoryIds: 'receita', page: 0, fields: 'id,name,active' })}`,
-        config,
-      ),
-      api.get(`campaign.list?${toQueryString({ page: 0, fields: 'id,title', sort: '-startDate' })}`, config),
-      api.get(`employee.list?${toQueryString({ page: 0, fields: 'id,name', sort: 'name' })}`, config),
+      canListTransactionTypes
+        ? api.get(
+            `transaction-type.list?${toQueryString({ categoryIds: 'receita', page: 0, fields: 'id,name,active' })}`,
+            config,
+          )
+        : Promise.resolve({ data: [] }),
+      canListCampaigns
+        ? api.get(`campaign.list?${toQueryString({ page: 0, fields: 'id,title', sort: '-startDate' })}`, config)
+        : Promise.resolve({ data: [] }),
+      canListEmployees
+        ? api.get(`employee.list?${toQueryString({ page: 0, fields: 'id,name', sort: 'name' })}`, config)
+        : Promise.resolve({ data: [] }),
     ])
       .then(([typesRes, campaignsRes, employeesRes]) => {
         const types = Array.isArray(typesRes.data) ? typesRes.data : []
@@ -294,7 +307,7 @@ export const RevenueList = () => {
         )
       })
       .catch((error) => toast.error(errorMessageHandler(error)))
-  }, [token, modal])
+  }, [token, modal, operator.roles])
 
   useEffect(() => {
     handleSubmit(listRevenues)()

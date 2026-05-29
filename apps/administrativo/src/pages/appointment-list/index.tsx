@@ -101,7 +101,7 @@ const statusOptions = [
 ]
 
 export const AppointmentList = () => {
-  const { modal, token } = useApp()
+  const { modal, token, operator } = useApp()
   const refresh = useRefresh()
   const [fetching, setFetching] = useState(false)
   const [downloading, setDownloading] = useState<ReportExportType | null>(null)
@@ -254,9 +254,19 @@ export const AppointmentList = () => {
 
   useEffect(() => {
     const config = { headers: { Authorization: `Bearer ${token}` } }
+    const roles = operator.roles ?? []
+    const canListAppointmentTypes = roles.some((role) =>
+      ['AdminPanel', 'Registrations', 'AppointmentTypes'].includes(role),
+    )
+    const canListVeterinaryClinics = roles.some((role) => ['AdminPanel', 'VeterinaryClinics'].includes(role))
+
     Promise.all([
-      api.get(`appointment-type.list?${toQueryString({ page: 0, fields: 'id,name,active' })}`, config),
-      api.get(`veterinary-clinic.list?${toQueryString({ page: 0, fields: 'id,name,active' })}`, config),
+      canListAppointmentTypes
+        ? api.get(`appointment-type.list?${toQueryString({ page: 0, fields: 'id,name,active' })}`, config)
+        : Promise.resolve({ data: [] }),
+      canListVeterinaryClinics
+        ? api.get(`veterinary-clinic.list?${toQueryString({ page: 0, fields: 'id,name,active' })}`, config)
+        : Promise.resolve({ data: [] }),
     ])
       .then(([typesRes, clinicsRes]) => {
         setAppointmentTypeOptions(
@@ -271,7 +281,7 @@ export const AppointmentList = () => {
         )
       })
       .catch((error) => toast.error(errorMessageHandler(error)))
-  }, [token, modal])
+  }, [token, modal, operator.roles])
 
   useEffect(() => {
     handleSubmit(listItems)()

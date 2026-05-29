@@ -186,7 +186,12 @@ export const Home = () => {
                       />
                       <XAxis dataKey="month" stroke="#6b7280" className="dark:stroke-gray-400" />
                       <YAxis stroke="#6b7280" className="dark:stroke-gray-400" />
-                      <Tooltip contentStyle={tooltipStyle} />
+                      <Tooltip
+                        contentStyle={tooltipStyle}
+                        cursor={{
+                          fill: isDark ? 'rgba(75, 85, 99, 0.35)' : 'rgba(229, 231, 235, 0.5)',
+                        }}
+                      />
                       <Legend />
                       <Bar dataKey="animals" fill="url(#colorAnimals)" name="Animais" radius={[8, 8, 0, 0]} />
                       <Bar dataKey="adoptions" fill="url(#colorAdoptions)" name="Adoções" radius={[8, 8, 0, 0]} />
@@ -221,10 +226,10 @@ export const Home = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="mb-4 grid grid-cols-3 gap-2">
+                <div className="mb-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
                   <div className="group rounded-lg bg-linear-to-br from-emerald-50 via-emerald-50/80 to-green-50 p-3 text-center shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-md dark:from-emerald-900/30 dark:via-emerald-900/25 dark:to-green-900/30">
                     <p className="mb-1 font-medium text-gray-600 text-xs dark:text-gray-400">Receitas</p>
-                    <p className="font-bold text-base text-emerald-600 transition-transform duration-300 group-hover:scale-105 dark:text-emerald-400">
+                    <p className="wrap-break-word font-bold text-emerald-600 text-sm leading-tight transition-transform duration-300 group-hover:scale-105 sm:text-base dark:text-emerald-400">
                       {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(
                         financialStats.totalIncome,
                       )}
@@ -232,7 +237,7 @@ export const Home = () => {
                   </div>
                   <div className="group rounded-lg bg-linear-to-br from-rose-50 via-rose-50/80 to-red-50 p-3 text-center shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-md dark:from-rose-900/30 dark:via-rose-900/25 dark:to-red-900/30">
                     <p className="mb-1 font-medium text-gray-600 text-xs dark:text-gray-400">Despesas</p>
-                    <p className="font-bold text-base text-rose-600 transition-transform duration-300 group-hover:scale-105 dark:text-rose-400">
+                    <p className="wrap-break-word font-bold text-rose-600 text-sm leading-tight transition-transform duration-300 group-hover:scale-105 sm:text-base dark:text-rose-400">
                       {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(
                         financialStats.totalExpense,
                       )}
@@ -247,7 +252,7 @@ export const Home = () => {
                   >
                     <p className="mb-1 font-medium text-gray-600 text-xs dark:text-gray-400">Saldo</p>
                     <p
-                      className={`font-bold text-base transition-transform duration-300 group-hover:scale-105 ${
+                      className={`wrap-break-word font-bold text-sm leading-tight transition-transform duration-300 group-hover:scale-105 sm:text-base ${
                         financialStats.balance >= 0
                           ? 'text-emerald-600 dark:text-emerald-400'
                           : 'text-rose-600 dark:text-rose-400'
@@ -275,6 +280,9 @@ export const Home = () => {
                           new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(value))
                         }
                         contentStyle={tooltipStyle}
+                        cursor={{
+                          fill: isDark ? 'rgba(75, 85, 99, 0.35)' : 'rgba(229, 231, 235, 0.5)',
+                        }}
                       />
                       <Legend />
                       <Bar dataKey="income" fill="url(#colorIncome)" name="Receitas" radius={[8, 8, 0, 0]} />

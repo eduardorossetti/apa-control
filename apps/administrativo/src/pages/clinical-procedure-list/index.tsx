@@ -97,7 +97,7 @@ const statusOptions = [
 ]
 
 export const ClinicalProcedureList = () => {
-  const { modal, token } = useApp()
+  const { modal, token, operator } = useApp()
   const refresh = useRefresh()
   const [fetching, setFetching] = useState(false)
   const [downloading, setDownloading] = useState<ReportExportType | null>(null)
@@ -260,9 +260,19 @@ export const ClinicalProcedureList = () => {
 
   useEffect(() => {
     const config = { headers: { Authorization: `Bearer ${token}` } }
+    const roles = operator.roles ?? []
+    const canListProcedureTypes = roles.some((role) => ['AdminPanel', 'Registrations', 'ProcedureTypes'].includes(role))
+    const canListAppointmentTypes = roles.some((role) =>
+      ['AdminPanel', 'Registrations', 'AppointmentTypes'].includes(role),
+    )
+
     Promise.all([
-      api.get(`procedure-type.list?${toQueryString({ page: 0, fields: 'id,name,active' })}`, config),
-      api.get(`appointment-type.list?${toQueryString({ page: 0, fields: 'id,name,active' })}`, config),
+      canListProcedureTypes
+        ? api.get(`procedure-type.list?${toQueryString({ page: 0, fields: 'id,name,active' })}`, config)
+        : Promise.resolve({ data: [] }),
+      canListAppointmentTypes
+        ? api.get(`appointment-type.list?${toQueryString({ page: 0, fields: 'id,name,active' })}`, config)
+        : Promise.resolve({ data: [] }),
     ])
       .then(([procedureTypeResponse, appointmentTypeResponse]) => {
         setProcedureTypeOptions(
@@ -277,7 +287,7 @@ export const ClinicalProcedureList = () => {
         )
       })
       .catch((error) => toast.error(errorMessageHandler(error)))
-  }, [token])
+  }, [token, operator.roles])
 
   useEffect(() => {
     handleSubmit(list)()

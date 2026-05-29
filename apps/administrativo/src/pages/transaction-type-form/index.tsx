@@ -39,7 +39,7 @@ export const TransactionTypeForm = ({ show, refresh, id }: TransactionTypeFormPr
 
   const transactionTypeForm = useForm({
     resolver: zodResolver(transactionTypeSchema),
-    defaultValues: { active: true },
+    defaultValues: { category: '', active: true },
   })
 
   const {
@@ -80,7 +80,7 @@ export const TransactionTypeForm = ({ show, refresh, id }: TransactionTypeFormPr
         .catch((err) => toast.error(errorMessageHandler(err)))
         .finally(() => setFetching(false))
     } else if (show) {
-      reset({ active: true })
+      reset({ category: '', active: true })
       setDisplayName('')
     }
   }, [id, show])

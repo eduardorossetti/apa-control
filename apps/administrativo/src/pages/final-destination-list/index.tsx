@@ -90,7 +90,7 @@ const finalDestinationFilterSchema = z
 type FinalDestinationFilterData = z.infer<typeof finalDestinationFilterSchema>
 
 export const FinalDestinationList = () => {
-  const { modal, token } = useApp()
+  const { modal, token, operator } = useApp()
   const refresh = useRefresh()
   const [fetching, setFetching] = useState(false)
   const [downloading, setDownloading] = useState<ReportExportType | null>(null)
@@ -158,9 +158,17 @@ export const FinalDestinationList = () => {
 
   useEffect(() => {
     const config = { headers: { Authorization: `Bearer ${token}` } }
+    const roles = operator.roles ?? []
+    const canListDestinationTypes = roles.some((role) =>
+      ['AdminPanel', 'Registrations', 'FinalDestinationTypes'].includes(role),
+    )
+    const canListEmployees = roles.some((role) => ['AdminPanel', 'Employees'].includes(role))
+
     Promise.all([
-      api.get('final-destination-type.list', config),
-      api.get(`employee.list?${toQueryString({ page: 0, fields: 'id,name', sort: 'name' })}`, config),
+      canListDestinationTypes ? api.get('final-destination-type.list', config) : Promise.resolve({ data: [] }),
+      canListEmployees
+        ? api.get(`employee.list?${toQueryString({ page: 0, fields: 'id,name', sort: 'name' })}`, config)
+        : Promise.resolve({ data: [] }),
     ])
       .then(([typeResponse, employeeResponse]) => {
         const types = Array.isArray(typeResponse.data) ? typeResponse.data : []
@@ -172,7 +180,7 @@ export const FinalDestinationList = () => {
         setEmployeeOptions(employees.map((item) => ({ value: item.id, label: item.name })))
       })
       .catch((error) => toast.error(errorMessageHandler(error)))
-  }, [])
+  }, [token, operator.roles])
 
   useEffect(() => {
     handleSubmit(listFinalDestinations)()

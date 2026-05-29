@@ -5,7 +5,9 @@ import { listRemindersController } from './list-reminders/list-reminders.control
 import { readRemindersController } from './read-reminders/read-reminders.controller'
 
 export async function reminderRoutes(app: FastifyInstance) {
-  app.get('/reminder.list', authorize('AdminPanel', 'Appointments'), listRemindersController)
-  app.get('/reminder.unread', authorize('AdminPanel', 'Appointments'), getRemindersUnreadController)
-  app.post('/reminder.read', authorize('AdminPanel', 'Appointments'), readRemindersController)
+  const reminderModules = ['AdminPanel', 'Appointments', 'ClinicalProcedures', 'Campaigns', 'Financial', 'Expenses']
+
+  app.get('/reminder.list', authorize(...reminderModules), listRemindersController)
+  app.get('/reminder.unread', authorize(...reminderModules), getRemindersUnreadController)
+  app.post('/reminder.read', authorize(...reminderModules), readRemindersController)
 }
