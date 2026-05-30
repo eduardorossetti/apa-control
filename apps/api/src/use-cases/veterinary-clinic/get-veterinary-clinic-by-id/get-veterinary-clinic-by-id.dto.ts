@@ -7,6 +7,7 @@ export interface GetVeterinaryClinicByIdDTO {
   id: number
   name: string
   cnpj: string
+  email: string | null
   phone: string
   address: string
   responsible: string

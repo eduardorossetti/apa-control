@@ -16,6 +16,7 @@ export class GetVeterinaryClinicByIdUseCase {
       id: veterinaryClinic.id,
       name: veterinaryClinic.name,
       cnpj: veterinaryClinic.cnpj,
+      email: veterinaryClinic.email ?? null,
       phone: veterinaryClinic.phone,
       address: veterinaryClinic.address,
       responsible: veterinaryClinic.responsible,

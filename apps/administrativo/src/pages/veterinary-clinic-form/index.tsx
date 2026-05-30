@@ -37,6 +37,7 @@ const veterinaryClinicSchema = z.object({
     .refine((phone) => [0, 10, 11].includes(phone.length), 'Informe um número de telefone válido.'),
   address: z.string().trim().min(1, RequiredMessage),
   responsible: z.string().trim().min(1, RequiredMessage),
+  email: z.string().email('Informe um e-mail válido.').nullable().optional(),
   specialties: z.string().nullable().optional(),
 })
 

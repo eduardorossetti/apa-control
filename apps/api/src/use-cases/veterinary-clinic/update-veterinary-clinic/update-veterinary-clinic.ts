@@ -19,6 +19,7 @@ export class UpdateVeterinaryClinicUseCase {
     await this.veterinaryClinicRepository.update(data.id, {
       name: data.name,
       cnpj: data.cnpj,
+      email: data.email,
       phone: data.phone,
       address: data.address,
       responsible: data.responsible,

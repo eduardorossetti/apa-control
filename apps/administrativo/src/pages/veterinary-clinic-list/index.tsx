@@ -60,6 +60,7 @@ const veterinaryClinicFilterSchema = z.object({
   fields: z.string(),
   page: z.number(),
   sort: z.string().optional(),
+  email: z.string().nullish(),
   name: z.string().nullish(),
   cnpj: z.string().nullish(),
   phone: z.string().nullish(),
@@ -90,7 +91,7 @@ export const VeterinaryClinicList = () => {
     resolver: zodResolver(veterinaryClinicFilterSchema),
     defaultValues: {
       page: 1,
-      fields: 'id,name,cnpj,phone,responsible,active',
+      fields: 'id,name,cnpj,email,phone,responsible,active',
       sort: 'name',
     },
   })
@@ -309,7 +310,13 @@ export const VeterinaryClinicList = () => {
                 </div>
               </div>
 
-              <div className="mb-6 grid gap-4 lg:grid-cols-2 2xl:grid-cols-2">
+              <div className="mb-6 grid gap-4 lg:grid-cols-2 2xl:grid-cols-3">
+                <div>
+                  <Form.Label htmlFor="email">Email</Form.Label>
+                  <Form.Input type="search" name="email" />
+                  <Form.ErrorMessage field="email" />
+                </div>
+
                 <div>
                   <Form.Label htmlFor="responsible">Responsável</Form.Label>
                   <Form.Input type="search" name="responsible" />

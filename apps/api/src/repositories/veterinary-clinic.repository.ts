@@ -39,7 +39,7 @@ export class VeterinaryClinicRepository {
   }
 
   async list(data: ListVeterinaryClinicsData) {
-    const { name, cnpj, phone, responsible, active } = data
+    const { name, cnpj, email, phone, responsible, active } = data
     const whereList: SQL[] = []
 
     if (name) {
@@ -48,6 +48,10 @@ export class VeterinaryClinicRepository {
 
     if (cnpj) {
       whereList.push(ilike(veterinaryClinic.cnpj, `%${cnpj}%`))
+    }
+
+    if (email) {
+      whereList.push(ilike(veterinaryClinic.email, `%${email}%`))
     }
 
     if (phone) {
@@ -86,6 +90,7 @@ export class VeterinaryClinicRepository {
         id: veterinaryClinic.id,
         name: veterinaryClinic.name,
         cnpj: veterinaryClinic.cnpj,
+        email: veterinaryClinic.email,
         phone: veterinaryClinic.phone,
         address: veterinaryClinic.address,
         responsible: veterinaryClinic.responsible,

@@ -16,6 +16,7 @@ export class CreateVeterinaryClinicUseCase {
     const veterinaryClinic = new VeterinaryClinic({
       name: data.name,
       cnpj: data.cnpj,
+      email: data.email,
       phone: data.phone,
       address: data.address,
       responsible: data.responsible,
