@@ -21,9 +21,9 @@ export class CreateAdoptionUseCase {
   async execute(data: CreateAdoptionData, employeeId: number): Promise<number> {
     const status = data.status ?? AdoptionStatus.PROCESSING
     const animalDepartureDate = null
-    const pendingAdoption = await this.adoptionRepository.findByAnimalId(data.animalId, AdoptionStatus.PROCESSING)
-    if (pendingAdoption) {
-      throw new ApiError('Este animal já possui uma adoção pendente.', 409)
+    const completedAdoption = await this.adoptionRepository.findByAnimalId(data.animalId, AdoptionStatus.COMPLETED)
+    if (completedAdoption) {
+      throw new ApiError('Este animal já possui uma adoção concluída.', 409)
     }
 
     const animal = await this.animalRepository.findById(data.animalId)

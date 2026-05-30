@@ -1,4 +1,5 @@
 import { AdoptionStatusValues } from '@/database/schema/enums/adoption-status'
+import { isDateRangeValid } from '@/utils/date-range'
 import { apiQueryStringSchema } from '@/utils/drizzle/api-query-schema'
 import { z } from 'zod'
 
@@ -13,23 +14,11 @@ export const listAdoptionsSchema = apiQueryStringSchema
     animalDepartureDateStart: z.string().optional(),
     animalDepartureDateEnd: z.string().optional(),
   })
-  .refine(
-    (data) => {
-      if (!data.adoptionDateStart || !data.adoptionDateEnd) return true
-      return new Date(data.adoptionDateStart) <= new Date(data.adoptionDateEnd)
-    },
-    {
-      message: 'A data inicial deve ser menor ou igual à data final.',
-      path: ['adoptionDateEnd'],
-    },
-  )
-  .refine(
-    (data) => {
-      if (!data.animalDepartureDateStart || !data.animalDepartureDateEnd) return true
-      return new Date(data.animalDepartureDateStart) <= new Date(data.animalDepartureDateEnd)
-    },
-    {
-      message: 'A data inicial de saída deve ser menor ou igual à data final de saída.',
-      path: ['animalDepartureDateEnd'],
-    },
-  )
+  .refine((data) => isDateRangeValid(data.adoptionDateStart, data.adoptionDateEnd), {
+    message: 'A data inicial deve ser menor ou igual à data final.',
+    path: ['adoptionDateEnd'],
+  })
+  .refine((data) => isDateRangeValid(data.animalDepartureDateStart, data.animalDepartureDateEnd), {
+    message: 'A data inicial de saída deve ser menor ou igual à data final de saída.',
+    path: ['animalDepartureDateEnd'],
+  })

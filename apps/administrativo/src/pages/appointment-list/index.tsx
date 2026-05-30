@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { isAxiosError } from 'axios'
-import { endOfMonth, format, startOfMonth } from 'date-fns'
+import { endOfMonth, formatISO9075, startOfMonth } from 'date-fns'
 import {
   CalendarHeartIcon,
   CheckCircle2Icon,
@@ -116,7 +116,7 @@ export const AppointmentList = () => {
   const allSelected = selectableItems.length > 0 && selectableItems.every((item) => selectedIds.includes(item.id))
 
   const currentDate = new Date()
-  const toDateInput = (date: Date) => format(date, 'yyyy-MM-dd')
+  const toDateInput = (date: Date) => formatISO9075(date, { representation: 'date' })
 
   const filterForm = useForm<FilterData>({
     resolver: zodResolver(appointmentFilterSchema),

@@ -3,7 +3,7 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { endOfMonth, format, startOfMonth } from 'date-fns'
+import { endOfMonth, formatISO9075, startOfMonth } from 'date-fns'
 import {
   ClipboardListIcon,
   DownloadIcon,
@@ -96,7 +96,7 @@ export const AnamnesisList = () => {
   const [appointmentTypeOptions, setAppointmentTypeOptions] = useState<SelectOption[]>([])
 
   const currentDate = new Date()
-  const toDateInput = (date: Date) => format(date, 'yyyy-MM-dd')
+  const toDateInput = (date: Date) => formatISO9075(date, { representation: 'date' })
 
   const form = useForm<FilterData>({
     resolver: zodResolver(schema),

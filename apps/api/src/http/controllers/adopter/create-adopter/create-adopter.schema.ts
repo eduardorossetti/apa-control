@@ -8,7 +8,7 @@ export const createAdopterSchema = z.object({
     .string({ error: 'O telefone é obrigatório.' })
     .trim()
     .max(20, 'O telefone deve ter no máximo 20 caracteres.'),
-  address: z.string({ error: 'O endereço é obrigatório.' }),
-  familyIncome: z.number({ error: 'A renda familiar é obrigatória.' }),
+  address: z.string({ error: 'O endereço é obrigatório.' }).trim(),
+  familyIncome: z.coerce.number({ error: 'A renda familiar é obrigatória.' }),
   animalExperience: z.coerce.boolean({ error: 'O campo experiência com animais é obrigatório.' }),
 })

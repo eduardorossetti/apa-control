@@ -23,8 +23,8 @@ interface AppointmentTypeFormProps {
 
 const appointmentTypeSchema = z.object({
   id: z.number().nullish(),
-  name: z.string().min(1, RequiredMessage),
-  description: z.string().min(1, RequiredMessage),
+  name: z.string().trim().min(1, RequiredMessage),
+  description: z.string().trim().min(1, RequiredMessage),
   urgency: z.enum(['rotina', 'urgente', 'emergencia']),
   active: z.coerce.boolean(),
 })

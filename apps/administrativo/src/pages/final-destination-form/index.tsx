@@ -3,6 +3,7 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { formatISO9075 } from 'date-fns'
 import { ChevronLeftIcon, ChevronRightIcon, FlagIcon, SaveIcon } from 'lucide-react'
 import { Helmet } from 'react-helmet-async'
 import { toast } from 'sonner'
@@ -52,7 +53,7 @@ const finalDestinationSchema = z.object({
   animalId: z.number({ message: RequiredMessage }).int().positive(),
   destinationTypeId: z.number({ message: RequiredMessage }).int().positive(),
   destinationDate: z.string({ message: RequiredMessage }),
-  reason: z.string().min(1, RequiredMessage),
+  reason: z.string().trim().min(1, RequiredMessage),
   observations: z.string().nullish(),
   proof: z.string().nullish(),
   proofFile: z.any().nullish(),
@@ -157,7 +158,7 @@ export const FinalDestinationForm = () => {
           const destinationDate =
             typeof key.destinationDate === 'string'
               ? key.destinationDate.split('T')[0]
-              : new Date(key.destinationDate).toISOString().split('T')[0]
+              : formatISO9075(new Date(key.destinationDate), { representation: 'date' })
 
           reset({
             id: key.id,

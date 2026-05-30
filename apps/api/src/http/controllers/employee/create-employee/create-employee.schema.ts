@@ -32,7 +32,7 @@ export const createEmployeeSchema = z.object({
         .toLowerCase(),
     ),
   password: z.string({ error: 'A senha do funcionário é obrigatória.' }).trim(),
-  profileId: z.number(),
+  profileId: z.coerce.number(),
   streetName: z.string().trim().nullish(),
   streetNumber: z.string().trim().max(10, 'O número do endereço deve ter no máximo 10 caracteres.').nullish(),
   district: z.string().trim().nullish(),

@@ -2,7 +2,7 @@ import { isCpf } from '@/utils/cpf-cnpj'
 import { z } from 'zod'
 
 export const updateEmployeeSchema = z.object({
-  id: z.number({ error: 'O código do funcionário é obrigatório.' }),
+  id: z.coerce.number({ error: 'O código do funcionário é obrigatório.' }),
   name: z
     .string({ error: 'O nome do funcionário é obrigatório.' })
     .trim()
@@ -33,7 +33,7 @@ export const updateEmployeeSchema = z.object({
         .toLowerCase(),
     ),
   password: z.string({ error: 'A senha do funcionário é obrigatória.' }).trim(),
-  profileId: z.number(),
+  profileId: z.coerce.number(),
   streetName: z.string().trim().nullish(),
   streetNumber: z.string().trim().max(10, 'O número do endereço deve ter no máximo 10 caracteres.').nullish(),
   district: z.string().trim().nullish(),

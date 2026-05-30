@@ -25,6 +25,7 @@ const adopterSchema = z.object({
   id: z.number().nullish(),
   name: z
     .string()
+    .trim()
     .min(1, 'O nome é obrigatório.')
     .refine((name) => (name ? name.length >= 8 : true), 'O nome deve ter pelo menos 8 caracteres.'),
   cpf: z
@@ -36,7 +37,7 @@ const adopterSchema = z.object({
     .string({ error: RequiredMessage })
     .transform((phone) => phone.replace(/\D/g, ''))
     .refine((phone) => [0, 10, 11].includes(phone.length), 'Informe um número de telefone válido.'),
-  address: z.string().min(1, RequiredMessage),
+  address: z.string().trim().min(1, RequiredMessage),
   familyIncome: z.number().min(1, 'A renda familiar não pode ser zero.'),
   animalExperience: z.coerce.boolean(),
 })

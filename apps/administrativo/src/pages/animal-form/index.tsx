@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { formatISO9075 } from 'date-fns'
 
 import { useApp } from '../../App'
 import { Button } from '../../components/button'
@@ -26,7 +27,7 @@ import { api } from '../../service'
 
 const animalSchema = z.object({
   id: z.number().nullish(),
-  name: z.string().min(1, 'O nome é obrigatório.').min(2, 'O nome deve ter pelo menos 2 caracteres.'),
+  name: z.string().trim().min(1, 'O nome é obrigatório.').min(2, 'O nome deve ter pelo menos 2 caracteres.'),
   species: z.string({ error: RequiredMessage }),
   breed: z.string().nullish(),
   size: z.string({ error: RequiredMessage }),
@@ -108,7 +109,7 @@ export const AnimalForm = () => {
   const animalForm = useForm({
     resolver: zodResolver(animalSchema),
     defaultValues: {
-      entryDate: new Date().toISOString().split('T')[0],
+      entryDate: formatISO9075(new Date(), { representation: 'date' }),
     },
   })
 

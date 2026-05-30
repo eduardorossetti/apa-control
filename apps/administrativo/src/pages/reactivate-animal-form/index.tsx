@@ -21,7 +21,7 @@ interface ReactivateAnimalFormProps {
 
 const reactivateAnimalSchema = z
   .object({
-    registerRescue: z.boolean(),
+    registerRescue: z.coerce.boolean().optional().default(false),
     rescueDate: z.string().optional(),
     locationFound: z.string().max(200).optional(),
     circumstances: z.string().optional(),
@@ -38,12 +38,13 @@ const reactivateAnimalSchema = z
     }
   })
 
-type ReactivateAnimalData = z.infer<typeof reactivateAnimalSchema>
+type ReactivateAnimalData = z.input<typeof reactivateAnimalSchema>
+type ParsedReactivateAnimalData = z.output<typeof reactivateAnimalSchema>
 
 export const ReactivateAnimalForm = ({ animal, show, onClose, onSuccess }: ReactivateAnimalFormProps) => {
   const { token } = useApp()
 
-  const form = useForm<ReactivateAnimalData>({
+  const form = useForm<ReactivateAnimalData, unknown, ParsedReactivateAnimalData>({
     resolver: zodResolver(reactivateAnimalSchema),
     defaultValues: { registerRescue: false },
   })
@@ -55,7 +56,7 @@ export const ReactivateAnimalForm = ({ animal, show, onClose, onSuccess }: React
     formState: { isSubmitting },
   } = form
 
-  const registerRescue = watch('registerRescue')
+  const registerRescue = Boolean(watch('registerRescue'))
 
   async function reactivate(values: ReactivateAnimalData) {
     try {

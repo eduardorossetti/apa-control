@@ -26,6 +26,7 @@ const employeeSchema = z
     id: z.number().nullish(),
     name: z
       .string()
+      .trim()
       .min(1, 'O nome é obrigatório.')
       .refine((name) => (name ? name.length >= 8 : true), 'O nome deve ter pelo menos 8 caracteres.'),
     cpf: z
@@ -54,9 +55,12 @@ const employeeSchema = z
       .transform(slugify),
     password: z.string().trim().or(z.literal('')),
     passwordCheck: z.string(),
-    postalCode: z.string().nullish(),
+    postalCode: z
+      .string()
+      .transform((postalCode) => postalCode.replace(/\D/g, ''))
+      .nullish(),
     streetName: z.string().nullish(),
-    streetNumber: z.string().nullish(),
+    streetNumber: z.string().trim().max(10, 'O número do endereço deve ter no máximo 10 caracteres.').nullish(),
     complement: z.string().nullish(),
     district: z.string().nullish(),
     city: z.string().nullish(),

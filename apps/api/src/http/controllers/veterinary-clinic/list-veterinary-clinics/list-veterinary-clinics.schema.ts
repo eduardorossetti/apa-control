@@ -3,7 +3,10 @@ import { z } from 'zod'
 
 export const listVeterinaryClinicsSchema = apiQueryStringSchema.extend({
   name: z.string().nullish(),
-  cnpj: z.string().nullish(),
+  cnpj: z
+    .string()
+    .transform((cnpj) => cnpj.replace(/\D/g, ''))
+    .nullish(),
   email: z.string().nullish(),
   phone: z
     .string()

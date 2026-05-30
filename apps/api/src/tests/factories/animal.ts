@@ -15,7 +15,7 @@ const AnimalFactory = {
   buildCreate: (props?: Partial<CreateAnimalPartData>): CreateAnimalPartData => ({
     name: faker.person.firstName(),
     species: faker.helpers.arrayElement(SpeciesValues),
-    breed: faker.helpers.maybe(() => faker.animal.dog(), { probability: 0.7 }) ?? null,
+    breed: faker.helpers.maybe(() => faker.animal.dog().slice(0, 50), { probability: 0.7 }) ?? null,
     size: faker.helpers.arrayElement(SizeValues),
     sex: faker.helpers.arrayElement(SexValues),
     birthYear:
@@ -30,7 +30,7 @@ const AnimalFactory = {
   build: (props?: Partial<typeof animal.$inferInsert>) => ({
     name: faker.person.firstName(),
     species: faker.helpers.arrayElement(SpeciesValues),
-    breed: faker.helpers.maybe(() => faker.animal.dog(), { probability: 0.7 }) ?? null,
+    breed: faker.helpers.maybe(() => faker.animal.dog().slice(0, 50), { probability: 0.7 }) ?? null,
     size: faker.helpers.arrayElement(SizeValues),
     sex: faker.helpers.arrayElement(SexValues),
     birthYear:

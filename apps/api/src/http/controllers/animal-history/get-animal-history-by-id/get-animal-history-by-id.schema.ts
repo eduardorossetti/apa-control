@@ -1,4 +1,5 @@
 import { AnimalHistoryTypeValues } from '@/database/schema/enums/animal-history-type'
+import { isDateTimeRangeValid } from '@/utils/date-range'
 import { z } from 'zod'
 
 export const getAnimalHistoryByIdSchema = z.object({
@@ -25,13 +26,7 @@ export const getAnimalHistoryByIdQuerySchema = z
     endDate: z.string().datetime({ local: true }).optional(),
     employeeId: z.coerce.number().int().positive().optional(),
   })
-  .refine(
-    (data) => {
-      if (!data.startDate || !data.endDate) return true
-      return new Date(data.startDate).getTime() <= new Date(data.endDate).getTime()
-    },
-    {
-      message: 'Data inicial deve ser menor ou igual a data final',
-      path: ['startDate'],
-    },
-  )
+  .refine((data) => isDateTimeRangeValid(data.startDate, data.endDate), {
+    message: 'Data inicial deve ser menor ou igual a data final',
+    path: ['startDate'],
+  })

@@ -3,6 +3,7 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { formatISO9075 } from 'date-fns'
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -69,7 +70,7 @@ const adoptionSchema = z
     adopterPhone: z.string().optional(),
     adopterAddress: z.string().optional(),
     adopterFamilyIncome: z.number().optional(),
-    adopterAnimalExperience: z.boolean().optional(),
+    adopterAnimalExperience: z.coerce.boolean().optional().default(false),
     adoptionDate: z.string({ message: RequiredMessage }),
     status: z.enum(['processando', 'concluida', 'cancelada']),
     observations: z.string().nullish(),
@@ -268,7 +269,7 @@ export const AdoptionForm = () => {
           const adoptionDate =
             typeof key.adoptionDate === 'string'
               ? key.adoptionDate.split('T')[0]
-              : new Date(key.adoptionDate).toISOString().split('T')[0]
+              : formatISO9075(new Date(key.adoptionDate), { representation: 'date' })
 
           setAnimalReadOnlyLabel(key.animalName ? `${key.animalName} (#${key.animalId})` : `Animal #${key.animalId}`)
           setCurrentProof(key.proof ?? '')

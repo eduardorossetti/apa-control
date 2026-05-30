@@ -10,7 +10,7 @@ export const updateExpenseSchema = z.object({
   transactionTypeId: z.coerce.number().int().positive('Tipo de despesa é obrigatório'),
   campaignId: optionalId,
   animalId: optionalId,
-  description: z.string().min(1, 'Descrição é obrigatória').max(200),
+  description: z.string().trim().min(1, 'Descrição é obrigatória').max(200),
   value: z.coerce.number().nonnegative('Valor deve ser maior ou igual a zero'),
   dueDate: z.string().nullish(),
   observations: z.string().nullish(),

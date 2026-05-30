@@ -60,7 +60,7 @@ const schema = z.object({
   procedureTypeId: z.number({ message: RequiredMessage }).int().positive(),
   appointmentId: z.number().nullish(),
   procedureDate: z.string({ message: RequiredMessage }).min(1, RequiredMessage),
-  description: z.string().min(1, RequiredMessage),
+  description: z.string().trim().min(1, RequiredMessage),
   proof: z.string().nullish(),
   proofFile: z.any().nullish(),
   actualCost: optionalCost,

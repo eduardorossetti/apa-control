@@ -8,7 +8,7 @@ export const createVeterinaryClinicSchema = z.object({
     .string({ error: 'O telefone é obrigatório.' })
     .trim()
     .max(20, 'O telefone deve ter no máximo 20 caracteres.'),
-  address: z.string({ error: 'O endereço é obrigatório.' }),
+  address: z.string({ error: 'O endereço é obrigatório.' }).trim(),
   responsible: z
     .string({ error: 'O responsável é obrigatório.' })
     .trim()

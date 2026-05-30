@@ -50,7 +50,7 @@ const schema = z.object({
   animalId: z.number({ message: RequiredMessage }).int().positive(),
   occurrenceTypeId: z.number({ message: RequiredMessage }).int().positive(),
   occurrenceDate: z.string({ message: RequiredMessage }).min(1, RequiredMessage),
-  description: z.string().min(1, RequiredMessage),
+  description: z.string().trim().min(1, RequiredMessage),
   observations: z.string().nullish(),
   animalNamePreview: z.string().nullish(),
   speciesPreview: z.string().nullish(),

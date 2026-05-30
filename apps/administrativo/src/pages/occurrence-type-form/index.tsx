@@ -20,11 +20,12 @@ interface OccurrenceTypeFormProps {
 
 const schema = z.object({
   id: z.number().nullish(),
-  name: z.string().min(1, RequiredMessage),
+  name: z.string().trim().min(1, RequiredMessage),
   description: z.string().nullish(),
-  active: z.boolean(),
+  active: z.coerce.boolean().optional().default(false),
 })
-type Data = z.infer<typeof schema>
+type Data = z.input<typeof schema>
+type ParsedData = z.output<typeof schema>
 
 export const OccurrenceTypeForm = ({ show, refresh, id }: OccurrenceTypeFormProps) => {
   const { token } = useApp()
@@ -32,7 +33,7 @@ export const OccurrenceTypeForm = ({ show, refresh, id }: OccurrenceTypeFormProp
   const [fetching, setFetching] = useState(false)
   const [displayName, setDisplayName] = useState('')
 
-  const form = useForm<Data>({ resolver: zodResolver(schema), defaultValues: { active: true } })
+  const form = useForm<Data, unknown, ParsedData>({ resolver: zodResolver(schema), defaultValues: { active: true } })
   const {
     handleSubmit,
     reset,

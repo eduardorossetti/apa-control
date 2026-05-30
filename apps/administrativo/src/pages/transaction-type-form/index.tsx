@@ -23,9 +23,9 @@ interface TransactionTypeFormProps {
 
 const transactionTypeSchema = z.object({
   id: z.number().nullish(),
-  name: z.string().min(1, RequiredMessage),
-  category: z.string().min(1, RequiredMessage),
-  description: z.string().min(1, RequiredMessage),
+  name: z.string().trim().min(1, RequiredMessage),
+  category: z.string().trim().min(1, RequiredMessage),
+  description: z.string().trim().min(1, RequiredMessage),
   active: z.coerce.boolean(),
 })
 

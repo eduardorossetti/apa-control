@@ -23,7 +23,7 @@ import type { FormTreeNode } from '../../components/form-hook/Tree'
 
 const profileSchema = z.object({
   id: z.number().nullish(),
-  description: z.string().min(1, RequiredMessage),
+  description: z.string().trim().min(1, RequiredMessage),
   permissions: z.array(z.number()).min(1, 'Selecione pelo menos uma permissão.'),
 })
 

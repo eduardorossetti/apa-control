@@ -33,7 +33,7 @@ const revenueSchema = z.object({
   transactionTypeId: z.number({ message: RequiredMessage }).int().positive(),
   campaignId: z.number().nullish(),
   animalId: z.union([z.number(), z.string()]).nullish(),
-  description: z.string().min(1, RequiredMessage).max(200),
+  description: z.string().trim().min(1, RequiredMessage).max(200),
   value: z.number({ message: RequiredMessage }).nonnegative(RequiredMessage),
   observations: z.string().nullish(),
   proof: z.string().nullish(),

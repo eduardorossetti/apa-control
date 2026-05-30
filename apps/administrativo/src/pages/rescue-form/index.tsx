@@ -17,6 +17,7 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { formatISO9075 } from 'date-fns'
 
 import { useApp } from '../../App'
 import { Button } from '../../components/button'
@@ -74,7 +75,7 @@ const healthConditionOptions = [
 const rescueFormSchema = z.object({
   id: z.number().nullish(),
   animalId: z.union([z.number(), z.string()]).optional(),
-  name: z.string().min(1, 'O nome é obrigatório.').min(2, 'O nome deve ter pelo menos 2 caracteres.'),
+  name: z.string().trim().min(1, 'O nome é obrigatório.').min(2, 'O nome deve ter pelo menos 2 caracteres.'),
   species: z.string({ error: RequiredMessage }),
   breed: z.string().nullish(),
   size: z.string({ error: RequiredMessage }),
@@ -90,9 +91,9 @@ const rescueFormSchema = z.object({
   entryDate: z.string({ error: RequiredMessage }),
   observations: z.string().nullish(),
   rescueDate: z.string({ error: RequiredMessage }),
-  locationFound: z.string().min(1, 'Local encontrado é obrigatório.').max(200),
-  circumstances: z.string().min(1, 'Circunstâncias são obrigatórias.'),
-  foundConditions: z.string().min(1, 'Condições em que foi encontrado é obrigatório.'),
+  locationFound: z.string().trim().min(1, 'Local encontrado é obrigatório.').max(200),
+  circumstances: z.string().trim().min(1, 'Circunstâncias são obrigatórias.'),
+  foundConditions: z.string().trim().min(1, 'Condições em que foi encontrado é obrigatório.'),
   immediateProcedures: z.string().nullish(),
   rescueObservations: z.string().nullish(),
 })
@@ -129,8 +130,8 @@ export const RescueForm = () => {
     mode: 'onSubmit',
     defaultValues: {
       animalId: '',
-      entryDate: new Date().toISOString().split('T')[0],
-      rescueDate: new Date().toISOString().split('T')[0],
+      entryDate: formatISO9075(new Date(), { representation: 'date' }),
+      rescueDate: formatISO9075(new Date(), { representation: 'date' }),
     },
   })
 

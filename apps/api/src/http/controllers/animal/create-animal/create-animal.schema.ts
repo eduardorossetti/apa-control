@@ -1,13 +1,25 @@
 import { z } from 'zod'
 
+const optionalInteger = z.preprocess(
+  (value) => (value === '' || value === null || value === undefined ? null : value),
+  z.union([z.coerce.number().int(), z.null(), z.undefined()]),
+)
+
 export const createAnimalSchema = z.object({
-  name: z.string().min(1, 'Nome é obrigatório').max(100, 'Nome deve ter no máximo 100 caracteres'),
+  name: z.string().trim().min(1, 'Nome é obrigatório').max(100, 'Nome deve ter no máximo 100 caracteres'),
   species: z.string().min(1, 'Espécie é obrigatória'),
   breed: z.string().max(50, 'Raça deve ter no máximo 50 caracteres').nullish(),
   size: z.string().min(1, 'Porte é obrigatório'),
   sex: z.string().min(1, 'Sexo é obrigatório'),
-  birthYear: z.number().int().min(1900, 'Ano de nascimento inválido').nullish(),
-  birthMonth: z.number().int().min(1, 'Mês de nascimento inválido').max(12, 'Mês de nascimento inválido').nullish(),
+  birthYear: optionalInteger
+    .refine((value) => value === undefined || value === null || value >= 1900, 'Ano de nascimento inválido')
+    .optional(),
+  birthMonth: optionalInteger
+    .refine(
+      (value) => value === undefined || value === null || (value >= 1 && value <= 12),
+      'Mês de nascimento inválido',
+    )
+    .optional(),
   healthCondition: z.string().min(1, 'Condição de saúde é obrigatória'),
   entryDate: z.string().min(1, 'Data de entrada é obrigatória'),
   observations: z.string().nullish(),

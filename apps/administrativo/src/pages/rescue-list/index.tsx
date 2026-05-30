@@ -3,6 +3,7 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { endOfMonth, formatISO9075, startOfMonth } from 'date-fns'
 import { EyeIcon, FileSpreadsheetIcon, FileTextIcon, LifeBuoyIcon, PlusIcon, SearchIcon, XIcon } from 'lucide-react'
 import { Helmet } from 'react-helmet-async'
 import { toast } from 'sonner'
@@ -80,10 +81,8 @@ export const RescueList = () => {
   const [items, setItems] = useState<RescueListValues[]>([])
   const [total, setTotal] = useState(0)
 
-  const today = new Date()
-  const monthAgo = new Date()
-  monthAgo.setMonth(monthAgo.getMonth() - 1)
-  const toDateInput = (date: Date) => date.toISOString().split('T')[0]
+  const currentDate = new Date()
+  const toDateInput = (date: Date) => formatISO9075(date, { representation: 'date' })
 
   const rescueFilterForm = useForm<RescueFilterData>({
     resolver: zodResolver(rescueFilterSchema),
@@ -92,8 +91,8 @@ export const RescueList = () => {
       perPage: 10,
       fields: 'id,animalId,employeeId,rescueDate,locationFound,circumstances,foundConditions,animalName',
       sort: '-rescueDate',
-      rescueDateStart: toDateInput(monthAgo),
-      rescueDateEnd: toDateInput(today),
+      rescueDateStart: toDateInput(startOfMonth(currentDate)),
+      rescueDateEnd: toDateInput(endOfMonth(currentDate)),
     },
   })
 

@@ -24,8 +24,8 @@ interface ProcedureTypeFormProps {
 
 const procedureTypeSchema = z.object({
   id: z.number().nullish(),
-  name: z.string().min(1, RequiredMessage),
-  description: z.string().min(1, RequiredMessage),
+  name: z.string().trim().min(1, RequiredMessage),
+  description: z.string().trim().min(1, RequiredMessage),
   category: z.enum(['clinico', 'cirurgico', 'exame', 'vacina']),
   averageCost: z.number().min(1, RequiredMessage),
   active: z.coerce.boolean(),

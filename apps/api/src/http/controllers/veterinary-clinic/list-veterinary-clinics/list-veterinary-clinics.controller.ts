@@ -3,13 +3,27 @@ import { exportListData } from '@/utils/report/list-export'
 import type { FastifyReply, FastifyRequest } from 'fastify'
 import { listVeterinaryClinicsSchema } from './list-veterinary-clinics.schema'
 
+function mapActiveToStatus(active: boolean | 'true' | 'false') {
+  return active === true || active === 'true' ? 'ativo' : 'inativo'
+}
+
 export async function listVeterinaryClinicsController(request: FastifyRequest, reply: FastifyReply) {
   const data = listVeterinaryClinicsSchema.parse(request.query)
   const listVeterinaryClinicsUseCase = makeListVeterinaryClinicsUseCase()
   const [count, items] = await listVeterinaryClinicsUseCase.execute(data)
 
   if (data.exportType) {
-    return exportListData(reply, data.exportType, 'Clínicas Veterinárias', 'clinicas-veterinarias', items)
+    const exportItems = items.map(({ active, ...rest }) => ({
+      ...rest,
+      status: mapActiveToStatus(active),
+    }))
+
+    const { active, ...restFilters } = data
+    const exportFilters = active == null ? restFilters : { ...restFilters, status: mapActiveToStatus(active) }
+
+    return exportListData(reply, data.exportType, 'Clínicas Veterinárias', 'clinicas-veterinarias', exportItems, {
+      filters: exportFilters,
+    })
   }
 
   reply.header('X-Total-Count', count)

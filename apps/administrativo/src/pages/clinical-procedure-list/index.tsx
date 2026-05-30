@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { isAxiosError } from 'axios'
+import { endOfMonth, formatISO9075, startOfMonth } from 'date-fns'
 import {
   CheckCircle2Icon,
   DownloadIcon,
@@ -110,10 +111,8 @@ export const ClinicalProcedureList = () => {
   const selectableItems = items.filter((item) => item.status === 'agendado')
   const allSelected = selectableItems.length > 0 && selectableItems.every((item) => selectedIds.includes(item.id))
 
-  const now = new Date()
-  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
-  const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0)
-  const toDateInput = (date: Date) => date.toISOString().split('T')[0]
+  const currentDate = new Date()
+  const toDateInput = (date: Date) => formatISO9075(date, { representation: 'date' })
 
   const form = useForm<FilterData>({
     resolver: zodResolver(schema),
@@ -126,8 +125,8 @@ export const ClinicalProcedureList = () => {
       procedureTypeId: null,
       appointmentTypeId: null,
       status: null,
-      procedureDateStart: toDateInput(monthStart),
-      procedureDateEnd: toDateInput(monthEnd),
+      procedureDateStart: toDateInput(startOfMonth(currentDate)),
+      procedureDateEnd: toDateInput(endOfMonth(currentDate)),
     },
   })
   const { handleSubmit, getValues, setValue } = form

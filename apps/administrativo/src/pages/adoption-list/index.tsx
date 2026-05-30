@@ -3,7 +3,7 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { endOfMonth, format, startOfMonth } from 'date-fns'
+import { endOfMonth, formatISO9075, startOfMonth } from 'date-fns'
 import {
   DownloadIcon,
   EyeIcon,
@@ -118,7 +118,7 @@ export const AdoptionList = () => {
   const allSelected = selectableItems.length > 0 && selectableItems.every((item) => selectedIds.includes(item.id))
 
   const currentDate = new Date()
-  const toDateInput = (date: Date) => format(date, 'yyyy-MM-dd')
+  const toDateInput = (date: Date) => formatISO9075(date, { representation: 'date' })
 
   const adoptionFilterForm = useForm<AdoptionFilterData>({
     resolver: zodResolver(adoptionFilterSchema),

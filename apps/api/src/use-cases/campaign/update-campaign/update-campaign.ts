@@ -7,6 +7,7 @@ import type { CampaignTypeRepository } from '@/repositories/campaign-type.reposi
 import type { CampaignRepository } from '@/repositories/campaign.repository'
 import type { ReminderRepository } from '@/repositories/reminder.repository'
 import { ApiError } from '@/utils/api-error'
+import { isDateOnOrAfterNow, isDateRangeValid } from '@/utils/date-range'
 import { removeUploadFile } from '@/utils/files/remove-upload-file'
 import { buildCampaignReminderMessage } from '../../reminder/builders'
 import type { UpdateCampaignData } from './update-campaign.dto'
@@ -27,7 +28,7 @@ export class UpdateCampaignUseCase {
     if (!campaign) throw new ApiError('Campanha não encontrada.', 404)
     if (!campaignType) throw new ApiError('Tipo de campanha não encontrado.', 404)
     if (!campaignType.active) throw new ApiError('Tipo de campanha inativo.', 409)
-    if (new Date(data.startDate) > new Date(data.endDate)) {
+    if (!isDateRangeValid(data.startDate, data.endDate)) {
       throw new ApiError('A data inicial deve ser menor ou igual à data final.', 400)
     }
     const proof = data.proof ?? null
@@ -49,7 +50,7 @@ export class UpdateCampaignUseCase {
         tx,
       )
 
-      if (new Date(data.endDate) >= new Date()) {
+      if (isDateOnOrAfterNow(data.endDate)) {
         const reminderMsg = buildCampaignReminderMessage({ title: data.title, endDate: data.endDate })
         await this.reminderRepository.upsertByEntity(
           ReminderEntityType.CAMPAIGN,
