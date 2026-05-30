@@ -76,7 +76,7 @@ const showOptions = [
 ]
 
 export const EmployeeList = () => {
-  const { modal, token } = useApp()
+  const { modal, operator, token } = useApp()
   const refresh = useRefresh()
   const [fetching, setFetching] = useState(false)
   const [downloading, setDownloading] = useState<ReportExportType | null>(null)
@@ -97,6 +97,7 @@ export const EmployeeList = () => {
   const { handleSubmit, getValues, setValue } = employeeFilterForm
   const page = getValues('page')
   const pages = Math.ceil(total / 10)
+  const canListProfiles = operator.roles?.some((role) => ['AdminPanel', 'AccessProfiles'].includes(role))
 
   const disableEmployee = useCallback(
     (values: EmployeeListValues) => {
@@ -189,13 +190,17 @@ export const EmployeeList = () => {
   }, [refresh.ref])
 
   useEffect(() => {
+    if (!canListProfiles) {
+      return
+    }
+
     api
       .get(`profile.list?${toQueryString({ page: 0, fields: 'id,description', sort: 'description' })}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(({ data }) => setProfiles(data))
       .catch((err) => toast.error(errorMessageHandler(err)))
-  }, [])
+  }, [canListProfiles, token])
 
   function changePage(page: number) {
     setValue('page', page)
@@ -297,7 +302,7 @@ export const EmployeeList = () => {
               <div className="mb-6 grid gap-4 lg:grid-cols-2 2xl:grid-cols-2">
                 <div>
                   <Form.Label>Perfil</Form.Label>
-                  <Form.MultiSelect name="profileIds" options={profileOptions} />
+                  <Form.MultiSelect name="profileIds" options={profileOptions} disabled={!canListProfiles} />
                   <Form.ErrorMessage field="profileIds" />
                 </div>
 

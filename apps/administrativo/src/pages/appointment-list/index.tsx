@@ -136,6 +136,11 @@ export const AppointmentList = () => {
   })
   const { handleSubmit, getValues, setValue } = filterForm
   const pages = Math.ceil(total / getValues('perPage')) || 1
+  const roles = operator.roles ?? []
+  const canListAppointmentTypes = roles.some((role) =>
+    ['AdminPanel', 'Registrations', 'AppointmentTypes'].includes(role),
+  )
+  const canListVeterinaryClinics = roles.some((role) => ['AdminPanel', 'VeterinaryClinics'].includes(role))
 
   useEffect(() => {
     setSelectedIds([])
@@ -254,11 +259,6 @@ export const AppointmentList = () => {
 
   useEffect(() => {
     const config = { headers: { Authorization: `Bearer ${token}` } }
-    const roles = operator.roles ?? []
-    const canListAppointmentTypes = roles.some((role) =>
-      ['AdminPanel', 'Registrations', 'AppointmentTypes'].includes(role),
-    )
-    const canListVeterinaryClinics = roles.some((role) => ['AdminPanel', 'VeterinaryClinics'].includes(role))
 
     Promise.all([
       canListAppointmentTypes
@@ -281,7 +281,7 @@ export const AppointmentList = () => {
         )
       })
       .catch((error) => toast.error(errorMessageHandler(error)))
-  }, [token, modal, operator.roles])
+  }, [canListAppointmentTypes, canListVeterinaryClinics, token])
 
   useEffect(() => {
     handleSubmit(listItems)()
@@ -368,14 +368,22 @@ export const AppointmentList = () => {
                     name="appointmentTypeId"
                     type="number"
                     isClearable
-                    placeholder="Todos"
+                    placeholder={canListAppointmentTypes ? 'Todos' : 'Sem permissão para listar'}
                     options={appointmentTypeOptions}
+                    disabled={!canListAppointmentTypes}
                   />
                   <Form.ErrorMessage field="appointmentTypeId" />
                 </div>
                 <div>
                   <Form.Label htmlFor="clinicId">Clínica</Form.Label>
-                  <Form.Select name="clinicId" type="number" isClearable placeholder="Todas" options={clinicOptions} />
+                  <Form.Select
+                    name="clinicId"
+                    type="number"
+                    isClearable
+                    placeholder={canListVeterinaryClinics ? 'Todas' : 'Sem permissão para listar'}
+                    options={clinicOptions}
+                    disabled={!canListVeterinaryClinics}
+                  />
                   <Form.ErrorMessage field="clinicId" />
                 </div>
               </div>

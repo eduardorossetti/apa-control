@@ -76,12 +76,14 @@ const employeeSchema = z
 type EmployeeData = z.infer<typeof employeeSchema>
 
 export const EmployeeForm = () => {
-  const { token } = useApp()
+  const { token, operator } = useApp()
   const params = useParams()
   const pushTo = useNavigate()
   const [fetching, setFetching] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [profiles, setProfiles] = useState<Array<{ id: number; description: string }>>([])
+  const roles = operator.roles ?? []
+  const canListProfiles = roles.some((role) => ['AdminPanel', 'AccessProfiles'].includes(role))
 
   const employeeForm = useForm({
     resolver: zodResolver(employeeSchema),
@@ -114,7 +116,7 @@ export const EmployeeForm = () => {
 
     Promise.all([
       params.id ? api.get(`employee.key/${params.id}`, config) : Promise.resolve({ data: null }),
-      api.get('profile.list', config),
+      canListProfiles ? api.get('profile.list', config) : Promise.resolve({ data: [] }),
     ])
       .then(([{ data: keyData }, { data: profileData }]) => {
         setProfiles(profileData)
@@ -125,7 +127,7 @@ export const EmployeeForm = () => {
       })
       .catch((err) => toast.error(errorMessageHandler(err)))
       .finally(() => setFetching(false))
-  }, [])
+  }, [canListProfiles, params.id, reset, token])
 
   const profileOptions = useMemo(
     () => profiles.map(({ id, description }) => ({ label: description, value: id })),

@@ -44,12 +44,14 @@ const campaignSchema = z
 type CampaignData = z.infer<typeof campaignSchema>
 
 export const CampaignForm = () => {
-  const { token } = useApp()
+  const { token, operator } = useApp()
   const params = useParams()
   const pushTo = useNavigate()
   const [fetching, setFetching] = useState(false)
   const [campaignTypeOptions, setCampaignTypeOptions] = useState<SelectOption[]>([])
   const [currentProof, setCurrentProof] = useState<string>('')
+  const roles = operator.roles ?? []
+  const canListCampaignTypes = roles.some((role) => ['AdminPanel', 'Registrations', 'CampaignTypes'].includes(role))
 
   const campaignForm = useForm<CampaignData>({
     resolver: zodResolver(campaignSchema),
@@ -98,7 +100,7 @@ export const CampaignForm = () => {
     const config = { headers: { Authorization: `Bearer ${token}` } }
 
     Promise.all([
-      api.get('campaign-type.list', config),
+      canListCampaignTypes ? api.get('campaign-type.list', config) : Promise.resolve({ data: [] }),
       params.id ? api.get(`campaign.key/${params.id}`, config) : Promise.resolve({ data: null }),
     ])
       .then(([typesResponse, keyResponse]) => {
@@ -125,7 +127,7 @@ export const CampaignForm = () => {
       })
       .catch((error) => toast.error(errorMessageHandler(error)))
       .finally(() => setFetching(false))
-  }, [])
+  }, [canListCampaignTypes, params.id, reset, token])
 
   if (fetching) return <LoadingCard />
 

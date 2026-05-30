@@ -79,7 +79,7 @@ const schema = z.object({
 type Data = z.input<typeof schema>
 
 export const ClinicalProcedureForm = () => {
-  const { token } = useApp()
+  const { token, operator } = useApp()
   const params = useParams()
   const pushTo = useNavigate()
   const isEdit = Boolean(params.id)
@@ -114,6 +114,8 @@ export const ClinicalProcedureForm = () => {
   const animalId = form.watch('animalId')
   const appointmentId = watch('appointmentId')
   const animalNamePreview = form.watch('animalNamePreview')
+  const roles = operator.roles ?? []
+  const canListProcedureTypes = roles.some((role) => ['AdminPanel', 'Registrations', 'ProcedureTypes'].includes(role))
 
   async function submit(values: Data) {
     try {
@@ -150,7 +152,9 @@ export const ClinicalProcedureForm = () => {
     setFetching(true)
     const config = { headers: { Authorization: `Bearer ${token}` } }
     Promise.all([
-      api.get(`procedure-type.list?${toQueryString({ page: 0, fields: 'id,name,active', sort: 'name' })}`, config),
+      canListProcedureTypes
+        ? api.get(`procedure-type.list?${toQueryString({ page: 0, fields: 'id,name,active', sort: 'name' })}`, config)
+        : Promise.resolve({ data: [] }),
       params.id ? api.get(`clinical-procedure.key/${params.id}`, config) : Promise.resolve({ data: null }),
     ])
       .then(async ([typesRes, keyResponse]) => {
@@ -192,7 +196,7 @@ export const ClinicalProcedureForm = () => {
       })
       .catch((error) => toast.error(errorMessageHandler(error)))
       .finally(() => setFetching(false))
-  }, [])
+  }, [canListProcedureTypes, params.id, reset, token])
 
   useEffect(() => {
     if (!animalId || Number(animalId) <= 0) {

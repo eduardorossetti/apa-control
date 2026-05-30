@@ -131,6 +131,11 @@ export const ClinicalProcedureList = () => {
   })
   const { handleSubmit, getValues, setValue } = form
   const pages = Math.ceil(total / getValues('perPage')) || 1
+  const roles = operator.roles ?? []
+  const canListProcedureTypes = roles.some((role) => ['AdminPanel', 'Registrations', 'ProcedureTypes'].includes(role))
+  const canListAppointmentTypes = roles.some((role) =>
+    ['AdminPanel', 'Registrations', 'AppointmentTypes'].includes(role),
+  )
 
   useEffect(() => {
     setSelectedIds([])
@@ -259,11 +264,6 @@ export const ClinicalProcedureList = () => {
 
   useEffect(() => {
     const config = { headers: { Authorization: `Bearer ${token}` } }
-    const roles = operator.roles ?? []
-    const canListProcedureTypes = roles.some((role) => ['AdminPanel', 'Registrations', 'ProcedureTypes'].includes(role))
-    const canListAppointmentTypes = roles.some((role) =>
-      ['AdminPanel', 'Registrations', 'AppointmentTypes'].includes(role),
-    )
 
     Promise.all([
       canListProcedureTypes
@@ -286,7 +286,7 @@ export const ClinicalProcedureList = () => {
         )
       })
       .catch((error) => toast.error(errorMessageHandler(error)))
-  }, [token, operator.roles])
+  }, [canListAppointmentTypes, canListProcedureTypes, token])
 
   useEffect(() => {
     handleSubmit(list)()
@@ -373,8 +373,9 @@ export const ClinicalProcedureList = () => {
                     name="procedureTypeId"
                     type="number"
                     isClearable
-                    placeholder="Todos"
+                    placeholder={canListProcedureTypes ? 'Todos' : 'Sem permissão para listar'}
                     options={procedureTypeOptions}
+                    disabled={!canListProcedureTypes}
                   />
                   <Form.ErrorMessage field="procedureTypeId" />
                 </div>
@@ -391,8 +392,9 @@ export const ClinicalProcedureList = () => {
                     name="appointmentTypeId"
                     type="number"
                     isClearable
-                    placeholder="Todos"
+                    placeholder={canListAppointmentTypes ? 'Todos' : 'Sem permissão para listar'}
                     options={appointmentTypeOptions}
+                    disabled={!canListAppointmentTypes}
                   />
                   <Form.ErrorMessage field="appointmentTypeId" />
                 </div>

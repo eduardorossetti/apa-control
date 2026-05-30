@@ -119,6 +119,11 @@ export const FinalDestinationList = () => {
   const page = getValues('page')
   const perPage = getValues('perPage')
   const pages = Math.ceil(total / perPage) || 1
+  const roles = operator.roles ?? []
+  const canListDestinationTypes = roles.some((role) =>
+    ['AdminPanel', 'Registrations', 'FinalDestinationTypes'].includes(role),
+  )
+  const canListEmployees = roles.some((role) => ['AdminPanel', 'Employees'].includes(role))
 
   const removeFinalDestination = useCallback(
     (values: FinalDestinationListValues) => {
@@ -158,11 +163,6 @@ export const FinalDestinationList = () => {
 
   useEffect(() => {
     const config = { headers: { Authorization: `Bearer ${token}` } }
-    const roles = operator.roles ?? []
-    const canListDestinationTypes = roles.some((role) =>
-      ['AdminPanel', 'Registrations', 'FinalDestinationTypes'].includes(role),
-    )
-    const canListEmployees = roles.some((role) => ['AdminPanel', 'Employees'].includes(role))
 
     Promise.all([
       canListDestinationTypes ? api.get('final-destination-type.list', config) : Promise.resolve({ data: [] }),
@@ -180,7 +180,7 @@ export const FinalDestinationList = () => {
         setEmployeeOptions(employees.map((item) => ({ value: item.id, label: item.name })))
       })
       .catch((error) => toast.error(errorMessageHandler(error)))
-  }, [token, operator.roles])
+  }, [canListDestinationTypes, canListEmployees, token])
 
   useEffect(() => {
     handleSubmit(listFinalDestinations)()
@@ -287,8 +287,9 @@ export const FinalDestinationList = () => {
                     name="destinationTypeId"
                     type="number"
                     isClearable
-                    placeholder="Todos"
+                    placeholder={canListDestinationTypes ? 'Todos' : 'Sem permissão para listar'}
                     options={destinationTypeOptions}
+                    disabled={!canListDestinationTypes}
                   />
                   <Form.ErrorMessage field="destinationTypeId" />
                 </div>
@@ -299,8 +300,9 @@ export const FinalDestinationList = () => {
                     name="employeeId"
                     type="number"
                     isClearable
-                    placeholder="Todos"
+                    placeholder={canListEmployees ? 'Todos' : 'Sem permissão para listar'}
                     options={employeeOptions}
+                    disabled={!canListEmployees}
                   />
                   <Form.ErrorMessage field="employeeId" />
                 </div>

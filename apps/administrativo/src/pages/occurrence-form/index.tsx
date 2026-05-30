@@ -65,7 +65,7 @@ const schema = z.object({
 type Data = z.infer<typeof schema>
 
 export const OccurrenceForm = () => {
-  const { token } = useApp()
+  const { token, operator } = useApp()
   const params = useParams()
   const pushTo = useNavigate()
   const isEdit = Boolean(params.id)
@@ -93,6 +93,8 @@ export const OccurrenceForm = () => {
   } = form
   const animalId = form.watch('animalId')
   const animalNamePreview = form.watch('animalNamePreview')
+  const roles = operator.roles ?? []
+  const canListOccurrenceTypes = roles.some((role) => ['AdminPanel', 'Registrations', 'OccurrenceTypes'].includes(role))
 
   const animalTabFields: Array<keyof Data> = ['animalId']
   const occurrenciaTabFields: Array<keyof Data> = ['occurrenceTypeId', 'occurrenceDate', 'description']
@@ -136,7 +138,9 @@ export const OccurrenceForm = () => {
     setFetching(true)
     const config = { headers: { Authorization: `Bearer ${token}` } }
     Promise.all([
-      api.get(`occurrence-type.list?${toQueryString({ page: 0, fields: 'id,name,active' })}`, config),
+      canListOccurrenceTypes
+        ? api.get(`occurrence-type.list?${toQueryString({ page: 0, fields: 'id,name,active' })}`, config)
+        : Promise.resolve({ data: [] }),
       params.id ? api.get(`occurrence.key/${params.id}`, config) : Promise.resolve({ data: null }),
     ])
       .then(([typesRes, keyResponse]) => {
@@ -162,7 +166,7 @@ export const OccurrenceForm = () => {
       })
       .catch((error) => toast.error(errorMessageHandler(error)))
       .finally(() => setFetching(false))
-  }, [params.id, token, reset])
+  }, [canListOccurrenceTypes, params.id, token, reset])
 
   useEffect(() => {
     if (!animalId || Number(animalId) <= 0) {

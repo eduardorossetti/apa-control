@@ -167,6 +167,12 @@ export const RevenueList = () => {
   const page = getValues('page')
   const perPage = getValues('perPage')
   const pages = Math.ceil(total / perPage) || 1
+  const roles = operator.roles ?? []
+  const canListTransactionTypes = roles.some((role) =>
+    ['AdminPanel', 'Registrations', 'TransactionTypes'].includes(role),
+  )
+  const canListCampaigns = roles.some((role) => ['AdminPanel', 'Campaigns'].includes(role))
+  const canListEmployees = roles.some((role) => ['AdminPanel', 'Employees'].includes(role))
 
   useEffect(() => {
     setSelectedIds([])
@@ -264,12 +270,6 @@ export const RevenueList = () => {
 
   useEffect(() => {
     const config = { headers: { Authorization: `Bearer ${token}` } }
-    const roles = operator.roles ?? []
-    const canListTransactionTypes = roles.some((role) =>
-      ['AdminPanel', 'Registrations', 'TransactionTypes'].includes(role),
-    )
-    const canListCampaigns = roles.some((role) => ['AdminPanel', 'Campaigns'].includes(role))
-    const canListEmployees = roles.some((role) => ['AdminPanel', 'Employees'].includes(role))
 
     Promise.all([
       canListTransactionTypes
@@ -307,7 +307,7 @@ export const RevenueList = () => {
         )
       })
       .catch((error) => toast.error(errorMessageHandler(error)))
-  }, [token, modal, operator.roles])
+  }, [canListCampaigns, canListEmployees, canListTransactionTypes, token])
 
   useEffect(() => {
     handleSubmit(listRevenues)()
@@ -412,8 +412,9 @@ export const RevenueList = () => {
                     name="transactionTypeId"
                     type="number"
                     isClearable
-                    placeholder="Todos"
+                    placeholder={canListTransactionTypes ? 'Todos' : 'Sem permissão para listar'}
                     options={transactionTypeOptions}
+                    disabled={!canListTransactionTypes}
                   />
                   <Form.ErrorMessage field="transactionTypeId" />
                 </div>
@@ -428,8 +429,9 @@ export const RevenueList = () => {
                     name="employeeId"
                     type="number"
                     isClearable
-                    placeholder="Todos"
+                    placeholder={canListEmployees ? 'Todos' : 'Sem permissão para listar'}
                     options={employeeOptions}
+                    disabled={!canListEmployees}
                   />
                   <Form.ErrorMessage field="employeeId" />
                 </div>
@@ -442,8 +444,9 @@ export const RevenueList = () => {
                     name="campaignId"
                     type="number"
                     isClearable
-                    placeholder="Todas"
+                    placeholder={canListCampaigns ? 'Todas' : 'Sem permissão para listar'}
                     options={campaignOptions}
+                    disabled={!canListCampaigns}
                   />
                   <Form.ErrorMessage field="campaignId" />
                 </div>

@@ -71,7 +71,7 @@ const finalDestinationSchema = z.object({
 type FinalDestinationData = z.infer<typeof finalDestinationSchema>
 
 export const FinalDestinationForm = () => {
-  const { token } = useApp()
+  const { token, operator } = useApp()
   const params = useParams()
   const pushTo = useNavigate()
   const isEdit = Boolean(params.id)
@@ -107,6 +107,10 @@ export const FinalDestinationForm = () => {
   const animalId = finalDestinationForm.watch('animalId')
   const animalNamePreview = finalDestinationForm.watch('animalNamePreview')
   const [currentProof, setCurrentProof] = useState<string>('')
+  const roles = operator.roles ?? []
+  const canListDestinationTypes = roles.some((role) =>
+    ['AdminPanel', 'Registrations', 'FinalDestinationTypes'].includes(role),
+  )
 
   async function addOrUpdateFinalDestination(values: FinalDestinationData) {
     try {
@@ -143,7 +147,7 @@ export const FinalDestinationForm = () => {
     const config = { headers: { Authorization: `Bearer ${token}` } }
 
     Promise.all([
-      api.get('final-destination-type.list', config),
+      canListDestinationTypes ? api.get('final-destination-type.list', config) : Promise.resolve({ data: [] }),
       params.id ? api.get(`final-destination.key/${params.id}`, config) : Promise.resolve({ data: null }),
     ])
       .then(([destinationTypesResponse, keyResponse]) => {
@@ -174,7 +178,7 @@ export const FinalDestinationForm = () => {
       })
       .catch((error) => toast.error(errorMessageHandler(error)))
       .finally(() => setFetching(false))
-  }, [])
+  }, [canListDestinationTypes, params.id, reset, token])
 
   useEffect(() => {
     if (!animalId || Number(animalId) <= 0) {

@@ -43,7 +43,7 @@ const revenueSchema = z.object({
 type RevenueData = z.infer<typeof revenueSchema>
 
 export const RevenueForm = () => {
-  const { token } = useApp()
+  const { token, operator } = useApp()
   const params = useParams()
   const pushTo = useNavigate()
   const [fetching, setFetching] = useState(false)
@@ -62,6 +62,11 @@ export const RevenueForm = () => {
   )
 
   const [currentProof, setCurrentProof] = useState<string>('')
+  const roles = operator.roles ?? []
+  const canListTransactionTypes = roles.some((role) =>
+    ['AdminPanel', 'Registrations', 'TransactionTypes'].includes(role),
+  )
+  const canListCampaigns = roles.some((role) => ['AdminPanel', 'Campaigns'].includes(role))
 
   const revenueForm = useForm<RevenueData>({
     resolver: zodResolver(revenueSchema),
@@ -112,11 +117,15 @@ export const RevenueForm = () => {
     const config = { headers: { Authorization: `Bearer ${token}` } }
 
     Promise.all([
-      api.get(
-        `transaction-type.list?${toQueryString({ categoryIds: 'receita', page: 0, fields: 'id,name,active' })}`,
-        config,
-      ),
-      api.get(`campaign.list?${toQueryString({ page: 0, fields: 'id,title', sort: '-startDate' })}`, config),
+      canListTransactionTypes
+        ? api.get(
+            `transaction-type.list?${toQueryString({ categoryIds: 'receita', page: 0, fields: 'id,name,active' })}`,
+            config,
+          )
+        : Promise.resolve({ data: [] }),
+      canListCampaigns
+        ? api.get(`campaign.list?${toQueryString({ page: 0, fields: 'id,title', sort: '-startDate' })}`, config)
+        : Promise.resolve({ data: [] }),
       params.id ? api.get(`revenue.key/${params.id}`, config) : Promise.resolve({ data: null }),
     ])
       .then(([typesRes, campaignsRes, keyResponse]) => {
@@ -154,7 +163,7 @@ export const RevenueForm = () => {
       })
       .catch((error) => toast.error(errorMessageHandler(error)))
       .finally(() => setFetching(false))
-  }, [])
+  }, [canListCampaigns, canListTransactionTypes, params.id, reset, token])
 
   if (fetching) return <LoadingCard />
 

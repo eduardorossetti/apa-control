@@ -76,7 +76,7 @@ const consultationTypeOptions = [
 ]
 
 export const AppointmentForm = () => {
-  const { token } = useApp()
+  const { token, operator } = useApp()
   const params = useParams()
   const pushTo = useNavigate()
   const isEdit = Boolean(params.id)
@@ -109,6 +109,11 @@ export const AppointmentForm = () => {
   } = form
   const animalId = form.watch('animalId')
   const animalNamePreview = form.watch('animalNamePreview')
+  const roles = operator.roles ?? []
+  const canListAppointmentTypes = roles.some((role) =>
+    ['AdminPanel', 'Registrations', 'AppointmentTypes'].includes(role),
+  )
+  const canListVeterinaryClinics = roles.some((role) => ['AdminPanel', 'VeterinaryClinics'].includes(role))
 
   async function submit(values: Data) {
     try {
@@ -139,8 +144,12 @@ export const AppointmentForm = () => {
     setFetching(true)
     const config = { headers: { Authorization: `Bearer ${token}` } }
     Promise.all([
-      api.get(`appointment-type.list?${toQueryString({ page: 0, fields: 'id,name,active' })}`, config),
-      api.get(`veterinary-clinic.list?${toQueryString({ page: 0, fields: 'id,name,active' })}`, config),
+      canListAppointmentTypes
+        ? api.get(`appointment-type.list?${toQueryString({ page: 0, fields: 'id,name,active' })}`, config)
+        : Promise.resolve({ data: [] }),
+      canListVeterinaryClinics
+        ? api.get(`veterinary-clinic.list?${toQueryString({ page: 0, fields: 'id,name,active' })}`, config)
+        : Promise.resolve({ data: [] }),
       params.id ? api.get(`appointment.key/${params.id}`, config) : Promise.resolve({ data: null }),
     ])
       .then(([typesRes, clinicsRes, keyResponse]) => {
@@ -173,7 +182,7 @@ export const AppointmentForm = () => {
       })
       .catch((error) => toast.error(errorMessageHandler(error)))
       .finally(() => setFetching(false))
-  }, [])
+  }, [canListAppointmentTypes, canListVeterinaryClinics, params.id, reset, token])
 
   useEffect(() => {
     if (!animalId || Number(animalId) <= 0) {
