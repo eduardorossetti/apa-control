@@ -63,7 +63,7 @@ export function getSelectClassNames<
     control: ({ isDisabled, isFocused }) =>
       cn(
         'flex !min-h-[2.75rem] flex-wrap rounded-md border bg-white text-base shadow-xs',
-        'dark:bg-gray-800 dark:border-gray-700',
+        'dark:bg-gray-800 dark:border-gray-700 dark:[&.border-danger]:border-danger',
         isFocused ? 'border-primary' : 'border-zinc-200',
         isDisabled && 'opacity-50',
         isFocused && 'shadow-[0_0_0_1px] shadow-primary',
