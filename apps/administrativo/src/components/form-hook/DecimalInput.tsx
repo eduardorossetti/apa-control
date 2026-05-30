@@ -11,6 +11,7 @@ interface DecimalInputProps extends NumericFormatProps {
 
 export const FormDecimalInput = (props: DecimalInputProps) => {
   const { control } = useFormContext()
+  const { className, ...numericProps } = props
 
   return (
     <Controller
@@ -22,14 +23,14 @@ export const FormDecimalInput = (props: DecimalInputProps) => {
           {...field}
           getInputRef={ref}
           onValueChange={({ floatValue }) => onChange(floatValue)}
-          className={clsx(props.className, { 'border-danger': error })}
           fixedDecimalScale
           decimalSeparator=","
           thousandSeparator="."
           inputMode="decimal"
           customInput={Input}
           decimalScale={2}
-          {...props}
+          {...numericProps}
+          className={clsx(className, { 'border-danger': error })}
         />
       )}
     />
