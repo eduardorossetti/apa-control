@@ -26,7 +26,8 @@ export async function listAnimalsController(request: FastifyRequest, reply: Fast
   const listAnimalsUseCase = makeListAnimalsUseCase()
 
   if (data.exportType) {
-    const { exportType, ...filters } = data
+    const { exportType, show, ...filters } = data
+    const reportFilters = show !== 'all' ? { ...filters, show } : filters
     const [, items] = await listAnimalsUseCase.execute({ ...filters, page: undefined, perPage: undefined })
 
     const formattedItems = items.map((item) => ({
@@ -83,7 +84,7 @@ export async function listAnimalsController(request: FastifyRequest, reply: Fast
       logoDataUrl: getApaControlLogoDataUrl(),
       generatedAt: format(new Date(), 'dd/MM/yyyy HH:mm:ss', { in: tz(timeZoneName.SP) }),
       period: null,
-      appliedFilters: buildAppliedFilters(filters),
+      appliedFilters: buildAppliedFilters(reportFilters),
       headers,
       rows: pdfRows,
     })

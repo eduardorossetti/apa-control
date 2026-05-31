@@ -40,6 +40,25 @@ describe('Update animal', () => {
     expect(data.name).toBe(updatedData.name)
   })
 
+  it('should update animal without birth month when birthMonth is null', async () => {
+    const animal = await AnimalFactory.create({ birthMonth: null })
+    const token = getAuthToken({ roles: ['AdminPanel', 'Animals'] })
+    const updatedData = AnimalFactory.buildCreate({ birthMonth: null })
+
+    const response = await app.inject({
+      method: 'PUT',
+      url: '/animal.update',
+      headers: { authorization: `Bearer ${token}` },
+      payload: {
+        id: animal.id,
+        ...updatedData,
+        birthMonth: null,
+      },
+    })
+
+    expect(response.statusCode).toBe(204)
+  })
+
   it('should return 404 when animal not found', async () => {
     const token = getAuthToken({ roles: ['AdminPanel', 'Animals'] })
     const updatedData = AnimalFactory.buildCreate()

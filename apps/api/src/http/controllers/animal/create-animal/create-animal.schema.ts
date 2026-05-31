@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 const optionalInteger = z.preprocess(
   (value) => (value === '' || value === null || value === undefined ? null : value),
-  z.union([z.coerce.number().int(), z.null(), z.undefined()]),
+  z.union([z.null(), z.coerce.number().int()]),
 )
 
 export const createAnimalSchema = z.object({
